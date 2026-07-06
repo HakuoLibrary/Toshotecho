@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)file:///C:/Users/Tosho/Documents/RPG.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>スクロールRPG＋コマンド戦闘</title>
+<style>
+  body {
+    background: #222;
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    color: #eee;
+    font-family: sans-serif;
+  }
+  #game {
+    background: #333;
+    padding: 10px;
+    border: 2px solid #555;
+  }
+  #map {
+    width: 480px;
+    height: 480px;
+    background: #000;
+    display: grid;
+    grid-template-columns: repeat(10, 48px);
+    grid-template-rows: repeat(10, 48px);
+  }
+  .tile {
+    width: 48px;
+    height: 48px;
+    position: relative;
+  }
+  .grass { background: #3a5; }
+  .forest { background: #272; }
+  .town { background: #55f; }
+  .dungeon { background: #a33; }
+  .boss { background: #800; }
+
+  .playerShape {
+    width: 40px;
+    height: 40px;
+    background: #ff0;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px; left: 4px;
+  }
+  .npcShape {
+    width: 40px;
+    height: 40px;
+    background: #0af;
+    position: absolute;
+    top: 4px; left: 4px;
+  }
+
+  #dialog {
+    background: #000a;
+    padding: 8px;
+    margin-top: 8px;
+    display: none;
+  }
+
+  #log {
+    margin-top: 8px;
+    background: #111;
+    padding: 8px;
+    height: 140px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+
+  /* 戦闘UI */
+  #battleUI {
+    margin-top: 10px;
+    background: #222;
+    padding: 10px;
+    display: none;
+  }
+  #enemyArea {
+    height: 120px;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .enemyShape {
+    width: 70px;
+    height: 70px;
+    background: #f33;
+    border-radius: 50%;
+  }
+  #status {
+    background: #111;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  #commands {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  #commands button {
+    padding: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div id="game">
+  <h2>スクロールRPG＆コマンド戦闘ゲーム</h2>
+
+  <div id="map"><div class="tile dungeon"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"><div class="playerShape"></div></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile grass"></div><div class="tile forest"></div><div class="tile forest"></div></div>
+  <div id="dialog"></div>
+
+  <div id="battleUI">
+    <div id="enemyArea">
+      <div class="enemyShape"></div>
+    </div>
+    <div id="status">
+      <div>▶ プレイヤー</div>
+      <div>HP: <span id="php"></span> / <span id="pmaxhp"></span></div>
+      <div>MP: <span id="pmp"></span></div>
+      <div>攻撃力: <span id="patk"></span></div>
+      <div>レベル: <span id="plv"></span></div>
+    </div>
+    <div id="commands">
+      <button onclick="cmdAttack()">たたかう</button>
+      <button onclick="cmdMagic()">まほう</button>
+      <button onclick="cmdItem()">アイテム</button>
+      <button onclick="cmdRun()">にげる</button>
+    </div>
+    <div>敵: <span id="enemyName"></span> / HP: <span id="ehp"></span></div>
+  </div>
+
+  <div id="log"></div>
+</div>
+
+<script>
+// 共通UI
+const mapEl = document.getElementById("map");
+const logEl = document.getElementById("log");
+const dialogEl = document.getElementById("dialog");
+const battleUI = document.getElementById("battleUI");
+
+function log(t){
+  const d=document.createElement("div");
+  d.textContent=t;
+  logEl.appendChild(d);
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+// =======================
+// マップ関連
+// =======================
+// 0:草 1:森 2:街 3:ダンジョン 4:ラスボス 5:NPC
+const MAP_W = 50;
+const MAP_H = 50;
+const VIEW_W = 10;
+const VIEW_H = 10;
+
+const worldMap = [];
+for(let y=0;y<MAP_H;y++){
+  worldMap[y] = [];
+  for(let x=0;x<MAP_W;x++){
+    const r = Math.random();
+    if(r < 0.75) worldMap[y][x] = 0;
+    else if(r < 0.90) worldMap[y][x] = 1;
+    else worldMap[y][x] = 0;
+  }
+}
+// 固定配置
+worldMap[10][10] = 2; // 街
+worldMap[20][20] = 3; // ダンジョン
+worldMap[40][40] = 4; // ラスボス
+worldMap[15][12] = 5; // NPC
+worldMap[30][25] = 5;
+
+// プレイヤー
+let px = 25, py = 25;
+
+// プレイヤーステータス
+let player = {
+  hp: 40,
+  maxHp: 40,
+  mp: 10,
+  atk: 8,
+  lv: 1,
+  items: 2 // 回復薬の数
+};
+
+// 戦闘フラグ
+let inBattle = false;
+let currentEnemy = null;
+
+// マップ描画
+function drawMap(){
+  mapEl.innerHTML="";
+
+  let camX = Math.floor(px - VIEW_W/2);
+  let camY = Math.floor(py - VIEW_H/2);
+  camX = Math.max(0, Math.min(camX, MAP_W - VIEW_W));
+  camY = Math.max(0, Math.min(camY, MAP_H - VIEW_H));
+
+  for(let y=0;y<VIEW_H;y++){
+    for(let x=0;x<VIEW_W;x++){
+      const tile=document.createElement("div");
+      tile.classList.add("tile");
+
+      const mapX = camX + x;
+      const mapY = camY + y;
+      const v = worldMap[mapY][mapX];
+
+      if(v===0) tile.classList.add("grass");
+      if(v===1) tile.classList.add("forest");
+      if(v===2) tile.classList.add("town");
+      if(v===3) tile.classList.add("dungeon");
+      if(v===4) tile.classList.add("boss");
+      if(v===5) tile.classList.add("grass");
+
+      if(v===5){
+        const npc=document.createElement("div");
+        npc.className="npcShape";
+        tile.appendChild(npc);
+      }
+
+      if(mapX===px && mapY===py){
+        const p=document.createElement("div");
+        p.className="playerShape";
+        tile.appendChild(p);
+      }
+
+      mapEl.appendChild(tile);
+    }
+  }
+}
+
+drawMap();
+
+// =======================
+// フィールド移動
+// =======================
+document.addEventListener("keydown", e=>{
+  if(inBattle) return;
+
+  if(dialogEl.style.display==="block"){
+    dialogEl.style.display="none";
+    return;
+  }
+
+  let nx=px, ny=py;
+  if(e.key==="ArrowUp") ny--;
+  if(e.key==="ArrowDown") ny++;
+  if(e.key==="ArrowLeft") nx--;
+  if(e.key==="ArrowRight") nx++;
+
+  if(nx<0||ny<0||nx>=MAP_W||ny>=MAP_H) return;
+
+  px=nx; py=ny;
+  drawMap();
+
+  const tile = worldMap[py][px];
+
+  if(tile===0) checkEncounter(0.08);
+  if(tile===1) checkEncounter(0.16);
+  if(tile===2) enterTown();
+  if(tile===3) enterDungeon();
+  if(tile===4) enterBossDungeon();
+  if(tile===5) talkNPC();
+});
+
+// =======================
+// NPC
+// =======================
+function talkNPC(){
+  dialogEl.style.display="block";
+  dialogEl.textContent = "NPC「この先には強い魔物がいるぞ。準備はいいか？」";
+}
+
+// =======================
+// エンカウント
+// =======================
+function checkEncounter(rate){
+  if(Math.random()<rate){
+    startBattle({
+      name: "野生の魔物",
+      hp: 30,
+      atk: 6,
+      type: "normal"
+    });
+  }
+}
+
+// 街
+function enterTown(){
+  log("街に到着した。HPとMPが全回復した！");
+  player.hp = player.maxHp;
+  player.mp = 10 + (player.lv-1)*2;
+  updateStatus();
+}
+
+// ダンジョン
+function enterDungeon(){
+  log("ダンジョンに入った…");
+  if(Math.random()<0.5){
+    startBattle({
+      name: "ダンジョンの魔物",
+      hp: 45,
+      atk: 9,
+      type: "dungeon"
+    });
+  } else if(Math.random()<0.2){
+    startBattle({
+      name: "中ボス",
+      hp: 80,
+      atk: 12,
+      type: "midboss"
+    });
+  }
+}
+
+// ラスボス
+function enterBossDungeon(){
+  log("不気味な気配が漂う… 魔王が現れた！");
+  startBattle({
+    name: "魔王",
+    hp: 150,
+    atk: 16,
+    type: "boss"
+  });
+}
+
+// =======================
+// 戦闘システム
+// =======================
+const phpEl = document.getElementById("php");
+const pmaxhpEl = document.getElementById("pmaxhp");
+const pmpEl = document.getElementById("pmp");
+const patkEl = document.getElementById("patk");
+const plvEl = document.getElementById("plv");
+const enemyNameEl = document.getElementById("enemyName");
+const ehpEl = document.getElementById("ehp");
+
+function updateStatus(){
+  phpEl.textContent = player.hp;
+  pmaxhpEl.textContent = player.maxHp;
+  pmpEl.textContent = player.mp;
+  patkEl.textContent = player.atk;
+  plvEl.textContent = player.lv;
+}
+
+function startBattle(enemyData){
+  inBattle = true;
+  currentEnemy = enemyData;
+  battleUI.style.display = "block";
+  enemyNameEl.textContent = currentEnemy.name;
+  ehpEl.textContent = currentEnemy.hp;
+  updateStatus();
+  log(`${currentEnemy.name}があらわれた！`);
+}
+
+function endBattle(){
+  inBattle = false;
+  battleUI.style.display = "none";
+  currentEnemy = null;
+}
+
+// コマンド：たたかう
+function cmdAttack(){
+  if(!currentEnemy) return;
+  const dmg = player.atk + Math.floor(Math.random()*4);
+  currentEnemy.hp -= dmg;
+  ehpEl.textContent = currentEnemy.hp;
+  log(`あなたの攻撃！ ${currentEnemy.name}に${dmg}ダメージ！`);
+
+  if(currentEnemy.hp <= 0){
+    log(`${currentEnemy.name}を倒した！`);
+    gainExp(currentEnemy.type);
+    endBattle();
+    return;
+  }
+
+  enemyTurn();
+}
+
+// コマンド：まほう
+function cmdMagic(){
+  if(!currentEnemy) return;
+  if(player.mp < 3){
+    log("MPが足りない！");
+    return;
+  }
+  player.mp -= 3;
+  const dmg = 14 + Math.floor(Math.random()*5);
+  currentEnemy.hp -= dmg;
+  ehpEl.textContent = currentEnemy.hp;
+  log(`あなたはファイアを唱えた！ ${currentEnemy.name}に${dmg}ダメージ！`);
+  updateStatus();
+
+  if(currentEnemy.hp <= 0){
+    log(`${currentEnemy.name}を倒した！`);
+    gainExp(currentEnemy.type);
+    endBattle();
+    return;
+  }
+
+  enemyTurn();
+}
+
+// コマンド：アイテム
+function cmdItem(){
+  if(player.items <= 0){
+    log("回復薬を持っていない！");
+    return;
+  }
+  if(player.hp >= player.maxHp){
+    log("HPはすでに最大だ！");
+    return;
+  }
+  player.items--;
+  const heal = 25;
+  player.hp = Math.min(player.maxHp, player.hp + heal);
+  log(`回復薬を使った！ HPが${heal}回復した！（残り${player.items}個）`);
+  updateStatus();
+  enemyTurn();
+}
+
+// コマンド：にげる
+function cmdRun(){
+  if(currentEnemy.type === "boss"){
+    log("魔王からは逃げられない！");
+    enemyTurn();
+    return;
+  }
+  if(Math.random() < 0.5){
+    log("うまくにげられた！");
+    endBattle();
+  } else {
+    log("にげられなかった！");
+    enemyTurn();
+  }
+}
+
+// 敵ターン
+function enemyTurn(){
+  if(!currentEnemy) return;
+  const dmg = currentEnemy.atk + Math.floor(Math.random()*4);
+  player.hp -= dmg;
+  if(player.hp < 0) player.hp = 0;
+  log(`${currentEnemy.name}の攻撃！ あなたは${dmg}ダメージを受けた！`);
+  updateStatus();
+
+  if(player.hp <= 0){
+    log("あなたは倒れた… ゲームオーバー");
+    disableCommands();
+  }
+}
+
+// レベルアップ処理
+function gainExp(type){
+  if(type === "normal"){
+    log("少し経験を積んだ。");
+  } else if(type === "dungeon"){
+    log("力がみなぎる…！");
+    levelUp();
+  } else if(type === "midboss"){
+    log("中ボスを倒した！ 大きく成長した！");
+    levelUp();
+    levelUp();
+  } else if(type === "boss"){
+    log("魔王を倒した！ 世界に平和が戻った…！");
+  }
+}
+
+function levelUp(){
+  player.lv++;
+  player.maxHp += 10;
+  player.hp = player.maxHp;
+  player.atk += 3;
+  player.mp += 3;
+  log(`レベルが上がった！ Lv${player.lv}になった！`);
+  updateStatus();
+}
+
+function disableCommands(){
+  document.querySelectorAll("#commands button").forEach(btn=>{
+    btn.disabled = true;
+  });
+}
+</script>
+
+
+
+</body></html>
