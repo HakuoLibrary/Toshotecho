@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>暗号作成機＆暗号解読機</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    h1, h2 { border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    textarea, input { width: 100%; box-sizing: border-box; margin: 4px 0; }
+    textarea { height: 100px; }
+    .row { margin-bottom: 16px; }
+    button { padding: 6px 12px; margin-top: 4px; }
+    .small { font-size: 0.85em; color: #555; }
+    .mono { font-family: monospace; }
+    #qrcode { margin-top: 10px; }
+  </style>
+
+  <!-- QRコード生成ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- LZ-String（圧縮ライブラリ） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+</head>
+<body>
+  <h1>暗号作成機＆暗号解読機</h1>
+
+  <h2>共通設定（パスワード & 虚数パラメータ）</h2>
+  <div class="row">
+    <label>パスワード</label>
+    <input id="password" type="password" placeholder="例：MyStrongPassword123!">
+  </div>
+  <div class="row">
+    <label>虚数パラメータ（a + bi）</label>
+    <input id="realPart" type="number" value="1"> 実数部 a<br>
+    <input id="imagPart" type="number" value="2"> 虚数部 b
+  </div>
+
+  <h2>暗号作成機（Encrypt）</h2>
+  <div class="row">
+    <label>平文（暗号化したいテキスト）</label>
+    <textarea id="plaintext" placeholder="ここに暗号化したいテキストを入力"></textarea>
+  </div>
+  <div class="row">
+    <button id="encryptBtn">暗号化する</button>
+  </div>
+  <div class="row">
+    <label>暗号文（Base64）</label>
+    <textarea id="ciphertext" class="mono" readonly></textarea>
+    <p class="small">
+      出力形式：<br>
+      <code>Base64( IV(12バイト) || Ciphertext )</code><br>
+      復号時にはこの Base64 をそのまま貼り付けて使います。
+    </p>
+  </div>
+
+  <h3>ＱＲコード表示</h3>
+  <div id="qrcode"></div>
+  <button id="savePngBtn">ＱＲコードを保存</button>
+
+  <h2>暗号解読機（Decrypt）</h2>
+  <div class="row">
+    <label>暗号文（上の暗号作成機で得たBase64または圧縮Base64URLを貼り付け）</label>
+    <textarea id="ciphertextInput" class="mono"></textarea>
+  </div>
+  <div class="row">
+    <button id="decryptBtn">復号する</button>
+  </div>
+  <div class="row">
+    <label>復号結果（平文）</label>
+    <textarea id="decrypted" readonly></textarea>
+  </div>
+
+<script>
+/* --- Utility: String <-> ArrayBuffer --- */
+function strToArrayBuffer(str) {
+  return new TextEncoder().encode(str);
+}
+function arrayBufferToStr(buf) {
+  return new TextDecoder().decode(buf);
+}
+
+/* --- Base64URL 変換 --- */
+function toBase64Url(b64) {
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function fromBase64Url(b64url) {
+  let b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4) b64 += "=";
+  return b64;
+}
+
+/* --- Complex Key Material --- */
+function buildKeyMaterialString(password, realPart, imagPart) {
+  return password + "::(" + realPart + " + " + imagPart + "i)";
+}
+
+/* --- PBKDF2 + AES-GCM Key Derivation --- */
+async function deriveAesKey(password, realPart, imagPart) {
+  const keyMaterialStr = buildKeyMaterialString(password, realPart, imagPart);
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    strToArrayBuffer(keyMaterialStr),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+
+  const salt = strToArrayBuffer("DemoSalt-NotForProduction");
+
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256"
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+/* --- Encrypt --- */
+async function encryptText(plaintext, password, realPart, imagPart) {
+  const key = await deriveAesKey(password, realPart, imagPart);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    strToArrayBuffer(plaintext)
+  );
+
+  const combined = new Uint8Array(iv.byteLength + encrypted.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(encrypted), iv.byteLength);
+
+  return btoa(String.fromCharCode(...combined));
+}
+
+/* --- Decrypt --- */
+async function decryptText(cipherBase64, password, realPart, imagPart) {
+  const key = await deriveAesKey(password, realPart, imagPart);
+
+  const bytes = Uint8Array.from(atob(cipherBase64), c => c.charCodeAt(0));
+  const iv = bytes.slice(0, 12);
+  const cipher = bytes.slice(12);
+
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    cipher
+  );
+
+  return arrayBufferToStr(decrypted);
+}
+
+/* --- ＱＲコード PNG 保存 --- */
+function saveQrPng() {
+  const img = document.querySelector("#qrcode img");
+  if (!img) {
+    alert("ＱＲコードが生成されていません。");
+    return;
+  }
+
+  const margin = 40; // 余白(px)
+
+  const qrWidth = img.naturalWidth;
+  const qrHeight = img.naturalHeight;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = qrWidth + margin * 2;
+  canvas.height = qrHeight + margin * 2;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.drawImage(img, margin, margin, qrWidth, qrHeight);
+
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = "cipher_qr.png";
+  link.click();
+}
+
+/* --- Event: Encrypt --- */
+document.getElementById("encryptBtn").addEventListener("click", async () => {
+  const passwordValue = document.getElementById("password").value;
+  const realValue = Number(document.getElementById("realPart").value);
+  const imagValue = Number(document.getElementById("imagPart").value);
+  const plaintext = document.getElementById("plaintext").value;
+
+  if (!plaintext) {
+    alert("平文が空です。");
+    return;
+  }
+
+  try {
+    const cipherBase64 = await encryptText(plaintext, passwordValue, realValue, imagValue);
+    document.getElementById("ciphertext").value = cipherBase64;
+
+    const compressed = LZString.compressToBase64(cipherBase64);
+    const compressedUrl = toBase64Url(compressed);
+
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+      text: compressedUrl,
+      width: 256,
+      height: 256
+    });
+
+    document.getElementById("ciphertextInput").value = compressedUrl;
+  } catch (e) {
+    alert("暗号化に失敗しました。: " + e.message);
+  }
+});
+
+/* --- Event: Decrypt --- */
+document.getElementById("decryptBtn").addEventListener("click", async () => {
+  const passwordValue = document.getElementById("password").value;
+  const realValue = Number(document.getElementById("realPart").value);
+  const imagValue = Number(document.getElementById("imagPart").value);
+  let input = document.getElementById("ciphertextInput").value.trim();
+
+  if (!input) {
+    alert("暗号文が空です。");
+    return;
+  }
+
+  try {
+    if (!input.includes("=") && !input.includes("+") && !input.includes("/")) {
+      input = fromBase64Url(input);
+      input = LZString.decompressFromBase64(input);
+    }
+
+    const plaintext = await decryptText(input, passwordValue, realValue, imagValue);
+    document.getElementById("decrypted").value = plaintext;
+  } catch (e) {
+    alert("復号に失敗しました。: " + e.message);
+  }
+});
+
+/* --- Event: Save PNG --- */
+document.getElementById("savePngBtn").addEventListener("click", saveQrPng);
+</script>
+</body>
+</html>
