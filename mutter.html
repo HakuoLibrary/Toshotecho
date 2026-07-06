@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>かもめんのつぶやき｜図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+/* =========================
+   BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Yu Gothic","Meiryo",sans-serif;
+background:#FAEEDD;
+color:#444;
+overflow-x:hidden;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:80px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 25px;
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(12px);
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+z-index:1000;
+}
+
+.logo img{
+height:45px;
+width:auto;
+object-fit:contain;
+cursor:pointer;
+transition:0.3s;
+}
+
+.logo img:hover{
+transform:scale(1.05);
+}
+
+/* =========================
+   MENU BUTTON
+========================= */
+
+.menu-btn{
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:6px;
+cursor:pointer;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+}
+
+.menu-btn span{
+width:26px;
+height:3px;
+background:#444;
+border-radius:5px;
+transition:0.3s;
+}
+
+.menu-btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2){
+opacity:0;
+}
+
+.menu-btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+
+/* =========================
+   MENU
+========================= */
+
+.menu{
+position:fixed;
+top:0;
+right:-320px;
+width:300px;
+height:100vh;
+background:white;
+padding-top:100px;
+display:flex;
+flex-direction:column;
+transition:0.4s ease;
+box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+z-index:999;
+}
+
+.menu.open{
+right:0;
+}
+
+.menu a{
+padding:18px 25px;
+text-decoration:none;
+color:#444;
+font-weight:bold;
+}
+
+.menu a:hover{
+padding-left:35px;
+color:#b67832;
+}
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.25);
+opacity:0;
+pointer-events:none;
+transition:0.3s;
+z-index:998;
+}
+
+.overlay.show{
+opacity:1;
+pointer-events:auto;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+text-align:center;
+font-size:36px;
+margin:120px 0 30px;
+color:#8b5a2b;
+}
+
+/* =========================
+   FEED
+========================= */
+
+.feed{
+max-width:900px;
+margin:0 auto;
+padding:0 20px 60px;
+}
+
+.post{
+background:white;
+border-radius:18px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+animation:fadeIn 0.4s ease;
+position:relative;
+}
+
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(10px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* 日付 */
+.date{
+font-size:12px;
+color:#888;
+margin-bottom:8px;
+}
+
+/* 吹き出し */
+.bubble{
+background:#fff7ea;
+padding:15px;
+border-radius:15px;
+position:relative;
+margin-top:10px;
+line-height:1.8;
+}
+
+.bubble::before{
+content:"";
+position:absolute;
+top:-10px;
+left:20px;
+border-width:0 10px 10px 10px;
+border-style:solid;
+border-color:transparent transparent #fff7ea transparent;
+}
+
+/* 画像 */
+.post img{
+width:100%;
+border-radius:12px;
+margin-top:10px;
+}
+
+/* いいね */
+.like-btn{
+margin-top:10px;
+display:inline-flex;
+align-items:center;
+gap:6px;
+cursor:pointer;
+color:#b67832;
+font-weight:bold;
+user-select:none;
+}
+
+/* FOOTER */
+
+footer{
+text-align:center;
+padding:40px;
+background:#e8d5bb;
+margin-top:60px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+   HEADER（内蔵）
+========================= -->
+
+<header class="header">
+
+<a href="index.html" class="logo">
+<img src="icon.png" alt="logo">
+</a>
+
+<button class="menu-btn" id="menuBtn">
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+</header>
+
+<nav class="menu" id="menu">
+
+<a href="index.html">ＨＯＭＥ</a>
+<a href="application.html">申し込み</a>
+<a href="features.html">特徴</a>
+<a href="mutter.html">かもめんのつぶやき</a>
+<a href="tool.html">お役立ちツール</a>
+
+</nav>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- =========================
+   MAIN
+========================= -->
+
+<h1 class="title">かもめんのつぶやき</h1>
+
+<div class="feed">
+
+<div class="post">
+<div class="date" data-date></div>
+
+<div class="bubble">
+図書手帳、ついに公開されたよ！<br>
+これからどんどん進化していく予定だよ。
+</div>
+
+<img src="image2.png" alt="かもめん">
+
+<div class="like-btn" onclick="like(this)">
+❤️ いいね <span>12</span>
+</div>
+</div>
+
+<div class="post">
+<div class="date" data-date></div>
+
+<div class="bubble">
+デザイン、かなりこだわって作ってるんだよね。
+</div>
+
+<img src="image2.png" alt="かもめん">
+
+<div class="like-btn" onclick="like(this)">
+❤️ いいね <span>8</span>
+</div>
+</div>
+
+</div>
+
+<footer>
+© ２０２６ 図書手帳公式ホームページ
+</footer>
+
+<script>
+
+/* =========================
+   MENU
+========================= */
+
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+
+btn.addEventListener("click", () => {
+menu.classList.toggle("open");
+overlay.classList.toggle("show");
+btn.classList.toggle("active");
+});
+
+overlay.addEventListener("click", () => {
+menu.classList.remove("open");
+overlay.classList.remove("show");
+btn.classList.remove("active");
+});
+
+/* =========================
+   日付（完全修正版）
+========================= */
+
+function setDates(){
+
+const days = ["日","月","火","水","木","金","土"];
+const now = new Date();
+
+const text =
+`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
+
+document.querySelectorAll("[data-date]").forEach(el=>{
+el.textContent = text;
+});
+
+}
+
+setDates();
+
+/* =========================
+   いいね
+========================= */
+
+function like(el){
+
+const span = el.querySelector("span");
+
+let num = parseInt(span.textContent);
+
+if(isNaN(num)){
+num = 0;
+}
+
+span.textContent = num + 1;
+
+}
+
+</script>
+
+</body>
+</html>
