@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>申し込み｜図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+/* =========================
+   BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Yu Gothic","Meiryo",sans-serif;
+background:#FAEEDD;
+color:#444;
+overflow-x:hidden;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+/* =========================
+   HEADER（共通化想定）
+========================= */
+
+.header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:80px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 25px;
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(12px);
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+z-index:1000;
+}
+
+/* ロゴ */
+.logo img{
+height:45px;
+width:auto;
+object-fit:contain;
+cursor:pointer;
+transition:0.3s;
+}
+
+.logo img:hover{
+transform:scale(1.05);
+}
+
+/* =========================
+   MENU BUTTON
+========================= */
+
+.menu-btn{
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:6px;
+cursor:pointer;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+}
+
+.menu-btn span{
+width:26px;
+height:3px;
+background:#444;
+border-radius:5px;
+transition:0.3s;
+}
+
+/* =========================
+   MENU
+========================= */
+
+.menu{
+position:fixed;
+top:0;
+right:-320px;
+width:300px;
+height:100vh;
+background:white;
+padding-top:100px;
+display:flex;
+flex-direction:column;
+transition:0.4s ease;
+box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+z-index:999;
+}
+
+.menu.open{
+right:0;
+}
+
+.menu a{
+padding:18px 25px;
+text-decoration:none;
+color:#444;
+font-weight:bold;
+}
+
+.menu a:hover{
+padding-left:35px;
+color:#b67832;
+}
+
+/* 背景オーバーレイ（外クリック用） */
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.25);
+opacity:0;
+pointer-events:none;
+transition:0.3s;
+z-index:998;
+}
+
+.overlay.show{
+opacity:1;
+pointer-events:auto;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+main{
+padding-top:100px;
+}
+
+.title{
+text-align:center;
+font-size:34px;
+margin:30px 0;
+color:#8b5a2b;
+}
+
+.section{
+max-width:900px;
+margin:20px auto;
+background:white;
+padding:30px;
+border-radius:18px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* 規約 */
+.terms{
+max-height:340px;
+overflow-y:auto;
+padding:20px;
+border:1px solid #ddd;
+border-radius:12px;
+background:#fffdf8;
+line-height:1.8;
+font-size:14px;
+}
+
+/* ボタン */
+.btn{
+display:inline-block;
+margin-top:25px;
+padding:15px 30px;
+border-radius:50px;
+background:linear-gradient(135deg,#d9a35f,#b67832);
+color:white;
+font-weight:bold;
+text-decoration:none;
+text-align:center;
+transition:0.3s;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.btn:hover{
+transform:translateY(-4px);
+}
+
+.btn.disabled{
+opacity:0.4;
+pointer-events:none;
+filter:grayscale(0.5);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+text-align:center;
+padding:40px;
+background:#e8d5bb;
+margin-top:60px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:600px){
+
+.title{
+font-size:26px;
+}
+
+.menu{
+width:260px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- オーバーレイ（外クリック用） -->
+<div class="overlay" id="overlay"></div>
+
+<!-- =========================
+     HEADER（共通部品）
+========================= -->
+
+<header class="header">
+
+<a href="index.html" class="logo">
+<img src="icon.png" alt="logo">
+</a>
+
+<button class="menu-btn" id="menuBtn">
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+</header>
+
+<!-- =========================
+     MENU
+========================= -->
+
+<nav class="menu" id="menu">
+
+<a href="index.html">ＨＯＭＥ</a>
+<a href="application.html">申し込み</a>
+<a href="features.html">特徴</a>
+<a href="mutter.html">かもめんのつぶやき</a>
+<a href="tool.html">お役立ちツール</a>
+
+</nav>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main>
+
+<h1 class="title">申し込み</h1>
+
+<section class="section">
+
+<h2>利用規約</h2>
+
+<div class="terms" id="termsBox">
+
+
+
+<h2>図書手帳利用規約</h2>
+
+<p>
+東京都立白鷗高等学校附属中学校Ｂ棟図書室<br>
+図書手帳発行担当
+</p>
+
+<br>
+
+<p>
+この度は、図書手帳の発行の申請および図書手帳をご利用いただきましてありがとうございます。<br>
+この利用規約（以下「本規約」といいます。）は、東京都立白鷗高等学校附属中学校Ｂ棟図書室図書手帳発行担当が図書手帳を提供するサービスの利用条件を定めるものです。<br>
+このサービスを利用する者は、本規約を最後まで確認・同意の上、このサービスを利用するものとします。<br>
+利用者の皆様によりよくご利用いただけますように、規約の遵守をお願い致します。
+</p>
+
+<hr>
+
+<h3>目次</h3>
+
+<p>
+第１条　　定義<br>
+第２条　　目的・適用<br>
+第３条　　利用登録およびそれに関連する個人情報の取り扱い<br>
+第４条　　禁止事項<br>
+第５条　　本サービスの提供の停止等<br>
+第６条　　免責事項<br>
+第７条　　利用規約の変更<br>
+第８条　　準拠法・裁判管轄<br>
+第９条　　利用登録の方法<br>
+第１０条　図書手帳の紛失・再発行
+</p>
+
+<hr>
+
+<h3>第１条（定義）</h3>
+
+<p>
+本規約における用語の定義は以下の通りとします。
+</p>
+
+<p>
+（１）本サービス<br>
+東京都立白鷗高等学校附属中学校図書室の図書手帳発行担当が提供する、図書手帳を発行するサービスのこと
+</p>
+
+<p>
+（２）利用者<br>
+本サービスを利用する者のこと
+</p>
+
+<p>
+（３）図書手帳<br>
+利用者の利便性向上のために当運営が発行する、学籍番号およびバーコード等が掲載された印刷物のこと
+</p>
+
+<p>
+（４）当運営<br>
+東京都立白鷗高等学校附属中学校図書室の、図書手帳を発行する団体および人物のこと
+</p>
+
+<p>
+（５）利用登録<br>
+第９条にあるリンクおよびＢ棟図書室周辺等に掲示されたＱＲコード®からフォームにアクセスし、それを送信完了すること<br>
+※「ＱＲコード®」は株式会社デンソーウェーブの登録商標です。
+</p>
+
+<p>
+（６）登録データ<br>
+利用者が当運営の指定したフォームを経由し、当運営に送信した情報およびアップロードした画像のこと
+</p>
+
+<hr>
+
+<h3>第２条（目的・適用）</h3>
+
+<p>
+本規約は、本サービスの利用に関する条件やルールを定めることを目的とします。利用者は、本規約に同意した上で本サービスを利用するものとします。
+</p>
+
+<hr>
+
+<h3>第３条（利用登録およびそれに関連する個人情報の取り扱い）</h3>
+
+<p>
+本サービスの利用を希望する者は、本サービスの定める方法（第９条に掲載）により利用登録を申請するものとします。<br>
+当運営は、利用登録によって利用者の学籍番号を取得します。登録データは図書手帳の発行およびそれに係る事務作業のみに使用します。なお、第三者への情報提供は行っておりません。<br>
+また、図書手帳の発行およびそれに係る事務作業の完了後、登録データの保持は行っておりません。
+</p>
+
+<p>
+当運営は、利用者に以下の事由があると判断した場合、利用登録を承認しないことがあります。
+</p>
+
+<p>
+・虚偽の事項を届け出た場合<br>
+・過去１ヶ月以内に規約違反をした者からの申請である場合<br>
+・図書手帳発行申込フォームに不適切な文言を書き込んだ場合<br>
+・その他、当運営が利用登録を適当でないと判断した場合
+</p>
+
+<hr>
+
+<h3>第４条（禁止事項）</h3>
+
+<p>
+利用者は、本サービスの利用にあたり、以下に定める行為をしてはなりません。<br>
+また、これらのいずれかに違反した場合、規約違反となります。
+</p>
+
+<p>
+・法令または公序良俗に違反する行為<br>
+・犯罪に関連する行為<br>
+・本サービスの運営を妨害する行為<br>
+・他の利用者の情報を不正に収集・利用する行為<br>
+・当運営の知的財産権を侵害する行為<br>
+・利用者自身のものではない、他の利用者の図書手帳を発行・使用・所持する行為<br>
+・その他、当運営が不適切と判断する行為
+</p>
+
+<hr>
+
+<h3>第５条（本サービスの提供の停止等）</h3>
+
+<p>
+当運営は、以下の場合には利用者に事前に通知することなく本サービスの全部または一部の提供を停止または終了、変更することができます。<br>
+また、提供を停止した際、復旧までに時間がかかる場合があります。
+</p>
+
+<p>
+・本サービスに係るシステムの保守点検を行う場合<br>
+・火災・停電・天災など不可抗力により提供が困難となった場合<br>
+・原価高騰などにより、無償での提供が困難となった場合<br>
+・その他、当運営が本サービスの提供および維持が困難と判断した場合
+</p>
+
+<hr>
+
+<h3>第６条（免責事項）</h3>
+
+<p>
+当運営は、本サービスに関して利用者に生じた損害について、一切の責任を負いません。<br>
+当運営は、利用者間または利用者と第三者との間において生じたトラブルについて、一切の責任を負いません。
+</p>
+
+<hr>
+
+<h3>第７条（利用規約の変更）</h3>
+
+<p>
+当運営は、必要と判断した場合には、利用者に通知することなく本規約を変更することができます。<br>
+変更後の規約は、本規約に掲載した時点から効力を生じるものとします。<br>
+また、本規約の最終変更日は、本規約下部に掲載しています。
+</p>
+
+<hr>
+
+<h3>第８条（準拠法・裁判管轄）</h3>
+
+<p>
+本規約の解釈にあたっては、日本法を準拠法とします。本サービスに関してトラブルが生じた場合には、当運営の所在地を管轄する裁判所を専属的合意管轄とします。
+</p>
+
+<hr>
+
+<h3>第９条（利用登録の方法）</h3>
+
+<p>
+本サービスを利用するにあたり、利用登録を行う必要があります。<br>
+利用登録の方法は、専用フォームでの回答のみです。（電子機器がない等によりフォームが開けない場合のみに限り、Ｂ棟図書室司書へ口頭で申し込むことを許可します。）<br>
+専用フォームを利用者が送信完了したと同時に、利用者はこの利用規約に同意したとみなします。<br>
+第５条に則り、当運営が事前に予告なくフォームを一時的に閉鎖する場合があります。<br>
+利用登録は利用者自身が以下のボタンから行うものとします。<br>
+利用登録が不十分な場合は、当該する発行は受け付けないものとします。<br>
+また、不具合・送信ボタンの押し忘れ等により送信が完了できなかった場合も同等です。
+</p>
+
+<hr>
+
+<h3>第１０条（図書手帳の紛失・再発行）</h3>
+
+<p>
+利用者が図書手帳を紛失した場合、再発行することができます。第９条に則り再度利用登録を行ってください。<br>
+また、新年度になる際、全ての利用者のバーコードが無効となるため、第９条に則り、再度利用登録を行ってください。新年度になる際、当運営から再発行することはありません。
+</p>
+
+<p style="text-align:right;">
+<br><br>
+この利用規約の最終変更日：２０２６年４月１０日（金）
+</p>
+
+</div>
+
+
+</section>
+
+
+<section class="section" style="text-align:center;">
+
+<a href="https://forms.cloud.microsoft/r/rw9wBcuevH"
+class="btn disabled"
+id="applyBtn"
+target="_blank"
+rel="noopener noreferrer">
+
+規約に同意して申し込みを始める
+
+</a>
+
+</section>
+
+</main>
+
+<footer>
+© ２０２６ 図書手帳公式ホームページ
+</footer>
+
+<script>
+
+/* =========================
+   MENU CONTROL（共通化対応）
+========================= */
+
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+
+function openMenu(){
+menu.classList.add("open");
+overlay.classList.add("show");
+}
+
+function closeMenu(){
+menu.classList.remove("open");
+overlay.classList.remove("show");
+}
+
+btn.addEventListener("click", () => {
+if(menu.classList.contains("open")){
+closeMenu();
+}else{
+openMenu();
+}
+});
+
+/* 外クリックで閉じる */
+overlay.addEventListener("click", closeMenu);
+
+/* =========================
+   規約スクロール連動
+========================= */
+
+const terms = document.getElementById("termsBox");
+const applyBtn = document.getElementById("applyBtn");
+
+applyBtn.classList.add("disabled");
+
+terms.addEventListener("scroll", () => {
+
+const bottom =
+terms.scrollTop + terms.clientHeight >= terms.scrollHeight - 5;
+
+if(bottom){
+applyBtn.classList.remove("disabled");
+}
+
+});
+
+</script>
+
+</body>
+</html>
