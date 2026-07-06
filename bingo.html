@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ビンゴ抽選アプリ</title>
+  <meta name="description" content="モバイル対応のビンゴ抽選機。背景色が暗い場合は文字色を自動で白に切替。PDF/画像出力、色カスタム対応。" />
+  <style>
+    :root{
+      --bg:#f5f6fa;
+      --text:#2d3436;
+      --card-bg:#ffffff;
+      --accent:#0984e3;
+      --accent-strong:#0666b8;
+      --danger:#d63031;
+      --border:#dfe6e9;
+      --radius:12px;
+      --shadow: 0 10px 25px rgba(0,0,0,0.12);
+      --focus: 0 0 0 4px rgba(9,132,227,0.12);
+      --tap-size:48px;
+    }
+    .dark{
+      --bg:#22272b;
+      --text:#f5f6fa;
+      --card-bg:#2f3336;
+      --accent:#74b9ff;
+      --accent-strong:#4aa3ff;
+      --danger:#ff7675;
+      --border:#3b3f41;
+      --shadow: 0 10px 25px rgba(0,0,0,0.35);
+      --focus: 0 0 0 4px rgba(116,185,255,0.12);
+    }
+
+    html,body{height:100%;}
+    body{
+      margin:0;
+      padding:16px;
+      box-sizing:border-box;
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .container{
+      width:100%;
+      max-width:560px;
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+      position:relative;
+      box-sizing:border-box;
+      animation:fadeIn .28s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none; } }
+
+    header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    h1{ margin:0; font-size:1.25rem; font-weight:700; }
+
+    /* ボタン共通改善：タッチ反応向上 */
+    button, .swatch {
+      -webkit-tap-highlight-color: rgba(0,0,0,0.12);
+      touch-action: manipulation;
+      -ms-touch-action: manipulation;
+    }
+
+    #settingsBtn{
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:0.95rem;
+      cursor:pointer;
+      box-shadow:none;
+    }
+    #settingsBtn:focus{ outline:none; box-shadow:var(--focus); }
+
+    .inputs{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; margin-bottom:12px; }
+    .field{ display:flex; align-items:center; gap:8px; }
+    label{ font-size:0.95rem; }
+    input[type="number"]{
+      -moz-appearance: textfield;
+      appearance: textfield;
+      width:120px;
+      max-width:45%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:2px solid var(--border);
+      background:var(--card-bg);
+      color:var(--text);
+      font-size:1rem;
+      text-align:right;
+      box-sizing:border-box;
+    }
+    input[type="number"]:focus{ outline:none; border-color:var(--accent-strong); box-shadow:var(--focus); }
+
+    .actions{ display:flex; flex-direction:column; gap:8px; align-items:center; margin-bottom:12px; }
+    button.primary{
+      width:100%;
+      max-width:360px;
+      padding:14px 18px;
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      font-size:1.05rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+    button.secondary{
+      width:100%;
+      max-width:360px;
+      padding:12px 16px;
+      background:var(--danger);
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      font-size:1rem;
+      cursor:pointer;
+    }
+    button.small{
+      padding:10px 12px;
+      border-radius:8px;
+      border:none;
+      background:#b2bec3;
+      color:#2d3436;
+      cursor:pointer;
+      font-size:0.95rem;
+    }
+    button:disabled{ background:#b2bec3; cursor:not-allowed; }
+
+    #result{
+      margin-top:6px;
+      font-size:3.2rem;
+      font-weight:800;
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:transform .12s ease;
+      word-break:break-word;
+    }
+    .glow{ animation:glowEffect .9s ease; }
+    @keyframes glowEffect { 0%{ text-shadow:0 0 8px #fff, 0 0 18px var(--accent); } 100%{ text-shadow:none; } }
+
+    #gridWrap{ margin-top:12px; }
+    #gridTitle{ margin:0 0 8px 0; font-size:1rem; font-weight:700; text-align:left; }
+    #grid{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+      max-height:260px;
+      overflow:auto;
+      padding:6px;
+      box-sizing:border-box;
+      border-radius:10px;
+      background:transparent;
+    }
+    .grid-item{
+      background:var(--accent);
+      color:#fff;
+      padding:10px;
+      border-radius:8px;
+      font-size:1.05rem;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      box-sizing:border-box;
+    }
+
+    .overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:1200; padding:16px; box-sizing:border-box; pointer-events:none; }
+    .overlay.show{ display:flex; pointer-events:auto; }
+    .modal{ width:100%; max-width:420px; background:var(--card-bg); border-radius:12px; padding:16px; box-sizing:border-box; max-height:90vh; overflow:auto; }
+    .modal h2{ margin-top:0; font-size:1.15rem; }
+
+    select{ width:100%; padding:10px; border-radius:8px; border:2px solid var(--border); background:var(--card-bg); color:var(--text); font-size:1rem; box-sizing:border-box; margin-bottom:8px; }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; }
+
+    #grid::-webkit-scrollbar{ width:8px; height:8px; }
+    #grid::-webkit-scrollbar-thumb{ background:rgba(0,0,0,0.12); border-radius:8px; }
+
+    @media (max-width:480px){
+      input[type="number"]{ width:48%; max-width:48%; }
+      #grid{ grid-template-columns:repeat(3,1fr); gap:6px; max-height:180px; }
+      #result{ font-size:2.6rem; min-height:56px; }
+      .container{ padding:14px; border-radius:10px; }
+      header{ gap:8px; }
+      #settingsBtn{ padding:8px 10px; font-size:0.9rem; }
+    }
+    @media (min-width:481px) and (max-width:768px){
+      #grid{ grid-template-columns:repeat(4,1fr); }
+      input[type="number"]{ width:40%; }
+      #result{ font-size:3rem; }
+    }
+    @media (min-width:769px){
+      .container{ padding:26px; max-width:420px; }
+      #grid{ grid-template-columns:repeat(5,1fr); }
+      input[type="number"]{ width:90px; }
+      #result{ font-size:4rem; }
+    }
+
+    button:focus, select:focus, input:focus { outline:none; box-shadow:var(--focus); border-color:var(--accent-strong); }
+    .touch-target{ min-height:var(--tap-size); display:flex; align-items:center; justify-content:center; }
+
+    /* カラー設定UI */
+    .color-row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .swatch{ width:36px; height:36px; border-radius:6px; border:2px solid rgba(0,0,0,0.06); cursor:pointer; box-sizing:border-box; }
+    .swatch:focus{ outline:3px solid rgba(0,0,0,0.12); }
+    .color-label{ font-size:0.9rem; margin-bottom:6px; display:block; }
+    .picker{ display:flex; gap:8px; align-items:center; width:100%; }
+    .picker input[type="color"]{ width:48px; height:36px; padding:0; border:none; background:transparent; cursor:pointer; }
+    .picker .hex{ flex:1; padding:8px 10px; border-radius:8px; border:2px solid var(--border); background:var(--card-bg); color:var(--text); font-size:0.95rem; }
+  </style>
+</head>
+<body>
+  <main class="container" id="mainContainer" role="application" aria-labelledby="appTitle">
+    <header>
+      <h1 id="appTitle">ビンゴ抽選アプリ</h1>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="settingsBtn" class="touch-target" aria-haspopup="dialog" aria-controls="settingsOverlay" onclick="openSettings()">⚙ 設定</button>
+      </div>
+    </header>
+
+    <section class="controls" aria-label="抽選設定">
+      <div class="inputs" role="group" aria-label="範囲設定">
+        <div class="field">
+          <label for="min">最小値</label>
+          <input id="min" type="number" value="1" min="1" onchange="onRangeChange()" aria-label="最小値">
+        </div>
+        <div class="field">
+          <label for="max">最大値</label>
+          <input id="max" type="number" value="75" min="1" onchange="onRangeChange()" aria-label="最大値">
+        </div>
+      </div>
+
+      <div class="actions" role="group" aria-label="操作">
+        <button id="startBtn" class="primary touch-target" onclick="startBingo()" aria-pressed="false">抽選スタート！</button>
+        <button class="secondary touch-target" onclick="openResetPopup()">リセット</button>
+      </div>
+
+      <div id="result" role="status" aria-live="polite">-</div>
+    </section>
+
+    <section id="gridWrap" aria-label="抽選された数字">
+      <h3 id="gridTitle">抽選された数字</h3>
+      <div id="grid" aria-live="polite" aria-label="抽選された数字の一覧"></div>
+    </section>
+  </main>
+
+  <!-- リセット確認ポップアップ -->
+  <div id="popupOverlay" class="overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" id="popupBox">
+      <h2>本当にリセットしますか？</h2>
+      <p style="margin:8px 0 12px 0;">現在の抽選状態がすべて消去されます。よろしいですか？</p>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="popupBtn small touch-target" style="background:var(--danger); color:#fff; border-radius:8px;" onclick="confirmReset()">はい</button>
+        <button class="popupBtn small touch-target" style="background:#b2bec3; color:#2d3436; border-radius:8px;" onclick="closeResetPopup()">いいえ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定モーダル -->
+  <div id="settingsOverlay" class="overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" id="settingsBox">
+      <h2>設定</h2>
+
+      <div class="sectionTitle" style="font-weight:700; margin-top:6px;">テーマ</div>
+      <select id="themeSelect" onchange="changeTheme(true)" aria-label="テーマ選択">
+        <option value="light">ライト</option>
+        <option value="dark">ダーク</option>
+      </select>
+
+      <div class="sectionTitle" style="font-weight:700;">抽選音</div>
+      <select id="soundSelect" onchange="saveState()" aria-label="抽選音">
+        <option value="none">音なし</option>
+        <option value="pinpon">ピンポン</option>
+        <option value="kirakira">キラキラ</option>
+        <option value="drum">ドラムロール</option>
+      </select>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button class="small" onclick="previewSound()">試聴</button>
+        <button class="small" onclick="saveState(true)">状態を保存</button>
+      </div>
+
+      <div class="sectionTitle" style="font-weight:700;">カラー設定</div>
+
+      <div class="color-label">プリセット</div>
+      <div class="row" style="margin-bottom:8px;">
+        <button class="swatch" title="ブルー" style="background:#0984e3" onclick="applyPreset('#f5f6fa','#ffffff','#0984e3')"></button>
+        <button class="swatch" title="ダーク" style="background:#22272b" onclick="applyPreset('#22272b','#2f3336','#74b9ff')"></button>
+        <button class="swatch" title="グリーン" style="background:#e8f8f2" onclick="applyPreset('#e8f8f2','#ffffff','#00b894')"></button>
+        <button class="swatch" title="ピンク" style="background:#fff0f6" onclick="applyPreset('#fff0f6','#ffffff','#ff6b81')"></button>
+        <button class="swatch" title="モノクロ" style="background:#f7f7f7" onclick="applyPreset('#f7f7f7','#ffffff','#636e72')"></button>
+      </div>
+
+      <div class="color-label">カスタムカラー</div>
+
+      <div class="color-row">
+        <div style="flex:1;">
+          <div style="font-size:0.95rem; margin-bottom:6px;">背景色</div>
+          <div class="picker">
+            <input id="bgColorPicker" type="color" value="#f5f6fa" onchange="onColorChange('bg')">
+            <input id="bgHex" class="hex" type="text" value="#f5f6fa" onchange="onHexInput('bg')">
+          </div>
+        </div>
+      </div>
+
+      <div class="color-row">
+        <div style="flex:1;">
+          <div style="font-size:0.95rem; margin-bottom:6px;">カード背景色</div>
+          <div class="picker">
+            <input id="cardColorPicker" type="color" value="#ffffff" onchange="onColorChange('card')">
+            <input id="cardHex" class="hex" type="text" value="#ffffff" onchange="onHexInput('card')">
+          </div>
+        </div>
+      </div>
+
+      <div class="color-row">
+        <div style="flex:1;">
+          <div style="font-size:0.95rem; margin-bottom:6px;">アクセント色（ボタン）</div>
+          <div class="picker">
+            <input id="accentColorPicker" type="color" value="#0984e3" onchange="onColorChange('accent')">
+            <input id="accentHex" class="hex" type="text" value="#0984e3" onchange="onHexInput('accent')">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <button class="small" onclick="applyColorsFromInputs()">状態を保存</button>
+        <button class="small" onclick="resetColorsToDefaults()">デフォルトに戻す</button>
+      </div>
+
+      <div class="sectionTitle" style="font-weight:700; margin-top:10px;">出力</div>
+      <select id="pdfStyleSelect" aria-label="PDFスタイル">
+        <option value="list">シンプル一覧</option>
+        <option value="card">カード風レイアウト</option>
+      </select>
+
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <select id="imageTargetSelect" aria-label="画像出力対象" style="flex:1;">
+          <option value="grid">グリッドのみ</option>
+          <option value="full">画面全体</option>
+        </select>
+        <button class="small" onclick="exportAsImage()">画像として保存</button>
+        <!-- PDFボタンを追加 -->
+        <button class="small" onclick="exportAsPDF()">ＰＤＦとして保存</button>
+      </div>
+
+      <div style="margin-top:12px; text-align:center;">
+        <button class="small" onclick="closeSettings()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 音源 -->
+  <audio id="soundPinpon" src="https://soundeffect-lab.info/sound/anime/mp3/decision1.mp3" preload="auto"></audio>
+  <audio id="soundKirakira" src="https://soundeffect-lab.info/sound/anime/mp3/decision2.mp3" preload="auto"></audio>
+  <audio id="soundDrum" src="https://soundeffect-lab.info/sound/anime/mp3/decision3.mp3" preload="auto"></audio>
+
+  <!-- ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    /* --- 状態 --- */
+    let rollingInterval = null;
+    let remainingNumbers = [];
+    let drawnNumbers = [];
+    let minVal = 1;
+    let maxVal = 75;
+    let isRolling = false;
+    const STORAGE_KEY = "bingoAppState_v1_with_colors";
+
+    /* --- カラー関連ユーティリティ --- */
+    function setCSSVar(name, value){ document.documentElement.style.setProperty(name, value); }
+
+    function hexToRgb(hex) {
+      const h = hex.replace('#','');
+      return { r: parseInt(h.substring(0,2),16), g: parseInt(h.substring(2,4),16), b: parseInt(h.substring(4,6),16) };
+    }
+
+    function getLuminance(hex) {
+      try {
+        const {r,g,b} = hexToRgb(hex);
+        const srgb = [r,g,b].map(v => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+      } catch (e) { return 1; }
+    }
+
+    function isDarkColor(hex) {
+      const lum = getLuminance(hex);
+      return lum < 0.179;
+    }
+
+    function shadeColor(hex, percent) {
+      try {
+        const f = hex.slice(1);
+        const t = percent < 0 ? 0 : 255;
+        const p = Math.abs(percent) / 100;
+        const R = parseInt(f.substring(0,2),16);
+        const G = parseInt(f.substring(2,4),16);
+        const B = parseInt(f.substring(4,6),16);
+        const newR = Math.round((t - R) * p) + R;
+        const newG = Math.round((t - G) * p) + G;
+        const newB = Math.round((t - B) * p) + B;
+        return "#" + ( (1<<24) + (newR<<16) + (newG<<8) + newB ).toString(16).slice(1);
+      } catch(e) { return hex; }
+    }
+
+    function applyColors(bg, card, accent){
+      if (bg) setCSSVar('--bg', bg);
+      if (card) setCSSVar('--card-bg', card);
+      if (accent) {
+        setCSSVar('--accent', accent);
+        setCSSVar('--accent-strong', shadeColor(accent, -15));
+      }
+
+      const currentBg = (bg && /^#([0-9A-Fa-f]{6})$/.test(bg)) ? bg : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if (/^#([0-9A-Fa-f]{6})$/.test(currentBg) && isDarkColor(currentBg)) {
+        setCSSVar('--text', '#ffffff');
+      } else {
+        setCSSVar('--text', '#2d3436');
+      }
+
+      if (bg) { document.getElementById('bgColorPicker').value = bg; document.getElementById('bgHex').value = bg; }
+      if (card) { document.getElementById('cardColorPicker').value = card; document.getElementById('cardHex').value = card; }
+      if (accent) { document.getElementById('accentColorPicker').value = accent; document.getElementById('accentHex').value = accent; }
+    }
+
+    function applyPreset(bg, card, accent){ applyColors(bg, card, accent); saveState(); }
+
+    function onColorChange(target){
+      const val = (target === 'bg') ? document.getElementById('bgColorPicker').value
+                : (target === 'card') ? document.getElementById('cardColorPicker').value
+                : document.getElementById('accentColorPicker').value;
+      if (target === 'bg') document.getElementById('bgHex').value = val;
+      if (target === 'card') document.getElementById('cardHex').value = val;
+      if (target === 'accent') document.getElementById('accentHex').value = val;
+
+      if (target === 'bg') {
+        setCSSVar('--bg', val);
+        if (isDarkColor(val)) setCSSVar('--text', '#ffffff');
+        else setCSSVar('--text', '#2d3436');
+      }
+      if (target === 'card') setCSSVar('--card-bg', val);
+      if (target === 'accent') {
+        setCSSVar('--accent', val);
+        setCSSVar('--accent-strong', shadeColor(val, -15));
+      }
+    }
+
+    function onHexInput(target){
+      const val = (target === 'bg') ? document.getElementById('bgHex').value.trim()
+                : (target === 'card') ? document.getElementById('cardHex').value.trim()
+                : document.getElementById('accentHex').value.trim();
+      if (!/^#([0-9A-Fa-f]{6})$/.test(val)) return;
+      if (target === 'bg') document.getElementById('bgColorPicker').value = val;
+      if (target === 'card') document.getElementById('cardColorPicker').value = val;
+      if (target === 'accent') document.getElementById('accentColorPicker').value = val;
+      onColorChange(target);
+    }
+
+    function applyColorsFromInputs(){
+      const bg = document.getElementById('bgHex').value.trim();
+      const card = document.getElementById('cardHex').value.trim();
+      const accent = document.getElementById('accentHex').value.trim();
+      if (!/^#([0-9A-Fa-f]{6})$/.test(bg) || !/^#([0-9A-Fa-f]{6})$/.test(card) || !/^#([0-9A-Fa-f]{6})$/.test(accent)) {
+        alert('カラーは6桁の16進数形式で指定してください。（例: #ff0000）');
+        return;
+      }
+      applyColors(bg, card, accent);
+      saveState(true);
+    }
+
+    function resetColorsToDefaults(){
+      const defaults = { bg:'#f5f6fa', card:'#ffffff', accent:'#0984e3' };
+      applyColors(defaults.bg, defaults.card, defaults.accent);
+      saveState(true);
+    }
+
+    /* --- 抽選ロジック --- */
+    function playSelectedSound() {
+      const selected = document.getElementById("soundSelect")?.value || "none";
+      if (selected === "none") return;
+      const soundMap = { pinpon: "soundPinpon", kirakira: "soundKirakira", drum: "soundDrum" };
+      const audio = document.getElementById(soundMap[selected]);
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play().catch(()=>{});
+    }
+
+    function previewSound(){ playSelectedSound(); }
+
+    function onRangeChange(){
+      const min = Number(document.getElementById('min').value) || 1;
+      const max = Number(document.getElementById('max').value) || 1;
+      if (min >= max) return;
+      minVal = min; maxVal = max;
+      saveState();
+    }
+
+    function startBingo(){
+      if (isRolling) return;
+      const min = Number(document.getElementById('min').value) || 1;
+      const max = Number(document.getElementById('max').value) || 1;
+      const result = document.getElementById('result');
+      const startBtn = document.getElementById('startBtn');
+
+      if (min >= max) { alert("最小値は最大値未満にしてください。"); return; }
+      minVal = min; maxVal = max;
+
+      if (remainingNumbers.length === 0 && drawnNumbers.length === 0) {
+        for (let i = min; i <= max; i++) remainingNumbers.push(i);
+      } else if (remainingNumbers.length === 0 && drawnNumbers.length > 0) {
+        result.textContent = "すべての数字を引き終わりました！";
+        return;
+      }
+
+      if (remainingNumbers.length === 0) { result.textContent = "すべての数字を引き終わりました！"; return; }
+
+      isRolling = true;
+      startBtn.disabled = true;
+      startBtn.setAttribute('aria-pressed','true');
+
+      playSelectedSound();
+
+      if (rollingInterval) clearInterval(rollingInterval);
+      rollingInterval = setInterval(() => {
+        const preview = remainingNumbers[Math.floor(Math.random() * remainingNumbers.length)];
+        result.textContent = preview;
+        result.style.transform = "rotate(12deg) scale(1.05)";
+        setTimeout(()=> result.style.transform = "rotate(0deg) scale(1)", 80);
+      }, 80);
+
+      setTimeout(() => {
+        clearInterval(rollingInterval); rollingInterval = null;
+        const index = Math.floor(Math.random() * remainingNumbers.length);
+        const finalNum = remainingNumbers.splice(index,1)[0];
+        result.textContent = finalNum;
+        drawnNumbers.push(finalNum);
+        result.classList.add("glow");
+        setTimeout(()=> result.classList.remove("glow"), 900);
+        addToGrid(finalNum);
+        isRolling = false;
+        startBtn.disabled = false;
+        startBtn.setAttribute('aria-pressed','false');
+        if (remainingNumbers.length === 0) result.textContent = "すべての数字を引き終わりました！";
+        saveState();
+      }, 1500);
+    }
+
+    function addToGrid(num){
+      const grid = document.getElementById("grid");
+      const item = document.createElement("div");
+      item.className = "grid-item";
+      item.textContent = num;
+      item.setAttribute('role','listitem');
+      grid.appendChild(item);
+      grid.scrollTop = grid.scrollHeight;
+    }
+
+    /* --- モーダル制御 --- */
+    function openResetPopup(){
+      const overlay = document.getElementById("popupOverlay");
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      overlay.querySelector('button')?.focus();
+    }
+    function closeResetPopup(){
+      const overlay = document.getElementById("popupOverlay");
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    function confirmReset(){
+      remainingNumbers = []; drawnNumbers = [];
+      document.getElementById('grid').innerHTML = "";
+      document.getElementById('result').textContent = "-";
+      document.getElementById('startBtn').disabled = false;
+      isRolling = false;
+      closeResetPopup();
+      saveState();
+    }
+
+    function openSettings(){
+      const overlay = document.getElementById("settingsOverlay");
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      overlay.querySelector('select, button, input')?.focus();
+    }
+    function closeSettings(){
+      const overlay = document.getElementById("settingsOverlay");
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    function changeTheme(shouldSave){
+      const theme = document.getElementById("themeSelect")?.value || "light";
+      if (theme === "dark") document.body.classList.add("dark");
+      else document.body.classList.remove("dark");
+      if (shouldSave) saveState();
+    }
+
+    /* --- 保存/復元 --- */
+    function saveState(showAlert){
+      try {
+        const state = {
+          theme: document.getElementById("themeSelect")?.value || "light",
+          sound: document.getElementById("soundSelect")?.value || "none",
+          min: Number(document.getElementById("min")?.value) || 1,
+          max: Number(document.getElementById("max")?.value) || 75,
+          remainingNumbers,
+          drawnNumbers,
+          lastResult: document.getElementById("result")?.textContent || "-",
+          colors: {
+            bg: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+            card: getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim(),
+            accent: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
+          }
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (showAlert) alert("現在の状態を保存しました！");
+      } catch (e) {
+        console.error("保存に失敗しました。", e);
+      }
+    }
+
+    function loadState(){
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          document.getElementById('bgHex').value = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+          document.getElementById('cardHex').value = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim();
+          document.getElementById('accentHex').value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+          document.getElementById('bgColorPicker').value = document.getElementById('bgHex').value;
+          document.getElementById('cardColorPicker').value = document.getElementById('cardHex').value;
+          document.getElementById('accentColorPicker').value = document.getElementById('accentHex').value;
+          const bg = document.getElementById('bgHex').value;
+          if (/^#([0-9A-Fa-f]{6})$/.test(bg) && isDarkColor(bg)) setCSSVar('--text','#ffffff');
+          else setCSSVar('--text','#2d3436');
+          return;
+        }
+        const state = JSON.parse(raw);
+        if (!state) return;
+        if (state.min !== undefined) document.getElementById("min").value = state.min;
+        if (state.max !== undefined) document.getElementById("max").value = state.max;
+        if (state.sound) document.getElementById("soundSelect").value = state.sound;
+        if (state.theme) document.getElementById("themeSelect").value = state.theme;
+        changeTheme(false);
+        remainingNumbers = Array.isArray(state.remainingNumbers) ? state.remainingNumbers : [];
+        drawnNumbers = Array.isArray(state.drawnNumbers) ? state.drawnNumbers : [];
+        document.getElementById("grid").innerHTML = "";
+        drawnNumbers.forEach(n => addToGrid(n));
+        if (state.lastResult) document.getElementById("result").textContent = state.lastResult;
+        if (state.colors) {
+          const c = state.colors;
+          if (/^#([0-9A-Fa-f]{6})$/.test(c.bg)) document.getElementById('bgHex').value = c.bg;
+          if (/^#([0-9A-Fa-f]{6})$/.test(c.card)) document.getElementById('cardHex').value = c.card;
+          if (/^#([0-9A-Fa-f]{6})$/.test(c.accent)) document.getElementById('accentHex').value = c.accent;
+          applyColors(c.bg, c.card, c.accent);
+        } else {
+          document.getElementById('bgHex').value = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+          document.getElementById('cardHex').value = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim();
+          document.getElementById('accentHex').value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+          document.getElementById('bgColorPicker').value = document.getElementById('bgHex').value;
+          document.getElementById('cardColorPicker').value = document.getElementById('cardHex').value;
+          document.getElementById('accentColorPicker').value = document.getElementById('accentHex').value;
+          const bg = document.getElementById('bgHex').value;
+          if (/^#([0-9A-Fa-f]{6})$/.test(bg) && isDarkColor(bg)) setCSSVar('--text','#ffffff');
+          else setCSSVar('--text','#2d3436');
+        }
+      } catch (e) {
+        console.error("状態の復元に失敗しました。", e);
+      }
+    }
+
+    /* --- 出力 --- */
+    async function exportAsPDF(){
+      const pdfStyle = document.getElementById("pdfStyleSelect")?.value || "list";
+      let targetElement;
+      if (pdfStyle === "list") {
+        const temp = document.createElement("div");
+        temp.style.padding = "20px";
+        temp.style.fontFamily = "sans-serif";
+        const title = document.createElement("h2");
+        title.textContent = "ビンゴ抽選結果";
+        const date = document.createElement("div");
+        date.textContent = new Date().toLocaleString();
+        const list = document.createElement("div");
+        list.style.marginTop = "10px";
+        list.style.display = "flex";
+        list.style.flexWrap = "wrap";
+        list.style.gap = "8px";
+        drawnNumbers.forEach(n => {
+          const span = document.createElement("div");
+          span.textContent = n;
+          span.style.padding = "6px 10px";
+          span.style.borderRadius = "6px";
+          span.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+          span.style.color = "#fff";
+          list.appendChild(span);
+        });
+        temp.appendChild(title);
+        temp.appendChild(date);
+        temp.appendChild(list);
+        document.body.appendChild(temp);
+        targetElement = temp;
+        await html2pdf().from(targetElement).set({
+          margin: 10,
+          filename: 'bingo_result.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).save();
+        document.body.removeChild(temp);
+      } else {
+        targetElement = document.getElementById("mainContainer");
+        await html2pdf().from(targetElement).set({
+          margin: 10,
+          filename: 'bingo_card_style.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).save();
+      }
+    }
+
+    async function exportAsImage(){
+      const target = document.getElementById("imageTargetSelect")?.value || "grid";
+      const element = target === "grid" ? document.getElementById("grid") : document.getElementById("mainContainer");
+      try {
+        const canvas = await html2canvas(element, { scale: 2 });
+        const dataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = target === "grid" ? "bingo_grid.png" : "bingo_full.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (e) {
+        console.error("画像出力に失敗しました。", e);
+        alert("画像の生成に失敗しました。端末の性能やブラウザの制限が原因の可能性があります。");
+      }
+    }
+
+    /* --- タッチ改善ユーティリティ --- */
+    // モバイルでボタンが反応しない・遅い問題を軽減するための補助処理
+    function enableTouchHelpers() {
+      // ボタンやスウォッチに touchstart を追加して即時 click を発火させる
+      const touchables = document.querySelectorAll('button, .swatch');
+      touchables.forEach(el => {
+        // 既に追加されている場合はスキップ
+        if (el.__touchHelperAdded) return;
+        el.__touchHelperAdded = true;
+        el.addEventListener('touchstart', function(e){
+          // preventDefault を使うと二重発火を防げるが、フォーカス等に影響するため最小限にする
+          // ここでは即時 click を呼び出して反応を早める
+          // 一部ブラウザでは click が自動的に発火するため、重複を避けるため短時間フラグを使う
+          if (el.__recentTouch) return;
+          el.__recentTouch = true;
+          el.click();
+          setTimeout(()=> { el.__recentTouch = false; }, 700);
+        }, {passive:true});
+      });
+
+      // オーバーレイが非表示でも pointer-events を無効にしてタッチをブロックしないようにする
+      const overlays = document.querySelectorAll('.overlay');
+      overlays.forEach(o => {
+        // クリックで閉じる領域外タップを無効化しないために何もしない here
+      });
+    }
+
+    /* --- 初期化 --- */
+    document.addEventListener("DOMContentLoaded", () => {
+      // 初期カラー入力をセット
+      document.getElementById('bgHex').value = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      document.getElementById('cardHex').value = getComputedStyle(document.documentElement).getPropertyValue('--card-bg').trim();
+      document.getElementById('accentHex').value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      document.getElementById('bgColorPicker').value = document.getElementById('bgHex').value;
+      document.getElementById('cardColorPicker').value = document.getElementById('cardHex').value;
+      document.getElementById('accentColorPicker').value = document.getElementById('accentHex').value;
+
+      loadState();
+
+      // タッチ改善を有効化
+      enableTouchHelpers();
+
+      // Esc でモーダルを閉じる
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closeSettings(); closeResetPopup(); }
+      });
+
+      // オーバーレイ外タップで閉じる（モバイルでの操作性向上）
+      document.getElementById('popupOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeResetPopup();
+      });
+      document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeSettings();
+      });
+    });
+  </script>
+</body>
+</html>
