@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>お役立ちツール｜図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+/* =========================
+   BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Yu Gothic","Meiryo",sans-serif;
+background:#FAEEDD;
+color:#444;
+overflow-x:hidden;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:80px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 25px;
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(12px);
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+z-index:1000;
+}
+
+.logo img{
+height:45px;
+width:auto;
+object-fit:contain;
+cursor:pointer;
+transition:0.3s;
+}
+
+.logo img:hover{
+transform:scale(1.05);
+}
+
+/* =========================
+   MENU BUTTON
+========================= */
+
+.menu-btn{
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:6px;
+cursor:pointer;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+}
+
+.menu-btn span{
+width:26px;
+height:3px;
+background:#444;
+border-radius:5px;
+transition:0.3s;
+}
+
+/* ×アニメ */
+.menu-btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2){
+opacity:0;
+}
+
+.menu-btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+
+/* =========================
+   MENU
+========================= */
+
+.menu{
+position:fixed;
+top:0;
+right:-320px;
+width:300px;
+height:100vh;
+background:white;
+padding-top:100px;
+display:flex;
+flex-direction:column;
+transition:0.4s ease;
+box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+z-index:999;
+}
+
+.menu.open{
+right:0;
+}
+
+.menu a{
+padding:18px 25px;
+text-decoration:none;
+color:#444;
+font-weight:bold;
+}
+
+.menu a:hover{
+padding-left:35px;
+color:#b67832;
+}
+
+/* 背景 */
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.25);
+opacity:0;
+pointer-events:none;
+transition:0.3s;
+z-index:998;
+}
+
+.overlay.show{
+opacity:1;
+pointer-events:auto;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+text-align:center;
+font-size:36px;
+margin:120px 0 30px;
+color:#8b5a2b;
+}
+
+/* =========================
+   TOOL CARDS
+========================= */
+
+.tools{
+max-width:900px;
+margin:0 auto;
+padding:0 20px 60px;
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.tool{
+background:white;
+padding:20px;
+border-radius:18px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+cursor:pointer;
+transition:0.3s;
+position:relative;
+}
+
+.tool:hover{
+transform:translateY(-4px);
+}
+
+.tool h3{
+color:#b67832;
+font-size:18px;
+}
+
+.tool p{
+margin-top:8px;
+font-size:14px;
+color:#666;
+}
+
+.tool::after{
+content:"→";
+position:absolute;
+right:20px;
+top:50%;
+transform:translateY(-50%);
+font-size:18px;
+color:#aaa;
+transition:0.3s;
+}
+
+.tool:hover::after{
+right:15px;
+color:#b67832;
+}
+
+/* FOOTER */
+
+footer{
+text-align:center;
+padding:40px;
+background:#e8d5bb;
+margin-top:60px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+   HEADER（直書き版）
+========================= -->
+
+<header class="header">
+
+<a href="index.html" class="logo">
+<img src="icon.png" alt="logo">
+</a>
+
+<button class="menu-btn" id="menuBtn">
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+</header>
+
+<nav class="menu" id="menu">
+
+<a href="index.html">ＨＯＭＥ</a>
+<a href="application.html">申し込み</a>
+<a href="features.html">特徴</a>
+<a href="mutter.html">かもめんのつぶやき</a>
+<a href="tool.html">お役立ちツール</a>
+
+</nav>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<h1 class="title">お役立ちツール</h1>
+
+<div class="tools">
+
+<div class="tool" onclick="openTool('ango.html')">
+<h3>🔐 暗号化・復号サイト</h3>
+<p>文字を暗号化・復号できます</p>
+</div>
+
+<div class="tool" onclick="openTool('bingo.html')">
+<h3>🎲 ビンゴ抽選機</h3>
+<p>ランダム抽選ツール</p>
+</div>
+
+<div class="tool" onclick="openTool('kokaon.html')">
+<h3>🔊 効果音プレイヤー</h3>
+<p>クリックで音を再生</p>
+</div>
+
+<div class="tool" onclick="openTool('barcode.html')">
+<h3>📊 バーコード作成</h3>
+<p>文字からバーコード生成</p>
+</div>
+
+<div class="tool" onclick="openTool('gemeplace.html')">
+<h3>🎮 ドットコムゲーム広場</h3>
+<p>ミニゲームまとめサイト</p>
+</div>
+
+<div class="tool" onclick="openTool('LIBRARY ORIDINAL RPG GAME.html')">
+<h3>⚔ RPGゲーム</h3>
+<p>図書館オリジナルRPG</p>
+</div>
+
+</div>
+
+<footer>
+© ２０２６ 図書手帳公式ホームページ
+</footer>
+
+<script>
+
+/* メニュー制御 */
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+
+function openMenu(){
+menu.classList.add("open");
+overlay.classList.add("show");
+btn.classList.add("active");
+}
+
+function closeMenu(){
+menu.classList.remove("open");
+overlay.classList.remove("show");
+btn.classList.remove("active");
+}
+
+btn.addEventListener("click", () => {
+menu.classList.contains("open") ? closeMenu() : openMenu();
+});
+
+overlay.addEventListener("click", closeMenu);
+
+/* ツール起動 */
+function openTool(page){
+window.open(page, "_blank", "noopener,noreferrer");
+}
+
+</script>
+
+</body>
+</html>
