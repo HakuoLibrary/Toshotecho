@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+/* ボタンアニメ */
+.menu-btn span{
+transition:0.3s;
+}
+
+.menu-btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2){
+opacity:0;
+}
+
+.menu-btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+
+/* ===== BASE ===== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Yu Gothic","Meiryo",sans-serif;
+background:#FAEEDD;
+color:#444;
+overflow-x:hidden;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+/* ===== HEADER ===== */
+
+.header{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:80px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 25px;
+background:rgba(255,255,255,0.6);
+backdrop-filter:blur(12px);
+z-index:1000;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+/* ★修正①：ロゴ（押しつぶし防止＋長方形） */
+.logo img{
+height:45px;
+width:auto;              /* 縦横比維持 */
+object-fit:contain;
+cursor:pointer;
+transition:0.3s;
+border-radius:8px;       /* 少しだけ柔らかく */
+}
+
+.logo img:hover{
+transform:scale(1.05);
+}
+
+/* ===== HAMBURGER ===== */
+
+.menu-btn{
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:6px;
+cursor:pointer;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+transition:0.3s;
+}
+
+.menu-btn:hover{
+transform:scale(1.05);
+}
+
+.menu-btn span{
+width:26px;
+height:3px;
+background:#444;
+border-radius:5px;
+transition:0.3s;
+}
+
+.menu-btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2){
+opacity:0;
+}
+
+.menu-btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+
+/* ===== MENU ===== */
+
+.menu{
+position:fixed;
+top:0;
+right:-320px;
+width:300px;
+height:100vh;
+background:white;
+padding-top:100px;
+display:flex;
+flex-direction:column;
+transition:0.4s;
+box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+z-index:999;
+}
+
+.menu.open{
+right:0;
+}
+
+.menu a{
+padding:18px 25px;
+font-weight:bold;
+text-decoration:none;
+color:#444;
+transition:0.3s;
+}
+
+.menu a:hover{
+padding-left:35px;
+color:#b67832;
+}
+
+/* ===== OVERLAY ===== */
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.35);
+opacity:0;
+visibility:hidden;
+transition:0.3s;
+z-index:998;
+}
+
+.overlay.show{
+opacity:1;
+visibility:visible;
+}
+
+/* ===== HERO（修正②画像追加） ===== */
+
+.hero{
+position:relative;
+text-align:center;
+padding:0;
+}
+
+.hero-img{
+width:100%;
+height:420px;
+object-fit:cover;
+display:block;
+filter:brightness(0.65);
+}
+
+.hero-content{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+text-align:center;
+width:90%;
+}
+
+.hero-content h1{
+font-size:42px;
+margin-bottom:10px;
+}
+
+.hero-content p{
+font-size:18px;
+}
+
+/* ===== BUTTON ===== */
+
+.btn{
+display:inline-block;
+margin-top:20px;
+padding:14px 28px;
+border-radius:50px;
+background:linear-gradient(135deg,#d9a35f,#b67832);
+color:white;
+font-weight:bold;
+text-decoration:none;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:translateY(-4px);
+}
+
+/* ===== CONTENT ===== */
+
+.card{
+max-width:900px;
+margin:40px auto;
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.features{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+max-width:1000px;
+margin:40px auto;
+padding:0 20px;
+}
+
+.feature{
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
+text-align:center;
+}
+
+/* ===== FOOTER ===== */
+
+footer{
+text-align:center;
+padding:40px 10px;
+background:#e8d5bb;
+margin-top:60px;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:600px){
+.hero-img{height:300px;}
+.hero-content h1{font-size:28px;}
+.hero-content p{font-size:14px;}
+.menu{width:260px;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<a href="index.html" class="logo">
+<img src="icon.png" alt="icon">
+</a>
+
+<button class="menu-btn" id="menuBtn">
+<span></span><span></span><span></span>
+</button>
+
+</header>
+
+<div class="overlay" id="overlay"></div>
+
+<nav class="menu" id="menu">
+
+<a href="index.html">HOME</a>
+<a href="application.html">申し込み</a>
+<a href="features.html">特徴</a>
+<a href="mutter.html">かもめんのつぶやき</a>
+<a href="tool.html">お役立ちツール</a>
+
+</nav>
+
+<main>
+
+<!-- ★修正②：画像をヒーローに追加 -->
+<section class="hero">
+
+<img src="image1.png" class="hero-img" alt="hero image">
+
+<div class="hero-content">
+
+<h1>図書手帳公式ホームページ</h1>
+
+<p>本とあなたをつなぐ、新しい読書体験。</p>
+
+<a href="application.html" class="btn">申し込み</a>
+
+</div>
+
+</section>
+
+<section class="card">
+<h2>ようこそ</h2>
+<p>図書手帳は読書を記録し、本との出会いをより楽しくするサービスです。</p>
+</section>
+
+<section class="features">
+
+<div class="feature">
+<h3>読書管理</h3>
+<p>本を整理できます。</p>
+</div>
+
+<div class="feature">
+<h3>検索</h3>
+<p>すぐに本を見つけられます。</p>
+</div>
+
+<div class="feature">
+<h3>簡単操作</h3>
+<p>誰でも使いやすい設計です。</p>
+</div>
+
+</section>
+
+</main>
+
+<footer>
+© 2026 図書手帳公式ホームページ
+</footer>
+
+<script>
+
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+
+btn.addEventListener("click", () => {
+btn.classList.toggle("active");
+menu.classList.toggle("open");
+overlay.classList.toggle("show");
+});
+
+overlay.addEventListener("click", () => {
+btn.classList.remove("active");
+menu.classList.remove("open");
+overlay.classList.remove("show");
+});
+
+</script>
+
+</body>
+</html>
