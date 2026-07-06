@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>効果音プレイヤー</title>
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --fg: #222;
+      --card: #ffffff;
+      --accent: #1976d2;
+      --danger: #c62828;
+      --border: #dddddd;
+      --select-bg: rgba(25,118,210,0.15);
+      --select-border: #1976d2;
+      --blue-light: #4fc3f7;
+      --blue-light-hover: #29b6f6;
+      --input-bg: #ffffff;
+      --input-fg: #222;
+    }
+    :root[data-theme="dark"] {
+      --bg: #181818;
+      --fg: #f5f5f5;
+      --card: #242424;
+      --accent: #64b5f6;
+      --danger: #ef5350;
+      --border: #444444;
+      --select-bg: rgba(100,181,246,0.2);
+      --select-border: #64b5f6;
+      --blue-light: #4fc3f7;
+      --blue-light-hover: #29b6f6;
+      --input-bg: #333333;
+      --input-fg: #ffffff;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ▼ ボタンアニメーション ▼ */
+    button,
+    .file-upload-label {
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+    }
+    button:hover,
+    .file-upload-label:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    button:active,
+    .file-upload-label:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .icon-btn:hover { background: var(--select-bg); }
+    .small-btn:hover { background: var(--select-bg); }
+    .row-btn:hover { background: var(--select-bg); }
+    .delete-btn:hover { background: rgba(198,40,40,0.15); }
+    .btn:hover { background: var(--select-bg); }
+
+    /* ▲ アニメーションここまで ▲ */
+
+    /* ▼ 右上コントロール（バッテリー含む） ▼ */
+    .top-right-controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #batteryInfo {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 16px;
+    }
+    #btBattery { display: none; }
+
+    .battery-green { color: #4caf50; font-weight: bold; }
+    .battery-red { color: #e53935; font-weight: bold; }
+    /* ▲ 右上バッテリーここまで ▲ */
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 70px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      padding: 0 20px 10px;
+      align-items: center;
+    }
+    #searchInput {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--input-fg);
+    }
+    .small-btn {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--fg);
+    }
+
+    .full-list {
+      padding: 0 20px 20px;
+      height: calc(100vh - 260px);
+      overflow-y: auto;
+      padding-bottom: 140px;
+    }
+    .sfx-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sfx-item {
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card);
+      transition: all 0.25s ease;
+      max-height: 80px;
+      position: relative;
+    }
+    .sfx-item.selected {
+      background: var(--select-bg);
+      border-left: 6px solid var(--select-border);
+      font-weight: bold;
+    }
+    .sfx-item.fade-out {
+      opacity: 0;
+      transform: scale(0.95);
+      max-height: 0;
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+    }
+
+    .sfx-item.dragging {
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      transform: scale(1.03);
+      z-index: 2000;
+    }
+
+    .sfx-name {
+      flex: 1;
+      margin-right: 10px;
+      word-break: break-all;
+    }
+
+    .row-buttons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .row-btn {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--fg);
+    }
+    .delete-btn {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .drop-indicator {
+      height: 4px;
+      background: black;
+      border-radius: 2px;
+      margin: 4px 0;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .drop-indicator.show {
+      opacity: 1;
+    }
+
+    /* ▼ 下部バー（中央揃え） ▼ */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 16px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center; /* ← 中央揃え */
+      gap: 20px;
+      z-index: 1000;
+    }
+
+    .volume-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="range"] {
+      width: 260px;
+      height: 10px;
+    }
+
+    #volumePercent {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* ▼ 中央ボタン大型化 ▼ */
+    .btn {
+      padding: 18px 32px;
+      border-radius: 999px;
+      border: 3px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      font-size: 26px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #playBtn {
+      font-size: 30px;
+      padding: 20px 36px;
+    }
+    /* ▲ ボタン大型化ここまで ▲ */
+
+    .btn-blue {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn-red {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      padding: 40px;
+      display: none;
+      flex-direction: column;
+      z-index: 2000;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .file-upload-label {
+      display: inline-block;
+      padding: 12px 18px;
+      background: var(--blue-light);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      width: 200px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    #selectedCount {
+      margin-left: 12px;
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .modal input[type="text"] {
+      font-size: 20px;
+      padding: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--input-fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .modal-buttons .btn {
+      font-size: 18px;
+      padding: 10px 18px;
+      width: 120px;
+      text-align: center;
+    }
+
+    .confirm-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    .confirm-modal.show {
+      display: flex;
+    }
+    .confirm-box {
+      background: var(--card);
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .confirm-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-right-controls">
+
+    <!-- ▼ バッテリー表示（右上に横並び） ▼ -->
+    <div id="batteryInfo">
+      <div id="pcBattery">PC充電残量：取得中…</div>
+      <div id="btBattery">📡Bluetooth充電残量：取得中…</div>
+    </div>
+    <!-- ▲ ここまで ▲ -->
+
+    <button id="themeToggleBtn" class="icon-btn">🌗</button>
+    <button id="fullscreenBtn" class="icon-btn">⛶</button>
+    <button id="openAddPanelBtn" class="icon-btn" style="font-size:28px;">＋</button>
+  </div>
+
+  <h1>効果音プレイヤー</h1>
+
+  <div class="toolbar">
+    <input id="searchInput" type="text" placeholder="効果音を検索">
+    <button id="clearSearchBtn" class="small-btn">✕</button>
+    <button id="sortByNameBtn" class="small-btn">名前順</button>
+  </div>
+
+  <div class="full-list">
+    <ul id="sfxList" class="sfx-list">
+      <li id="emptyMessage" style="padding:12px; text-align:center; opacity:0.7;">
+        右上の＋ボタンを押して効果音を選択してください
+      </li>
+    </ul>
+  </div>
+
+  <div class="bottom-bar">
+
+    <div class="volume-wrapper">
+      <span style="font-size:18px;">音量</span>
+      <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8">
+      <span id="volumePercent">80%</span>
+    </div>
+
+    <button id="playBtn" class="btn btn-blue">▶ 再生</button>
+    <button id="stopAllBtn" class="btn btn-red">■ 停止</button>
+
+    <button id="btConnectBtn" class="small-btn">🔋 Bluetooth充電残量取得</button>
+
+  </div>
+
+  <div id="addModal" class="modal">
+    <h2>効果音を追加</h2>
+
+    <label for="fileInput" class="file-upload-label">ファイルを選択</label>
+    <span id="selectedCount"></span>
+
+    <input id="fileInput" type="file" accept="audio/*" multiple>
+
+    <input id="displayNameInput" type="text" placeholder="表示名（任意）">
+
+    <div class="modal-buttons">
+      <button id="addSfxBtn" class="btn btn-blue">追加</button>
+      <button id="closeModalBtn" class="btn btn-red">閉じる</button>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="confirm-modal">
+    <div class="confirm-box">
+      <p id="confirmText"></p>
+      <div class="confirm-buttons">
+        <button id="confirmYes" class="btn btn-red">削除</button>
+        <button id="confirmNo" class="btn btn-blue">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+    const openAddPanelBtn = document.getElementById("openAddPanelBtn");
+    const addModal = document.getElementById("addModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    const confirmModal = document.getElementById("confirmModal");
+    const confirmText = document.getElementById("confirmText");
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    const fileInput = document.getElementById("fileInput");
+    const displayNameInput = document.getElementById("displayNameInput");
+    const addSfxBtn = document.getElementById("addSfxBtn");
+    const sfxList = document.getElementById("sfxList");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    const selectedCount = document.getElementById("selectedCount");
+
+    const volumeControl = document.getElementById("volumeControl");
+    const volumePercent = document.getElementById("volumePercent");
+    const stopAllBtn = document.getElementById("stopAllBtn");
+    const playBtn = document.getElementById("playBtn");
+
+    const pcBatteryEl = document.getElementById("pcBattery");
+    const btBatteryEl = document.getElementById("btBattery");
+    const btConnectBtn = document.getElementById("btConnectBtn");
+
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const sortByNameBtn = document.getElementById("sortByNameBtn");
+
+    let sfxItems = [];
+    let nextId = 0;
+    let selectedId = null;
+    let draggedLi = null;
+
+    const dropIndicator = document.createElement("div");
+    dropIndicator.className = "drop-indicator";
+
+    /* ▼ PCバッテリー取得 ▼ */
+    if (navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        function updatePcBattery() {
+          const level = Math.round(battery.level * 100);
+          const charging = battery.charging ? "（充電中）" : "";
+
+          pcBatteryEl.textContent = `PC充電残量：${level}% ${charging}`;
+
+          if (level >= 21) {
+            pcBatteryEl.classList.add("battery-green");
+            pcBatteryEl.classList.remove("battery-red");
+          } else {
+            pcBatteryEl.classList.add("battery-red");
+            pcBatteryEl.classList.remove("battery-green");
+          }
+        }
+        updatePcBattery();
+        battery.addEventListener("levelchange", updatePcBattery);
+        battery.addEventListener("chargingchange", updatePcBattery);
+      });
+    } else {
+      pcBatteryEl.textContent = "PC充電残量：取得不可";
+    }
+    /* ▲ PCバッテリーここまで ▲ */
+
+    /* ▼ Bluetoothバッテリー取得 ▼ */
+    async function connectBluetoothBattery() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: ["battery_service"] }]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService("battery_service");
+        const characteristic = await service.getCharacteristic("battery_level");
+
+        async function updateBtBattery() {
+          const value = await characteristic.readValue();
+          const level = value.getUint8(0);
+
+          btBatteryEl.style.display = "block";
+          btBatteryEl.textContent = `Bluetooth充電残量：${level}%`;
+
+          if (level >= 21) {
+            btBatteryEl.classList.add("battery-green");
+            btBatteryEl.classList.remove("battery-red");
+          } else {
+            btBatteryEl.classList.add("battery-red");
+            btBatteryEl.classList.remove("battery-green");
+          }
+        }
+
+        await updateBtBattery();
+        characteristic.addEventListener("characteristicvaluechanged", updateBtBattery);
+        await characteristic.startNotifications();
+
+      } catch (e) {
+        console.log("Bluetooth取得失敗:", e);
+      }
+    }
+
+    btConnectBtn.onclick = connectBluetoothBattery;
+    /* ▲ Bluetoothここまで ▲ */
+
+    /* ▼ テーマ切替 ▼ */
+    themeToggleBtn.onclick = () => {
+      const now = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", now);
+      localStorage.setItem("theme", now);
+    };
+    root.setAttribute("data-theme", localStorage.getItem("theme") || "light");
+
+    /* ▼ 全画面切替 ▼ */
+    fullscreenBtn.onclick = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    };
+
+    /* ▼ モーダル ▼ */
+    openAddPanelBtn.onclick = () => addModal.classList.add("show");
+    closeModalBtn.onclick = () => addModal.classList.remove("show");
+
+    fileInput.onchange = () => {
+      const count = fileInput.files.length;
+      selectedCount.textContent = count > 0 ? `${count} 個選択中` : "";
+    };
+
+    /* ▼ 削除確認 ▼ */
+    function openConfirmModal(name, onConfirm) {
+      confirmText.textContent = `${name} を削除しますか？`;
+      confirmModal.classList.add("show");
+      confirmYes.onclick = () => {
+        confirmModal.classList.remove("show");
+        onConfirm();
+      };
+      confirmNo.onclick = () => {
+        confirmModal.classList.remove("show");
+      };
+    }
+
+    /* ▼ 音量 ▼ */
+    function updateVolumePercent() {
+      volumePercent.textContent = Math.round(volumeControl.value * 100) + "%";
+    }
+    updateVolumePercent();
+
+    volumeControl.oninput = () => {
+      updateVolumePercent();
+      sfxItems.forEach(item => {
+        if (item) item.audio.volume = volumeControl.value;
+      });
+    };
+
+    /* ▼ 並び順同期 ▼ */
+    function syncOrderFromDOM() {
+      const orderIds = [...document.querySelectorAll(".sfx-item")].map(li => Number(li.dataset.id));
+      sfxItems.sort((a, b) => orderIds.indexOf(a.id) - orderIds.indexOf(b.id));
+    }
+
+    /* ▼ 効果音アイテム生成 ▼ */
+    function createSfxItem(file, customName) {
+      const url = URL.createObjectURL(file);
+      const audio = new Audio(url);
+      audio.volume = volumeControl.value;
+      const name = customName || file.name;
+      const id = nextId++;
+
+      const li = document.createElement("li");
+      li.className = "sfx-item";
+      li.draggable = true;
+      li.dataset.id = id;
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "sfx-name";
+      nameSpan.textContent = name;
+
+      const btnWrap = document.createElement("div");
+      btnWrap.className = "row-buttons";
+
+      const upBtn = document.createElement("button");
+      upBtn.textContent = "▲";
+      upBtn.className = "row-btn";
+
+      const downBtn = document.createElement("button");
+      downBtn.textContent = "▼";
+      downBtn.className = "row-btn";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "削除";
+      deleteBtn.className = "row-btn delete-btn";
+
+      btnWrap.appendChild(upBtn);
+      btnWrap.appendChild(downBtn);
+      btnWrap.appendChild(deleteBtn);
+
+      li.appendChild(nameSpan);
+      li.appendChild(btnWrap);
+
+      const item = { id, audio, name, li };
+      sfxItems.push(item);
+
+      li.addEventListener("click", (e) => {
+        if (e.target === upBtn || e.target === downBtn || e.target === deleteBtn) return;
+        document.querySelectorAll(".sfx-item").forEach(el => el.classList.remove("selected"));
+        li.classList.add("selected");
+        selectedId = id;
+      });
+
+      upBtn.onclick = (e) => {
+        e.stopPropagation();
+        const prev = li.previousElementSibling;
+        if (prev) {
+          sfxList.insertBefore(li, prev);
+          syncOrderFromDOM();
+        }
+      };
+      downBtn.onclick = (e) => {
+        e.stopPropagation();
+        const next = li.nextElementSibling;
+        if (next) {
+          sfxList.insertBefore(next, li);
+          syncOrderFromDOM();
+        }
+      };
+
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        openConfirmModal(name, () => {
+          audio.pause();
+          audio.currentTime = 0;
+          li.classList.add("fade-out");
+          if (selectedId === id) selectedId = null;
+          setTimeout(() => {
+            li.remove();
+            sfxItems = sfxItems.filter(it => it.id !== id);
+            if (!sfxList.querySelector(".sfx-item")) {
+              sfxList.appendChild(emptyMessage);
+            }
+            syncOrderFromDOM();
+          }, 250);
+        });
+      };
+
+      /* ▼ ドラッグ並び替え ▼ */
+      li.addEventListener("dragstart", () => {
+        draggedLi = li;
+        li.classList.add("dragging");
+      });
+      li.addEventListener("dragend", () => {
+        li.classList.remove("dragging");
+        draggedLi = null;
+        dropIndicator.remove();
+        syncOrderFromDOM();
+      });
+      li.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (!draggedLi || draggedLi === li) return;
+
+        const rect = li.getBoundingClientRect();
+        const offset = e.clientY - rect.top;
+        const before = offset < rect.height / 2;
+
+        dropIndicator.classList.add("show");
+        if (before) {
+          sfxList.insertBefore(dropIndicator, li);
+        } else {
+          sfxList.insertBefore(dropIndicator, li.nextSibling);
+        }
+      });
+      li.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (!draggedLi || draggedLi === li) return;
+
+        const before = dropIndicator.nextSibling === li;
+        if (before) {
+          sfxList.insertBefore(draggedLi, li);
+        } else {
+          sfxList.insertBefore(draggedLi, li.nextSibling);
+        }
+        dropIndicator.remove();
+        syncOrderFromDOM();
+      });
+
+      return item;
+    }
+
+    /* ▼ 効果音追加 ▼ */
+    addSfxBtn.onclick = () => {
+      const files = fileInput.files;
+      if (!files.length) {
+        alert("ファイルを選択してください");
+        return;
+      }
+      const customName = displayNameInput.value.trim();
+      [...files].forEach(file => {
+        const item = createSfxItem(file, customName);
+        if (emptyMessage.parentNode) emptyMessage.remove();
+        sfxList.appendChild(item.li);
+      });
+
+      selectedCount.textContent = "";
+      fileInput.value = "";
+      displayNameInput.value = "";
+      addModal.classList.remove("show");
+      syncOrderFromDOM();
+    };
+
+    /* ▼ 再生 ▼ */
+    playBtn.onclick = () => {
+      const item = sfxItems.find(i => i && i.id === selectedId);
+      if (!item) {
+        alert("再生する効果音を一覧から選択してください");
+        return;
+      }
+      item.audio.currentTime = 0;
+      item.audio.play();
+    };
+
+    /* ▼ 停止 ▼ */
+    stopAllBtn.onclick = () => {
+      sfxItems.forEach(item => {
+        if (item) {
+          item.audio.pause();
+          item.audio.currentTime = 0;
+        }
+      });
+    };
+
+    /* ▼ 検索 ▼ */
+    searchInput.oninput = () => {
+      const q = searchInput.value.toLowerCase();
+      document.querySelectorAll(".sfx-item").forEach(li => {
+        const name = li.querySelector(".sfx-name").textContent.toLowerCase();
+        li.style.display = name.includes(q) ? "" : "none";
+      });
+    };
+    clearSearchBtn.onclick = () => {
+      searchInput.value = "";
+      document.querySelectorAll(".sfx-item").forEach(li => {
+        li.style.display = "";
+      });
+    };
+
+    /* ▼ 名前順ソート ▼ */
+    sortByNameBtn.onclick = () => {
+      const lis = [...document.querySelectorAll(".sfx-item")];
+      lis.sort((a, b) => {
+        const na = a.querySelector(".sfx-name").textContent.toLowerCase();
+        const nb = b.querySelector(".sfx-name").textContent.toLowerCase();
+        return na.localeCompare(nb, "ja");
+      });
+      lis.forEach(li => sfxList.appendChild(li));
+      syncOrderFromDOM();
+    };
+  </script>
+</body>
+</html>
