@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>バーコード生成機</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #ffffff;
+      padding: 24px 32px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 640px;
+      width: 100%;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+      text-align: center;
+    }
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 240px;
+      padding: 8px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid #0078d4;
+      background: #0078d4;
+      color: #fff;
+      white-space: nowrap;
+    }
+    button.secondary {
+      border-color: #666;
+      background: #fff;
+      color: #333;
+    }
+    #barcodeCanvas {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      display: block;
+      margin: 0 auto;
+    }
+    #copyStatus {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>バーコード生成機</h1>
+
+    <div class="form-row">
+      <input id="textInput" type="text" placeholder="半角で入力してください">
+      <button id="generateBtn">生成</button>
+      <button id="copyBtn" class="secondary">画像コピー</button>
+    </div>
+
+    <canvas id="barcodeCanvas" width="600" height="90"></canvas>
+    <div id="copyStatus"></div>
+  </div>
+
+  <script>
+    const CODE39_MAP = {
+      '0': '000110100','1': '100100001','2': '001100001','3': '101100000',
+      '4': '000110001','5': '100110000','6': '001110000','7': '000100101',
+      '8': '100100100','9': '001100100','A': '100001001','B': '001001001',
+      'C': '101001000','D': '000011001','E': '100011000','F': '001011000',
+      'G': '000001101','H': '100001100','I': '001001100','J': '000011100',
+      'K': '100000011','L': '001000011','M': '101000010','N': '000010011',
+      'O': '100010010','P': '001010010','Q': '000000111','R': '100000110',
+      'S': '001000110','T': '000010110','U': '110000001','V': '011000001',
+      'W': '111000000','X': '010010001','Y': '110010000','Z': '011010000',
+      '-': '010000101','.' : '110000100',' ': '011000100','$': '010101000',
+      '/': '010100010','+': '010001010','%': '000101010','*': '010010100'
+    };
+
+    const VALID_CHARS = /^[0-9A-Z\-\. \$\/\+\%]+$/;
+
+    function drawCode39(text) {
+      const canvas = document.getElementById('barcodeCanvas');
+      const ctx = canvas.getContext('2d');
+      const upperText = text.toUpperCase();
+
+      if (!VALID_CHARS.test(upperText)) {
+        alert('使用できない文字があります');
+        return false;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const quietZone = 10;
+      const fullText = '*' + upperText + '*';
+
+      let modules = [];
+
+      for (let char of fullText) {
+        const pattern = CODE39_MAP[char];
+        for (let i = 0; i < pattern.length; i++) {
+          const isWide = pattern[i] === '1';
+          const width = isWide ? 3 : 1;
+          modules.push({ type: i % 2 === 0 ? 'bar' : 'space', width });
+        }
+        modules.push({ type: 'space', width: 1 });
+      }
+
+      const modulePixel = 2;
+      const barHeight = 70;
+
+      let x = quietZone;
+      ctx.fillStyle = '#000';
+
+      let lastX = x;
+
+      for (let m of modules) {
+        const w = m.width * modulePixel;
+        if (m.type === 'bar') {
+          ctx.fillRect(x, 10, w, barHeight);
+        }
+        x += w;
+        lastX = x;
+      }
+
+      // ★ 右側の余白を完全に削る
+      const actualWidth = lastX + quietZone;
+
+      const trimmed = document.createElement('canvas');
+      trimmed.width = actualWidth;
+      trimmed.height = canvas.height;
+
+      const tctx = trimmed.getContext('2d');
+      tctx.drawImage(canvas, 0, 0, actualWidth, canvas.height, 0, 0, actualWidth, canvas.height);
+
+      canvas.width = actualWidth;
+      canvas.height = trimmed.height;
+      ctx.drawImage(trimmed, 0, 0);
+
+      return true;
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const value = document.getElementById('textInput').value.trim();
+      if (!value) return alert('文字列を入力してください');
+      drawCode39(value);
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const canvas = document.getElementById('barcodeCanvas');
+      const status = document.getElementById('copyStatus');
+
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const item = new ClipboardItem({ 'image/png': blob });
+        await navigator.clipboard.write([item]);
+        status.textContent = 'コピーしました';
+      } catch (e) {
+        status.textContent = 'コピーに失敗しました';
+      }
+    });
+
+    drawCode39('CODE39');
+  </script>
+</body>
+</html>
+
