@@ -2,295 +2,682 @@
 <html lang="ja">
 
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>申し込み｜図書手帳公式ホームページ</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" type="image/png" href="favicon.png">
+<title>
+
+申し込み｜図書手帳公式ホームページ
+
+</title>
+
+<link rel="icon"
+type="image/png"
+href="favicon.png">
 
 <style>
 
-/* =========================
-   BASE
-========================= */
+/* ==========================================
+   RESET
+========================================== */
 
 *{
+
 margin:0;
 padding:0;
 box-sizing:border-box;
-}
 
-body{
-font-family:"Yu Gothic","Meiryo",sans-serif;
-background:#FAEEDD;
-color:#444;
-overflow-x:hidden;
 }
 
 html{
+
 scroll-behavior:smooth;
+
 }
 
-/* =========================
-   HEADER（共通化想定）
-========================= */
+body{
+
+font-family:
+
+"Yu Gothic UI",
+"Yu Gothic",
+Meiryo,
+sans-serif;
+
+background:#FAEEDD;
+
+color:#444;
+
+overflow-x:hidden;
+
+}
+
+/* ==========================================
+   HEADER
+========================================== */
 
 .header{
+
 position:fixed;
+
 top:0;
 left:0;
+
 width:100%;
 height:80px;
+
 display:flex;
+
 justify-content:space-between;
+
 align-items:center;
-padding:0 25px;
-background:rgba(255,255,255,0.6);
+
+padding:0 24px;
+
+background:rgba(255,255,255,.72);
+
 backdrop-filter:blur(12px);
-box-shadow:0 5px 20px rgba(0,0,0,0.08);
+
+box-shadow:
+
+0 5px 20px rgba(0,0,0,.08);
+
 z-index:1000;
+
 }
 
-/* ロゴ */
+/* ---------- LOGO ---------- */
+
+.logo{
+
+display:flex;
+
+align-items:center;
+
+}
+
 .logo img{
-height:45px;
+
+height:52px;
+
 width:auto;
-object-fit:contain;
-cursor:pointer;
-transition:0.3s;
+
+display:block;
+
+transition:.25s;
+
 }
 
 .logo img:hover{
+
 transform:scale(1.05);
+
 }
 
-/* =========================
-   MENU BUTTON
-========================= */
+/* ---------- MENU BUTTON ---------- */
 
 .menu-btn{
-width:55px;
-height:55px;
-border-radius:50%;
+
+width:56px;
+
+height:56px;
+
 border:none;
+
+border-radius:50%;
+
 background:white;
+
 display:flex;
+
 flex-direction:column;
+
 justify-content:center;
+
 align-items:center;
+
 gap:6px;
+
 cursor:pointer;
-box-shadow:0 6px 20px rgba(0,0,0,0.15);
+
+box-shadow:
+
+0 6px 20px rgba(0,0,0,.15);
+
+transition:.3s;
+
+}
+
+.menu-btn:hover{
+
+transform:scale(1.05);
+
 }
 
 .menu-btn span{
+
 width:26px;
+
 height:3px;
+
 background:#444;
-border-radius:5px;
-transition:0.3s;
+
+border-radius:20px;
+
+transition:.35s;
+
 }
 
-/* =========================
+/* 三本線 → × */
+
+.menu-btn.active span:nth-child(1){
+
+transform:
+
+translateY(9px)
+
+rotate(45deg);
+
+}
+
+.menu-btn.active span:nth-child(2){
+
+opacity:0;
+
+}
+
+.menu-btn.active span:nth-child(3){
+
+transform:
+
+translateY(-9px)
+
+rotate(-45deg);
+
+}
+
+/* ==========================================
    MENU
-========================= */
+========================================== */
 
 .menu{
+
 position:fixed;
+
 top:0;
 right:-320px;
+
 width:300px;
+
 height:100vh;
+
 background:white;
-padding-top:100px;
+
+padding-top:90px;
+
 display:flex;
+
 flex-direction:column;
-transition:0.4s ease;
-box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+
+box-shadow:
+
+-10px 0 30px rgba(0,0,0,.12);
+
+transition:.35s;
+
 z-index:999;
+
 }
 
 .menu.open{
+
 right:0;
+
 }
 
 .menu a{
-padding:18px 25px;
+
+padding:18px 24px;
+
 text-decoration:none;
-color:#444;
+
 font-weight:bold;
+
+color:#444;
+
+transition:.25s;
+
 }
 
 .menu a:hover{
-padding-left:35px;
-color:#b67832;
+
+background:#FAEEDD;
+
+padding-left:36px;
+
+color:#B67832;
+
 }
 
-/* 背景オーバーレイ（外クリック用） */
+/* ---------- Overlay ---------- */
+
 .overlay{
+
 position:fixed;
+
 top:0;
 left:0;
+
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.25);
+
+background:rgba(0,0,0,.25);
+
 opacity:0;
+
 pointer-events:none;
-transition:0.3s;
+
+transition:.3s;
+
 z-index:998;
+
 }
 
 .overlay.show{
+
 opacity:1;
+
 pointer-events:auto;
+
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* ==========================================
+   PAGE TITLE
+========================================== */
 
-main{
-padding-top:100px;
-}
+.page-title{
 
-.title{
+margin-top:120px;
+
 text-align:center;
-font-size:34px;
-margin:30px 0;
-color:#8b5a2b;
+
+color:#8B5A2B;
+
+font-size:38px;
+
+animation:fadeIn 1s;
+
 }
 
-.section{
-max-width:900px;
-margin:20px auto;
-background:white;
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(20px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+/* ==========================================
+   RULE AREA
+========================================== */
+
+.rule-box{
+
+max-width:1000px;
+
+margin:40px auto;
+
 padding:30px;
-border-radius:18px;
-box-shadow:0 10px 30px rgba(0,0,0,0.08);
+
+background:white;
+
+border-radius:20px;
+
+box-shadow:
+
+0 10px 25px rgba(0,0,0,.08);
+
 }
 
-/* 規約 */
-.terms{
-max-height:340px;
+.rule-content{
+
+height:500px;
+
 overflow-y:auto;
-padding:20px;
-border:1px solid #ddd;
+
+padding-right:10px;
+
+line-height:2;
+
+border:1px solid #E8D5BB;
+
 border-radius:12px;
-background:#fffdf8;
-line-height:1.8;
-font-size:14px;
+
+padding:25px;
+
+background:#FFFDF8;
+
 }
 
-/* ボタン */
-.btn{
-display:inline-block;
-margin-top:25px;
-padding:15px 30px;
-border-radius:50px;
-background:linear-gradient(135deg,#d9a35f,#b67832);
-color:white;
-font-weight:bold;
-text-decoration:none;
+/* ==========================================
+   FORM BUTTON AREA
+========================================== */
+
+.agree-area{
+
+max-width:1000px;
+
+margin:30px auto 80px;
+
+padding:0 30px;
+
 text-align:center;
-transition:0.3s;
-box-shadow:0 8px 20px rgba(0,0,0,0.2);
+
 }
 
-.btn:hover{
-transform:translateY(-4px);
-}
 
-.btn.disabled{
-opacity:0.4;
+.agree-button{
+
+display:inline-block;
+
+padding:18px 45px;
+
+border:none;
+
+border-radius:999px;
+
+background:#B67832;
+
+color:white;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:.3s;
+
+box-shadow:
+0 10px 20px rgba(182,120,50,.25);
+
+opacity:.5;
+
 pointer-events:none;
-filter:grayscale(0.5);
+
 }
 
-/* =========================
+
+.agree-button.enabled{
+
+opacity:1;
+
+pointer-events:auto;
+
+}
+
+
+.agree-button.enabled:hover{
+
+transform:
+translateY(-4px)
+scale(1.03);
+
+box-shadow:
+0 15px 30px rgba(182,120,50,.35);
+
+}
+
+
+/* ==========================================
    FOOTER
-========================= */
+========================================== */
+
 
 footer{
+
+background:#E8D5BB;
+
+padding:40px 20px;
+
 text-align:center;
-padding:40px;
-background:#e8d5bb;
-margin-top:60px;
+
+color:#666;
+
+margin-top:50px;
+
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
 
-@media(max-width:600px){
+/* ==========================================
+   MOBILE
+========================================== */
 
-.title{
-font-size:26px;
+
+@media(max-width:768px){
+
+
+.header{
+
+height:75px;
+
+padding:0 15px;
+
 }
+
+
+.logo img{
+
+height:45px;
+
+}
+
 
 .menu{
+
 width:260px;
-}
 
 }
+
+
+.page-title{
+
+font-size:30px;
+
+}
+
+
+.rule-box{
+
+margin:30px 15px;
+
+padding:20px;
+
+}
+
+
+.rule-content{
+
+height:450px;
+
+padding:15px;
+
+font-size:14px;
+
+}
+
+
+.agree-area{
+
+padding:0 15px;
+
+}
+
+
+.agree-button{
+
+width:100%;
+
+font-size:16px;
+
+}
+
+
+}
+
 
 </style>
 
 </head>
 
+
 <body>
 
-<!-- オーバーレイ（外クリック用） -->
-<div class="overlay" id="overlay"></div>
 
-<!-- =========================
-     HEADER（共通部品）
-========================= -->
+<!-- ==========================================
+     HEADER
+========================================== -->
+
 
 <header class="header">
 
+
 <a href="index.html" class="logo">
-<img src="icon.png" alt="logo">
+
+<img src="icon.png" alt="図書手帳">
+
 </a>
 
+
+
 <button class="menu-btn" id="menuBtn">
+
+
 <span></span>
+
 <span></span>
+
 <span></span>
+
+
 </button>
+
 
 </header>
 
-<!-- =========================
+
+
+
+<!-- ==========================================
      MENU
-========================= -->
+========================================== -->
+
 
 <nav class="menu" id="menu">
 
-<a href="index.html">ＨＯＭＥ</a>
-<a href="application.html">申し込み</a>
-<a href="features.html">特徴</a>
-<a href="movie.html">紹介動画</a>
-<a href="mutter.html">かもめんのつぶやき</a>
-<a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener noreferrer">蔵書検索（Ａ・Ｂ棟共通）</a>
-<a href="tool.html">お役立ちツール</a>
+
+<a href="index.html">
+
+HOME
+
+</a>
+
+
+<a href="application.html">
+
+申し込み
+
+</a>
+
+
+<a href="features.html">
+
+特徴
+
+</a>
+
+
+<a href="movie.html">
+
+紹介動画
+
+</a>
+
+
+<a href="mutter.html">
+
+かもめんのつぶやき
+
+</a>
+
+
+<a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener noreferrer">
+
+蔵書検索（Ａ・Ｂ棟共通）
+
+</a>
+
+
+<a href="tool.html">
+
+お役立ちツール
+
+</a>
+
 
 </nav>
 
-<!-- =========================
-     MAIN
-========================= -->
 
-<main>
 
-<h1 class="title">申し込み</h1>
+<div class="overlay" id="overlay"></div>
 
-<section class="section">
 
-<h2>利用規約</h2>
+
+
+
+<!-- ==========================================
+     TITLE
+========================================== -->
+
+
+<h1 class="page-title">
+
+申し込み
+
+</h1>
+
+
+
+
+
+<!-- ==========================================
+     RULE
+========================================== -->
+
+
+<section class="rule-box">
+
+
+<h2>利用規約</h2><br>
+
+<div class="rule-content" id="ruleContent">
 
 <div class="terms" id="termsBox">
-
 
 
 <h2>図書手帳利用規約</h2>
@@ -476,8 +863,7 @@ width:260px;
 
 <p>
 利用者が図書手帳を紛失した場合、再発行することができます。第９条に則り再度利用登録を行ってください。<br>
-また、新年度になる際、「１年度のみ有効」で発行した利用者のバーコードが無効となるため、第９条に則り、再度利用登録を行ってください。
-新年度になる際、当運営から再発行することはありません。
+また、新年度になる際、「１年度のみ有効」で発行した利用者のバーコードが無効となるため、第９条に則り、再度利用登録を行ってください。新年度になる際、当運営から再発行することはありません。
 </p>
 
 <p style="text-align:right;">
@@ -490,79 +876,225 @@ width:260px;
 
 </section>
 
+<!-- ==========================================
+     AGREE BUTTON
+========================================== -->
 
-<section class="section" style="text-align:center;">
 
-<a href="https://forms.cloud.microsoft/r/rw9wBcuevH"
-class="btn disabled"
-id="applyBtn"
-target="_blank"
-rel="noopener noreferrer">
+<section class="agree-area">
 
-規約に同意して申し込みを始める
 
-</a>
+<button
+class="agree-button"
+id="agreeButton"
+disabled>
+
+
+利用規約に同意して申し込みを始める
+
+
+</button>
+
 
 </section>
 
-</main>
+
+
+
+
+<!-- ==========================================
+     FOOTER
+========================================== -->
+
 
 <footer>
+
+
 © ２０２６ 図書手帳公式ホームページ
+
+
 </footer>
 
 <script>
 
-/* =========================
-   MENU CONTROL（共通化対応）
-========================= */
 
-const btn = document.getElementById("menuBtn");
-const menu = document.getElementById("menu");
-const overlay = document.getElementById("overlay");
+/* ==========================================
+   MENU CONTROL
+========================================== */
+
+
+const menuBtn =
+document.getElementById("menuBtn");
+
+
+const menu =
+document.getElementById("menu");
+
+
+const overlay =
+document.getElementById("overlay");
+
+
 
 function openMenu(){
+
+
 menu.classList.add("open");
+
+
 overlay.classList.add("show");
+
+
+menuBtn.classList.add("active");
+
+
 }
+
+
 
 function closeMenu(){
+
+
 menu.classList.remove("open");
+
+
 overlay.classList.remove("show");
+
+
+menuBtn.classList.remove("active");
+
+
 }
 
-btn.addEventListener("click", () => {
+
+
+menuBtn.addEventListener(
+"click",
+()=>{
+
+
 if(menu.classList.contains("open")){
+
+
 closeMenu();
+
+
 }else{
+
+
 openMenu();
-}
-});
 
-/* 外クリックで閉じる */
-overlay.addEventListener("click", closeMenu);
 
-/* =========================
-   規約スクロール連動
-========================= */
-
-const terms = document.getElementById("termsBox");
-const applyBtn = document.getElementById("applyBtn");
-
-applyBtn.classList.add("disabled");
-
-terms.addEventListener("scroll", () => {
-
-const bottom =
-terms.scrollTop + terms.clientHeight >= terms.scrollHeight - 5;
-
-if(bottom){
-applyBtn.classList.remove("disabled");
 }
 
-});
+
+}
+);
+
+
+
+overlay.addEventListener(
+"click",
+closeMenu
+);
+
+
+
+
+
+
+/* ==========================================
+   RULE SCROLL CHECK
+========================================== */
+
+
+const ruleContent =
+document.getElementById("ruleContent");
+
+
+const agreeButton =
+document.getElementById("agreeButton");
+
+
+
+ruleContent.addEventListener(
+"scroll",
+()=>{
+
+
+const scrollPosition =
+ruleContent.scrollTop +
+ruleContent.clientHeight;
+
+
+
+const scrollHeight =
+ruleContent.scrollHeight;
+
+
+
+// 最後まで読んだ場合
+
+if(
+scrollPosition >= scrollHeight - 5
+){
+
+
+agreeButton.disabled=false;
+
+
+agreeButton.classList.add("enabled");
+
+
+}
+
+
+}
+);
+
+
+
+
+
+
+/* ==========================================
+   FORM LINK
+========================================== */
+
+
+agreeButton.addEventListener(
+"click",
+()=>{
+
+
+if(
+agreeButton.classList.contains("enabled")
+){
+
+
+window.open(
+
+"https://forms.cloud.microsoft/r/rw9wBcuevH",
+
+"_blank",
+
+"noopener"
+
+);
+
+
+}
+
+
+}
+);
+
+
 
 </script>
 
+
+
 </body>
+
 </html>
