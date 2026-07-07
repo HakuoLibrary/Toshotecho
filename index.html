@@ -2,6 +2,7 @@
 <html lang="ja">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,24 +12,9 @@
 
 <style>
 
-/* ボタンアニメ */
-.menu-btn span{
-transition:0.3s;
-}
-
-.menu-btn.active span:nth-child(1){
-transform:translateY(9px) rotate(45deg);
-}
-
-.menu-btn.active span:nth-child(2){
-opacity:0;
-}
-
-.menu-btn.active span:nth-child(3){
-transform:translateY(-9px) rotate(-45deg);
-}
-
-/* ===== BASE ===== */
+/* ==========================================================
+   RESET
+========================================================== */
 
 *{
 margin:0;
@@ -36,242 +22,625 @@ padding:0;
 box-sizing:border-box;
 }
 
-body{
-font-family:"Yu Gothic","Meiryo",sans-serif;
-background:#FAEEDD;
-color:#444;
-overflow-x:hidden;
-}
-
 html{
 scroll-behavior:smooth;
 }
 
-/* ===== HEADER ===== */
+body{
+
+font-family:
+"Yu Gothic UI",
+"Yu Gothic",
+Meiryo,
+sans-serif;
+
+background:#FAEEDD;
+color:#444;
+overflow-x:hidden;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
 
 .header{
+
 position:fixed;
 top:0;
 left:0;
+
 width:100%;
 height:80px;
+
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:0 25px;
-background:rgba(255,255,255,0.6);
+
+padding:0 24px;
+
+background:rgba(255,255,255,.72);
 backdrop-filter:blur(12px);
+
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+
 z-index:1000;
-box-shadow:0 5px 20px rgba(0,0,0,0.08);
+
 }
 
-/* ★修正①：ロゴ（押しつぶし防止＋長方形） */
+/* ---------- LOGO ---------- */
+
+.logo{
+
+display:flex;
+align-items:center;
+
+}
+
 .logo img{
-height:45px;
-width:auto;              /* 縦横比維持 */
-object-fit:contain;
-cursor:pointer;
-transition:0.3s;
-border-radius:8px;       /* 少しだけ柔らかく */
+
+height:52px;
+width:auto;
+
+display:block;
+
+transition:.25s;
+
 }
 
 .logo img:hover{
+
 transform:scale(1.05);
+
 }
 
-/* ===== HAMBURGER ===== */
+/* ---------- MENU BUTTON ---------- */
 
 .menu-btn{
-width:55px;
-height:55px;
-border-radius:50%;
+
+width:56px;
+height:56px;
+
 border:none;
+border-radius:50%;
+
 background:white;
+
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
+
 gap:6px;
+
 cursor:pointer;
-box-shadow:0 6px 20px rgba(0,0,0,0.15);
-transition:0.3s;
+
+box-shadow:0 6px 20px rgba(0,0,0,.15);
+
+transition:.3s;
+
 }
 
 .menu-btn:hover{
+
 transform:scale(1.05);
+
 }
 
 .menu-btn span{
+
 width:26px;
 height:3px;
+
 background:#444;
-border-radius:5px;
-transition:0.3s;
+
+border-radius:20px;
+
+transition:.35s;
+
 }
 
+/* ---------- × Animation ---------- */
+
 .menu-btn.active span:nth-child(1){
-transform:translateY(9px) rotate(45deg);
+
+transform:
+translateY(9px)
+rotate(45deg);
+
 }
 
 .menu-btn.active span:nth-child(2){
+
 opacity:0;
+
 }
 
 .menu-btn.active span:nth-child(3){
-transform:translateY(-9px) rotate(-45deg);
+
+transform:
+translateY(-9px)
+rotate(-45deg);
+
 }
 
-/* ===== MENU ===== */
+/* ==========================================================
+   SIDE MENU
+========================================================== */
 
 .menu{
+
 position:fixed;
+
 top:0;
 right:-320px;
+
 width:300px;
 height:100vh;
+
 background:white;
-padding-top:100px;
+
+padding-top:90px;
+
 display:flex;
 flex-direction:column;
-transition:0.4s;
-box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+
+box-shadow:-10px 0 30px rgba(0,0,0,.12);
+
+transition:.35s;
+
 z-index:999;
+
 }
 
 .menu.open{
+
 right:0;
+
 }
 
 .menu a{
-padding:18px 25px;
-font-weight:bold;
+
+padding:18px 24px;
+
 text-decoration:none;
+
+font-weight:bold;
+
 color:#444;
-transition:0.3s;
+
+transition:.25s;
+
 }
 
 .menu a:hover{
-padding-left:35px;
-color:#b67832;
+
+background:#FAEEDD;
+
+padding-left:36px;
+
+color:#B67832;
+
 }
 
-/* ===== OVERLAY ===== */
+/* ---------- Overlay ---------- */
 
 .overlay{
+
 position:fixed;
+
 top:0;
 left:0;
+
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.35);
+
+background:rgba(0,0,0,.25);
+
 opacity:0;
-visibility:hidden;
-transition:0.3s;
+
+pointer-events:none;
+
+transition:.3s;
+
 z-index:998;
+
 }
 
 .overlay.show{
+
 opacity:1;
-visibility:visible;
+pointer-events:auto;
+
 }
 
-/* ===== HERO（修正②画像追加） ===== */
+/* ==========================================================
+   HERO IMAGE
+========================================================== */
 
-.hero{
-position:relative;
-text-align:center;
-padding:0;
-}
+.hero-image{
 
-.hero-img{
+margin-top:80px;
+
 width:100%;
 height:420px;
-object-fit:cover;
-display:block;
-filter:brightness(0.65);
+
+background:url("image1.png") center center/cover no-repeat;
+
+display:flex;
+justify-content:center;
+align-items:flex-end;
+
+animation:fadeHero 1s ease;
+
 }
 
-.hero-content{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-color:white;
+@keyframes fadeHero{
+
+from{
+
+opacity:0;
+transform:scale(1.03);
+
+}
+
+to{
+
+opacity:1;
+transform:scale(1);
+
+}
+
+}
+
+/* ==========================================================
+   WELCOME
+========================================================== */
+
+.welcome{
+
+max-width:1000px;
+
+margin:55px auto 20px;
+
+padding:0 25px;
+
 text-align:center;
-width:90%;
+
 }
 
-.hero-content h1{
+.welcome h1{
+
 font-size:42px;
-margin-bottom:10px;
+
+color:#8B5A2B;
+
+margin-bottom:20px;
+
 }
 
-.hero-content p{
+.welcome p{
+
 font-size:18px;
+
+line-height:2;
+
+color:#555;
+
 }
 
-/* ===== BUTTON ===== */
+/* ==========================================================
+   APPLY BUTTON
+========================================================== */
 
-.btn{
+.apply{
+
+text-align:center;
+
+margin:40px 0 60px;
+
+}
+
+.apply a{
+
 display:inline-block;
-margin-top:20px;
-padding:14px 28px;
-border-radius:50px;
-background:linear-gradient(135deg,#d9a35f,#b67832);
+
+background:#B67832;
+
 color:white;
-font-weight:bold;
+
 text-decoration:none;
-transition:0.3s;
+
+padding:18px 42px;
+
+border-radius:999px;
+
+font-size:18px;
+
+font-weight:bold;
+
+transition:.3s;
+
+box-shadow:0 10px 20px rgba(182,120,50,.25);
+
 }
 
-.btn:hover{
-transform:translateY(-4px);
+.apply a:hover{
+
+transform:
+translateY(-4px)
+scale(1.03);
+
+box-shadow:0 15px 30px rgba(182,120,50,.35);
+
 }
 
-/* ===== CONTENT ===== */
+/* ==========================================================
+   NEWS
+========================================================== */
 
-.card{
-max-width:900px;
-margin:40px auto;
+.news{
+
+max-width:1000px;
+
+margin:0 auto 60px;
+
+padding:0 25px;
+
+}
+
+.news h2{
+
+font-size:30px;
+
+color:#8B5A2B;
+
+margin-bottom:20px;
+
+}
+
+.news-item{
+
 background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.08);
+
+border-radius:18px;
+
+margin-bottom:16px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+overflow:hidden;
+
+transition:.3s;
+
 }
+
+.news-title{
+
+width:100%;
+
+border:none;
+
+background:white;
+
+padding:18px 20px;
+
+display:flex;
+align-items:center;
+
+cursor:pointer;
+
+transition:.3s;
+
+font-size:16px;
+
+}
+
+.news-title:hover{
+
+background:#FFF7EA;
+
+}
+
+.news-date{
+
+width:180px;
+
+font-size:13px;
+
+color:#888;
+
+flex-shrink:0;
+
+}
+
+.news-head{
+
+flex:1;
+
+text-align:left;
+
+font-weight:bold;
+
+color:#444;
+
+}
+
+.news-arrow{
+
+font-size:24px;
+
+color:#B67832;
+
+transition:.35s;
+
+}
+
+.news-item.open .news-arrow{
+
+transform:rotate(45deg);
+
+}
+
+.news-content{
+
+max-height:0;
+
+overflow:hidden;
+
+background:#FFFDF8;
+
+transition:max-height .45s ease;
+
+}
+
+.news-content p{
+
+padding:20px;
+
+line-height:2;
+
+}
+
+/* ==========================================================
+   FEATURES
+========================================================== */
 
 .features{
+
+max-width:1100px;
+
+margin:0 auto 80px;
+
+padding:0 25px;
+
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-max-width:1000px;
-margin:40px auto;
-padding:0 20px;
+
+grid-template-columns:
+repeat(auto-fit,minmax(250px,1fr));
+
+gap:22px;
+
 }
 
 .feature{
+
 background:white;
-padding:25px;
+
 border-radius:18px;
-box-shadow:0 8px 20px rgba(0,0,0,0.08);
-text-align:center;
+
+padding:28px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+transition:.3s;
+
 }
 
-/* ===== FOOTER ===== */
+.feature:hover{
+
+transform:translateY(-6px);
+
+}
+
+.feature h3{
+
+color:#B67832;
+
+margin-bottom:12px;
+
+font-size:22px;
+
+}
+
+.feature p{
+
+line-height:1.9;
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
 
 footer{
+
+background:#E8D5BB;
+
+padding:40px 20px;
+
 text-align:center;
-padding:40px 10px;
-background:#e8d5bb;
-margin-top:60px;
+
+color:#666;
+
 }
 
-/* ===== RESPONSIVE ===== */
+/* ==========================================================
+   SCROLL ANIMATION
+========================================================== */
 
-@media(max-width:600px){
-.hero-img{height:300px;}
-.hero-content h1{font-size:28px;}
-.hero-content p{font-size:14px;}
-.menu{width:260px;}
+.fade{
+
+opacity:0;
+
+transform:translateY(30px);
+
+transition:
+opacity .8s,
+transform .8s;
+
+}
+
+.fade.show{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+/* ==========================================================
+   SMARTPHONE
+========================================================== */
+
+@media(max-width:768px){
+
+.hero-image{
+
+height:300px;
+
+}
+
+.welcome h1{
+
+font-size:30px;
+
+}
+
+.news-title{
+
+display:block;
+
+text-align:left;
+
+}
+
+.news-date{
+
+display:block;
+
+width:auto;
+
+margin-bottom:8px;
+
+}
+
+.menu{
+
+width:260px;
+
+}
+
 }
 
 </style>
@@ -280,98 +649,442 @@ margin-top:60px;
 
 <body>
 
+<!-- ==========================================================
+     HEADER
+========================================================== -->
+
 <header class="header">
 
 <a href="index.html" class="logo">
-<img src="icon.png" alt="icon">
+
+<img src="icon.png" alt="図書手帳">
+
 </a>
 
-<button class="menu-btn" id="menuBtn">
-<span></span><span></span><span></span>
+<button
+class="menu-btn"
+id="menuBtn">
+
+<span></span>
+<span></span>
+<span></span>
+
 </button>
 
 </header>
 
-<div class="overlay" id="overlay"></div>
-
-<nav class="menu" id="menu">
+<nav
+class="menu"
+id="menu">
 
 <a href="index.html">HOME</a>
-<a href="application.html">申し込み</a>
-<a href="features.html">特徴</a>
-<a href="mutter.html">かもめんのつぶやき</a>
-<a href="tool.html">お役立ちツール</a>
+
+<a href="application.html">
+申し込み
+</a>
+
+<a href="features.html">
+特徴
+</a>
+
+<a href="movie.html">
+紹介動画
+</a>
+
+<a href="mutter.html">
+かもめんのつぶやき
+</a>
+
+<a href="tool.html">
+お役立ちツール
+</a>
 
 </nav>
 
-<main>
+<div
+class="overlay"
+id="overlay">
+</div>
 
-<!-- ★修正②：画像をヒーローに追加 -->
-<section class="hero">
+<!-- ==========================================================
+     HERO IMAGE
+========================================================== -->
 
-<img src="image1.png" class="hero-img" alt="hero image">
+<section class="hero-image">
+</section>
 
-<div class="hero-content">
+<!-- ==========================================================
+     WELCOME
+========================================================== -->
 
-<h1>図書手帳公式ホームページ</h1>
+<section class="welcome fade">
 
-<p>貸出がより楽になる、新しい手帳。</p>
+<h1>
 
-<a href="application.html" class="btn">発行申し込み</a>
+図書手帳公式ホームページ
+
+</h1>
+
+<p>
+
+ようこそ図書手帳公式ホームページへ！<br>
+
+図書手帳はバーコードが印刷された手帳。
+図書室でより快適に過ごせるサービスです。
+
+</p>
+
+</section>
+
+<!-- ==========================================================
+     APPLY BUTTON
+========================================================== -->
+
+<section class="apply fade">
+
+<a href="application.html">
+
+申し込みはこちら
+
+</a>
+
+</section>
+
+<!-- ==========================================================
+     NEWS
+========================================================== -->
+
+<section class="news fade">
+
+<h2>
+
+📢 お知らせ
+
+</h2>
+
+<div class="news-item">
+
+<button class="news-title">
+
+<span class="news-date">
+
+２０２６年７月７日（火）
+
+</span>
+
+<span class="news-head">
+
+デザイン改善・メニューに「紹介動画」を追加
+
+</span>
+
+<span class="news-arrow">
+
+＋
+
+</span>
+
+</button>
+
+<div class="news-content">
+
+<p>
+
+図書手帳公式ホームページをご覧いただきありがとうございます。<br><br>
+
+ホーム画面のデザインとアニメーションの軽微な修正と
+「紹介動画」をメニューに追加しました。ぜひご覧ください。<br><br>
+
+これからの追加機能もお楽しみに！
+
+</p>
 
 </div>
 
+</div>
+
+
+<div class="news-item">
+
+<button class="news-title">
+
+<span class="news-date">
+
+２０２６年７月６日（月）
+
+</span>
+
+<span class="news-head">
+
+図書手帳公式ホームページを公開しました
+
+</span>
+
+<span class="news-arrow">
+
+＋
+
+</span>
+
+</button>
+
+<div class="news-content">
+
+<p>
+
+図書手帳公式ホームページを公開しました。<br><br>
+
+これからも機能追加やデザイン改善を行い、
+より使いやすいホームページを目指していきます。<br><br>
+
+ぜひ定期的にご覧ください。
+
+</p>
+
+</div>
+
+</div>
+
+
 </section>
 
-<section class="card">
-<h2>ようこそ</h2>
-<p>図書手帳はバーコードが印刷された手帳。図書室でより快適に過ごせるサービスです。</p>
-</section>
+<!-- ==========================================================
+     FEATURES
+========================================================== -->
 
 <section class="features">
 
-<div class="feature">
-<h3>図書手帳は今年で１周年！</h3>
-<p>２０２５年１０月２４日に１枚目が発行されました。</p>
+<div class="feature fade">
+
+<h3>
+
+📚 図書手帳とは？
+
+</h3>
+
+<p>
+
+学籍番号または利用者ＩＤの印刷された白鷗オリジナル手帳！
+
+</p>
+
 </div>
 
-<div class="feature">
-<h3>画期的</h3>
-<p>２０期生が発明した手帳です。</p>
+<div class="feature fade">
+
+<h3>
+
+⚡ 充実したサービス
+
+</h3>
+
+<p>
+
+このホームページに加え、手帳の特注など、様々なニーズに応えます。
+
+</p>
+
 </div>
 
-<div class="feature">
-<h3>特注可能</h3>
-<p>自分好みに設計できます。</p>
+<div class="feature fade">
+
+<h3>
+
+😊 遊び心のあるサイト
+
+</h3>
+
+<p>
+
+「かもめんのつぶやき」など、クスッと笑ってしまうようなコンテンツもあります。
+
+</p>
+
+</div>
+
+<div class="feature fade">
+
+<h3>
+
+📱 マルチデバイス対応
+
+</h3>
+
+<p>
+
+このホームページは、スマートフォン・タブレット・パソコンなど、どの端末でも快適に利用できます。
+
+</p>
+
+</div>
+
+<div class="feature fade">
+
+<h3>
+
+🎮 コンテンツ充実
+
+</h3>
+
+<p>
+
+お役立ちツールやゲームなど、図書室をもっと楽しくする機能を掲載しています。
+
+</p>
+
+</div>
+
+<div class="feature fade">
+
+<h3>
+
+🚀 今後も進化予定
+
+</h3>
+
+<p>
+
+これからも新機能を追加し、さらに便利で快適なサービスを目指します。
+
+</p>
+
 </div>
 
 </section>
 
-</main>
-
 <footer>
-© 2026 図書手帳公式ホームページ
+
+© ２０２６ 図書手帳公式ホームページ
+
 </footer>
 
 <script>
 
-const btn = document.getElementById("menuBtn");
+/* ==========================================================
+   MENU
+========================================================== */
+
+const menuBtn = document.getElementById("menuBtn");
 const menu = document.getElementById("menu");
 const overlay = document.getElementById("overlay");
 
-btn.addEventListener("click", () => {
-btn.classList.toggle("active");
-menu.classList.toggle("open");
-overlay.classList.toggle("show");
-});
+function openMenu(){
 
-overlay.addEventListener("click", () => {
-btn.classList.remove("active");
+menu.classList.add("open");
+overlay.classList.add("show");
+menuBtn.classList.add("active");
+
+}
+
+function closeMenu(){
+
 menu.classList.remove("open");
 overlay.classList.remove("show");
+menuBtn.classList.remove("active");
+
+}
+
+menuBtn.addEventListener("click",()=>{
+
+if(menu.classList.contains("open")){
+
+closeMenu();
+
+}else{
+
+openMenu();
+
+}
+
+});
+
+overlay.addEventListener("click",closeMenu);
+
+/* ==========================================================
+   NEWS ACCORDION
+========================================================== */
+
+const newsItems=document.querySelectorAll(".news-item");
+
+newsItems.forEach(item=>{
+
+const button=item.querySelector(".news-title");
+
+button.addEventListener("click",()=>{
+
+item.classList.toggle("open");
+
+const content=item.querySelector(".news-content");
+
+if(item.classList.contains("open")){
+
+content.style.maxHeight=
+content.scrollHeight+"px";
+
+}else{
+
+content.style.maxHeight="0";
+
+}
+
+});
+
+});
+
+/* ==========================================================
+   SCROLL ANIMATION
+========================================================== */
+
+const observer=new IntersectionObserver((entries)=>{
+
+entries.forEach(entry=>{
+
+if(entry.isIntersecting){
+
+entry.target.classList.add("show");
+
+}
+
+});
+
+},{
+threshold:0.15
+});
+
+document.querySelectorAll(".fade").forEach(el=>{
+
+observer.observe(el);
+
+});
+
+/* ==========================================================
+   BUTTON HOVER EFFECT
+========================================================== */
+
+document.querySelectorAll("a,.menu-btn,.news-title").forEach(el=>{
+
+el.addEventListener("mousedown",()=>{
+
+el.style.transform="scale(.97)";
+
+});
+
+el.addEventListener("mouseup",()=>{
+
+el.style.transform="";
+
+});
+
+el.addEventListener("mouseleave",()=>{
+
+el.style.transform="";
+
+});
+
 });
 
 </script>
 
 </body>
+
 </html>
