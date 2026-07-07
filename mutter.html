@@ -292,7 +292,9 @@ margin-top:60px;
 <div class="feed">
 
 <div class="post">
-<div class="date" data-date></div>
+<div class="date">
+２０２６年７月６日（月）
+</div>
 
 <div class="bubble">
 みんな、期末考査お疲れ様！<br>
@@ -307,7 +309,9 @@ margin-top:60px;
 </div>
 
 <div class="post">
-<div class="date" data-date></div>
+<div class="date">
+２０２６年７月６日（月）
+</div>
 
 <div class="bubble">
 図書手帳公式ホームページがついに公開されたよ！<br>
@@ -322,7 +326,9 @@ margin-top:60px;
 </div>
 
 <div class="post">
-<div class="date" data-date></div>
+<div class="date">
+２０２６年７月６日（月）
+</div>
 
 <div class="bubble">
 デザイン、かなりこだわって作ってるんだよね。
@@ -363,25 +369,6 @@ overlay.classList.remove("show");
 btn.classList.remove("active");
 });
 
-/* =========================
-   日付（完全修正版）
-========================= */
-
-function setDates(){
-
-const days = ["日","月","火","水","木","金","土"];
-const now = new Date();
-
-const text =
-`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
-
-document.querySelectorAll("[data-date]").forEach(el=>{
-el.textContent = text;
-});
-
-}
-
-setDates();
 
 /* =========================
    いいね
