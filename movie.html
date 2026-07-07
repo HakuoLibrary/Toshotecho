@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>紹介動画｜図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+
+<style>
+
+/* ==================================================
+   RESET
+================================================== */
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+
+html{
+
+scroll-behavior:smooth;
+
+}
+
+
+body{
+
+font-family:
+"Yu Gothic UI",
+"Yu Gothic",
+Meiryo,
+sans-serif;
+
+background:#FAEEDD;
+
+color:#444;
+
+overflow-x:hidden;
+
+}
+
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+
+.header{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:80px;
+
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+
+padding:0 25px;
+
+
+background:
+rgba(255,255,255,.72);
+
+
+backdrop-filter:blur(12px);
+
+
+box-shadow:
+0 5px 20px rgba(0,0,0,.08);
+
+
+z-index:1000;
+
+
+}
+
+
+
+/* ロゴ */
+
+
+.logo img{
+
+
+height:52px;
+
+width:auto;
+
+
+display:block;
+
+
+cursor:pointer;
+
+
+transition:.3s;
+
+
+}
+
+
+
+.logo img:hover{
+
+
+transform:scale(1.05);
+
+
+}
+
+
+
+
+
+/* ==================================================
+   MENU BUTTON
+================================================== */
+
+
+.menu-btn{
+
+
+width:56px;
+
+height:56px;
+
+
+border:none;
+
+
+border-radius:50%;
+
+
+background:white;
+
+
+display:flex;
+
+
+flex-direction:column;
+
+
+justify-content:center;
+
+
+align-items:center;
+
+
+gap:6px;
+
+
+cursor:pointer;
+
+
+box-shadow:
+0 6px 20px rgba(0,0,0,.15);
+
+
+transition:.3s;
+
+
+}
+
+
+
+.menu-btn:hover{
+
+
+transform:scale(1.05);
+
+
+}
+
+
+
+.menu-btn span{
+
+
+width:26px;
+
+
+height:3px;
+
+
+background:#444;
+
+
+border-radius:20px;
+
+
+transition:.35s;
+
+
+}
+
+
+
+
+/* 三本線→× */
+
+
+.menu-btn.active span:nth-child(1){
+
+
+transform:
+translateY(9px)
+rotate(45deg);
+
+
+}
+
+
+
+.menu-btn.active span:nth-child(2){
+
+
+opacity:0;
+
+
+}
+
+
+
+
+.menu-btn.active span:nth-child(3){
+
+
+transform:
+translateY(-9px)
+rotate(-45deg);
+
+
+}
+
+
+
+
+
+/* ==================================================
+   SIDE MENU
+================================================== */
+
+
+.menu{
+
+
+position:fixed;
+
+
+top:0;
+
+
+right:-320px;
+
+
+width:300px;
+
+
+height:100vh;
+
+
+background:white;
+
+
+padding-top:100px;
+
+
+display:flex;
+
+
+flex-direction:column;
+
+
+box-shadow:
+-10px 0 30px rgba(0,0,0,.15);
+
+
+transition:.4s;
+
+
+z-index:999;
+
+
+}
+
+
+
+.menu.open{
+
+
+right:0;
+
+
+}
+
+
+
+.menu a{
+
+
+padding:18px 25px;
+
+
+text-decoration:none;
+
+
+font-weight:bold;
+
+
+color:#444;
+
+
+transition:.3s;
+
+
+}
+
+
+
+.menu a:hover{
+
+
+background:#FAEEDD;
+
+
+padding-left:35px;
+
+
+color:#B67832;
+
+
+}
+
+
+
+
+
+/* ==================================================
+   OVERLAY
+================================================== */
+
+
+.overlay{
+
+
+position:fixed;
+
+
+top:0;
+
+
+left:0;
+
+
+width:100%;
+
+
+height:100%;
+
+
+background:
+rgba(0,0,0,.25);
+
+
+opacity:0;
+
+
+pointer-events:none;
+
+
+transition:.3s;
+
+
+z-index:998;
+
+
+}
+
+
+
+.overlay.show{
+
+
+opacity:1;
+
+
+pointer-events:auto;
+
+
+}
+
+
+
+
+
+/* ==================================================
+   TITLE
+================================================== */
+
+
+.page-title{
+
+
+margin-top:120px;
+
+
+text-align:center;
+
+
+font-size:38px;
+
+
+color:#8B5A2B;
+
+
+animation:titleFade 1s ease;
+
+
+}
+
+
+
+@keyframes titleFade{
+
+
+from{
+
+
+opacity:0;
+
+
+transform:translateY(20px);
+
+
+}
+
+
+to{
+
+
+opacity:1;
+
+
+transform:translateY(0);
+
+
+}
+
+
+}
+
+
+
+
+/* ==================================================
+   MOVIE AREA
+================================================== */
+
+
+.movie-area{
+
+
+max-width:1000px;
+
+
+margin:40px auto;
+
+
+padding:0 25px;
+
+
+}
+
+/* ==================================================
+   SELECT BOX
+================================================== */
+
+
+.select-box{
+
+
+background:white;
+
+
+border-radius:18px;
+
+
+padding:25px;
+
+
+box-shadow:
+0 10px 25px rgba(0,0,0,.08);
+
+
+margin-bottom:30px;
+
+
+}
+
+
+
+.select-box label{
+
+
+display:block;
+
+
+font-weight:bold;
+
+
+font-size:18px;
+
+
+color:#8B5A2B;
+
+
+margin-bottom:12px;
+
+
+}
+
+
+
+#yearSelect{
+
+
+width:100%;
+
+
+padding:15px;
+
+
+border-radius:12px;
+
+
+border:2px solid #E8D5BB;
+
+
+background:white;
+
+
+font-size:16px;
+
+
+cursor:pointer;
+
+
+transition:.3s;
+
+
+}
+
+
+
+#yearSelect:hover{
+
+
+border-color:#B67832;
+
+
+}
+
+
+
+
+
+/* ==================================================
+   VIDEO CARD
+================================================== */
+
+
+.video-card{
+
+
+background:white;
+
+
+border-radius:22px;
+
+
+padding:25px;
+
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.1);
+
+
+overflow:hidden;
+
+
+}
+
+
+
+.video-wrapper{
+
+
+position:relative;
+
+
+width:100%;
+
+
+aspect-ratio:16 / 9;
+
+
+background:#000;
+
+
+border-radius:15px;
+
+
+overflow:hidden;
+
+
+}
+
+
+
+/* 動画 */
+
+
+#movie{
+
+
+width:100%;
+
+
+height:100%;
+
+
+object-fit:contain;
+
+
+opacity:1;
+
+
+transition:.6s;
+
+
+}
+
+
+
+
+/* 動画切替アニメーション用 */
+
+
+#movie.fade-out{
+
+
+opacity:0;
+
+
+transform:scale(.98);
+
+
+}
+
+
+
+#movie.fade-in{
+
+
+opacity:1;
+
+
+transform:scale(1);
+
+
+}
+
+
+
+
+/* 準備中表示 */
+
+
+#message{
+
+
+display:none;
+
+
+text-align:center;
+
+
+padding:60px 20px;
+
+
+font-size:20px;
+
+
+font-weight:bold;
+
+
+color:#8B5A2B;
+
+
+}
+
+
+
+
+
+/* ==================================================
+   DESCRIPTION
+================================================== */
+
+
+.description{
+
+
+margin-top:25px;
+
+
+background:#FFF7EA;
+
+
+padding:20px;
+
+
+border-radius:15px;
+
+
+line-height:1.8;
+
+
+}
+
+
+
+
+.description h2{
+
+
+font-size:22px;
+
+
+color:#B67832;
+
+
+margin-bottom:10px;
+
+
+}
+
+
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+
+footer{
+
+
+margin-top:70px;
+
+
+background:#E8D5BB;
+
+
+padding:40px 20px;
+
+
+text-align:center;
+
+
+color:#666;
+
+
+}
+
+
+
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+
+@media(max-width:768px){
+
+
+
+.header{
+
+
+height:75px;
+
+
+padding:0 15px;
+
+
+}
+
+
+
+.logo img{
+
+
+height:45px;
+
+
+}
+
+
+
+.menu-btn{
+
+
+width:50px;
+
+
+height:50px;
+
+
+}
+
+
+
+.menu{
+
+
+width:260px;
+
+
+}
+
+
+
+.page-title{
+
+
+font-size:30px;
+
+
+margin-top:110px;
+
+
+}
+
+
+
+.movie-area{
+
+
+padding:0 15px;
+
+
+}
+
+
+
+.video-card{
+
+
+padding:15px;
+
+
+}
+
+
+
+.select-box{
+
+
+padding:20px;
+
+
+}
+
+
+
+.description{
+
+
+font-size:14px;
+
+
+}
+
+
+}
+
+
+/* ==================================================
+   BODY START
+================================================== */
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+
+<header class="header">
+
+
+<a href="index.html" class="logo">
+
+<img src="icon.png" alt="図書手帳">
+
+</a>
+
+
+
+<button class="menu-btn" id="menuBtn">
+
+<span></span>
+
+<span></span>
+
+<span></span>
+
+</button>
+
+
+
+</header>
+
+
+
+
+<nav class="menu" id="menu">
+
+
+<a href="index.html">
+
+HOME
+
+</a>
+
+
+<a href="application.html">
+
+申し込み
+
+</a>
+
+
+<a href="features.html">
+
+特徴
+
+</a>
+
+
+<a href="movie.html">
+
+紹介動画
+
+</a>
+
+
+<a href="mutter.html">
+
+かもめんのつぶやき
+
+</a>
+
+
+<a href="tool.html">
+
+お役立ちツール
+
+</a>
+
+
+</nav>
+
+
+
+<div class="overlay" id="overlay"></div>
+
+
+
+
+<!-- ==================================================
+     MAIN
+================================================== -->
+
+
+<h1 class="page-title">
+
+紹介動画
+
+</h1>
+
+
+
+<section class="movie-area">
+
+
+<div class="select-box">
+
+
+<label for="yearSelect">
+
+視聴する年度を選択
+
+</label>
+
+
+
+<select id="yearSelect">
+
+
+<option value="2025movie.mp4">
+
+２０２５年度
+
+</option>
+
+
+<option value="2026movie.mp4">
+
+２０２６年度
+
+</option>
+
+
+<option value="2027movie.mp4">
+
+２０２７年度
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div class="video-card">
+
+
+<div class="video-wrapper">
+
+
+<video
+id="movie"
+controls
+playsinline>
+
+<source src="2025movie.mp4" type="video/mp4">
+
+
+お使いのブラウザでは動画を再生できません。
+
+</video>
+
+
+<div id="message">
+
+この年度の動画は準備中です。
+
+</div>
+
+
+</div>
+
+
+<div class="description">
+
+
+<h2>
+
+図書室紹介動画
+
+</h2>
+
+
+<p>
+
+白鷗の図書室についての紹介動画を見ることができます。<br>
+
+年度ごとに動画が追加されます。（毎年２月ころ）
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+<script>
+
+
+/* ==================================================
+   ELEMENT
+================================================== */
+
+
+const yearSelect =
+document.getElementById("yearSelect");
+
+
+const movie =
+document.getElementById("movie");
+
+
+const message =
+document.getElementById("message");
+
+
+
+
+
+/* ==================================================
+   VIDEO DATA
+================================================== */
+
+
+const videos = {
+
+
+"2025movie.mp4":
+
+"２０２５年度",
+
+
+"2026movie.mp4":
+
+"２０２６年度",
+
+
+"2027movie.mp4":
+
+"２０２７年度"
+
+
+};
+
+
+
+
+
+/* ==================================================
+   MOVIE CHANGE
+================================================== */
+
+
+function changeMovie(){
+
+
+const file =
+yearSelect.value;
+
+
+
+// フェードアウト
+
+movie.classList.add("fade-out");
+
+
+
+setTimeout(()=>{
+
+
+// 動画変更
+
+movie.src=file;
+
+
+movie.load();
+
+
+
+// メッセージ非表示
+
+message.style.display="none";
+
+
+
+// 動画表示
+
+movie.style.display="block";
+
+
+
+// フェードイン
+
+movie.classList.remove("fade-out");
+
+movie.classList.add("fade-in");
+
+
+
+// 自動再生
+
+movie.play()
+.catch(()=>{});
+
+
+
+},500);
+
+
+
+}
+
+
+
+
+
+/* ==================================================
+   VIDEO ERROR
+================================================== */
+
+
+movie.addEventListener(
+"error",
+()=>{
+
+
+movie.style.display="none";
+
+
+message.style.display="block";
+
+
+}
+
+);
+
+
+
+
+
+/* ==================================================
+   SELECT EVENT
+================================================== */
+
+
+yearSelect.addEventListener(
+"change",
+()=>{
+
+
+changeMovie();
+
+
+});
+
+
+
+
+
+/* ==================================================
+   FIRST PLAY
+================================================== */
+
+
+window.addEventListener(
+"load",
+()=>{
+
+
+movie.play()
+.catch(()=>{
+
+
+// ブラウザによって
+// 自動再生制限がある場合
+
+
+});
+
+
+
+});
+
+
+
+
+
+/* ==================================================
+   MENU
+================================================== */
+
+
+const menuBtn =
+document.getElementById("menuBtn");
+
+
+const menu =
+document.getElementById("menu");
+
+
+const overlay =
+document.getElementById("overlay");
+
+
+
+
+
+function openMenu(){
+
+
+menu.classList.add("open");
+
+
+overlay.classList.add("show");
+
+
+menuBtn.classList.add("active");
+
+
+}
+
+
+
+
+function closeMenu(){
+
+
+menu.classList.remove("open");
+
+
+overlay.classList.remove("show");
+
+
+menuBtn.classList.remove("active");
+
+
+}
+
+
+
+
+menuBtn.addEventListener(
+"click",
+()=>{
+
+
+if(menu.classList.contains("open")){
+
+
+closeMenu();
+
+
+}else{
+
+
+openMenu();
+
+
+}
+
+
+});
+
+
+
+
+
+overlay.addEventListener(
+"click",
+()=>{
+
+
+closeMenu();
+
+
+});
+
+
+
+
+
+
+/* ==================================================
+   SCROLL FADE ANIMATION
+================================================== */
+
+
+const fadeElements =
+document.querySelectorAll(".video-card,.select-box,.description");
+
+
+const fadeObserver =
+new IntersectionObserver(
+(entries)=>{
+
+
+entries.forEach(entry=>{
+
+
+if(entry.isIntersecting){
+
+
+entry.target.style.opacity="1";
+
+entry.target.style.transform=
+"translateY(0)";
+
+
+}
+
+
+});
+
+
+},
+{
+threshold:0.15
+}
+);
+
+
+
+fadeElements.forEach(el=>{
+
+
+el.style.opacity="0";
+
+
+el.style.transform=
+"translateY(30px)";
+
+
+el.style.transition=
+"0.8s ease";
+
+
+fadeObserver.observe(el);
+
+
+
+});
+
+
+
+
+
+/* ==================================================
+   BUTTON CLICK EFFECT
+================================================== */
+
+
+document.querySelectorAll(
+"a,button,select"
+)
+.forEach(element=>{
+
+
+element.addEventListener(
+"mousedown",
+()=>{
+
+
+element.style.transform=
+"scale(.97)";
+
+
+});
+
+
+element.addEventListener(
+"mouseup",
+()=>{
+
+
+element.style.transform="";
+
+
+});
+
+
+element.addEventListener(
+"mouseleave",
+()=>{
+
+
+element.style.transform="";
+
+
+});
+
+
+});
+
+
+
+
+</script>
+
+
+
+<!-- ==================================================
+     FOOTER
+================================================== -->
+
+
+<footer>
+
+
+© ２０２６ 図書手帳公式ホームページ
+
+
+</footer>
+
+
+
+
+</body>
+
+
+</html>
