@@ -232,6 +232,27 @@ background:#e8d5bb;
 margin-top:60px;
 }
 
+/* ===========================
+   SECRET BUTTON
+=========================== */
+
+#secretArea{
+
+margin-top:auto;
+
+width:2cm;
+
+height:2cm;
+
+align-self:center;
+
+cursor:default;
+
+background:transparent;
+
+}
+
+
 </style>
 
 </head>
@@ -263,9 +284,10 @@ margin-top:60px;
 <a href="features.html">特徴</a>
 <a href="movie.html">紹介動画</a>
 <a href="mutter.html">かもめんのつぶやき</a>
-<a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener noreferrer">蔵書検索（Ａ・Ｂ棟共通）</a>
 <a href="character.html">キャラクター紹介</a>
 <a href="tool.html">お役立ちツール</a>
+
+<div id="secretArea"></div>
 
 </nav>
 
@@ -344,6 +366,38 @@ overlay.addEventListener("click", closeMenu);
 function openTool(page){
 window.open(page, "_blank", "noopener,noreferrer");
 }
+
+/* ===========================
+   SECRET
+=========================== */
+
+const secretArea =
+document.getElementById("secretArea");
+
+let clickCount = 0;
+let firstClick = 0;
+
+secretArea.addEventListener("click",()=>{
+
+const now = Date.now();
+
+if(now - firstClick > 3000){
+
+clickCount = 0;
+firstClick = now;
+
+}
+
+clickCount++;
+
+if(clickCount >= 5){
+
+window.location.href = "secret.html";
+
+}
+
+});
+
 
 </script>
 
