@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>図書手帳公式ホームページ｜管理画面</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Yu Gothic","Meiryo",sans-serif;
+}
+
+body{
+    background:#f0f8ff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    width:420px;
+    max-width:95%;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,.2);
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#005bac;
+    margin-bottom:25px;
+}
+
+.notice{
+    background:#fff7cc;
+    border:1px solid #e0c200;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    color:#444;
+    line-height:1.7;
+}
+
+label{
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    margin-top:5px;
+    margin-bottom:18px;
+    border-radius:8px;
+    border:1px solid #bbb;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    font-size:18px;
+    background:#005bac;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#00448a;
+}
+
+#error{
+    color:red;
+    font-weight:bold;
+    text-align:center;
+    margin-top:15px;
+}
+
+footer{
+    margin-top:25px;
+    text-align:center;
+    color:#888;
+    font-size:13px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>管理画面</h1>
+
+<div class="notice">
+このページは管理画面です。<br>
+キャンセルボタンを押して戻ってください。
+</div>
+
+<label>ユーザーＩＤ</label>
+<input id="userid" type="text">
+
+<label>パスワード</label>
+<input id="password" type="password">
+
+<button id="login">ログイン</button>
+
+<div id="error"></div>
+
+<footer>
+図書手帳公式ホームページ　管理システム
+</footer>
+
+</div>
+
+<script>
+
+const login=document.getElementById("login");
+
+function doLogin(){
+
+    const id=document.getElementById("userid").value.trim();
+    const pass=document.getElementById("password").value;
+
+    const error=document.getElementById("error");
+
+    error.innerHTML="";
+
+    // HTMLアップロード画面
+    if(id==="" && pass==="Hakuo890"){
+
+        location.href="upload.html";
+        return;
+
+    }
+
+    // かもめ編集画面
+    if(id==="Hakuolibrary" && pass==="kamome890"){
+
+        location.href="kamome-editor.html";
+        return;
+
+    }
+
+    error.innerHTML="ユーザーＩＤとパスワードが違います。";
+
+}
+
+login.onclick=doLogin;
+
+document.getElementById("password").addEventListener("keypress",function(e){
+
+    if(e.key==="Enter"){
+        doLogin();
+    }
+
+});
+
+document.getElementById("userid").addEventListener("keypress",function(e){
+
+    if(e.key==="Enter"){
+        doLogin();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
