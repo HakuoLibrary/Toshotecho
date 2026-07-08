@@ -1,176 +1,422 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>図書手帳公式ホームページ｜管理画面</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>白鴎図書館 管理画面ログイン</title>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <style>
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Yu Gothic","Meiryo",sans-serif;
+box-sizing:border-box;
+font-family:"Yu Gothic","Meiryo",sans-serif;
 }
+
 
 body{
-    background:#f0f8ff;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+
+margin:0;
+height:100vh;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+background:#eef5ff;
+
 }
 
-.box{
-    width:420px;
-    max-width:95%;
-    background:white;
-    border-radius:15px;
-    box-shadow:0 0 15px rgba(0,0,0,.2);
-    padding:30px;
+
+
+.login-box{
+
+width:420px;
+max-width:90%;
+
+background:white;
+
+padding:30px;
+
+border-radius:15px;
+
+box-shadow:0 0 15px rgba(0,0,0,.2);
+
 }
+
+
 
 h1{
-    text-align:center;
-    color:#005bac;
-    margin-bottom:25px;
+
+text-align:center;
+
+color:#005bac;
+
+margin-bottom:25px;
+
 }
+
+
 
 .notice{
-    background:#fff7cc;
-    border:1px solid #e0c200;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:20px;
-    color:#444;
-    line-height:1.7;
+
+background:#fff6cc;
+
+border:1px solid #d5b500;
+
+padding:15px;
+
+border-radius:10px;
+
+line-height:1.7;
+
+margin-bottom:25px;
+
 }
+
+
 
 label{
-    font-weight:bold;
+
+font-weight:bold;
+
+display:block;
+
+margin-top:15px;
+
 }
+
+
 
 input{
-    width:100%;
-    padding:12px;
-    font-size:16px;
-    margin-top:5px;
-    margin-bottom:18px;
-    border-radius:8px;
-    border:1px solid #bbb;
+
+width:100%;
+
+padding:12px;
+
+font-size:16px;
+
+margin-top:5px;
+
+border-radius:8px;
+
+border:1px solid #aaa;
+
 }
+
+
 
 button{
-    width:100%;
-    padding:14px;
-    font-size:18px;
-    background:#005bac;
-    color:white;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
+
+width:100%;
+
+margin-top:25px;
+
+padding:14px;
+
+font-size:18px;
+
+border:0;
+
+border-radius:10px;
+
+background:#005bac;
+
+color:white;
+
+cursor:pointer;
+
 }
+
+
 
 button:hover{
-    background:#00448a;
+
+background:#003f80;
+
 }
+
+
 
 #error{
-    color:red;
-    font-weight:bold;
-    text-align:center;
-    margin-top:15px;
+
+color:red;
+
+font-weight:bold;
+
+text-align:center;
+
+margin-top:15px;
+
 }
 
-footer{
-    margin-top:25px;
-    text-align:center;
-    color:#888;
-    font-size:13px;
-}
+
+
 </style>
 
 </head>
 
+
 <body>
 
-<div class="box">
 
-<h1>管理画面</h1>
+<div class="login-box">
+
+
+<h1>
+管理画面
+</h1>
+
+
 
 <div class="notice">
+
 このページは管理画面です。<br>
 キャンセルボタンを押して戻ってください。
+
 </div>
 
-<label>ユーザーＩＤ</label>
-<input id="userid" type="text">
 
-<label>パスワード</label>
-<input id="password" type="password">
 
-<button id="login">ログイン</button>
+<label>
+
+メールアドレス
+
+</label>
+
+
+<input
+
+type="email"
+
+id="email"
+
+placeholder="example@example.com"
+
+>
+
+
+
+<label>
+
+パスワード
+
+</label>
+
+
+<input
+
+type="password"
+
+id="password"
+
+placeholder="パスワード"
+
+>
+
+
+
+<button id="login">
+
+ログイン
+
+</button>
+
+
 
 <div id="error"></div>
 
-<footer>
-図書手帳公式ホームページ　管理システム
-</footer>
 
 </div>
 
+
+
+
+
 <script>
 
-const login=document.getElementById("login");
 
-function doLogin(){
+// ==========================
+// Supabase設定
+// ==========================
 
-    const id=document.getElementById("userid").value.trim();
-    const pass=document.getElementById("password").value;
 
-    const error=document.getElementById("error");
+const SUPABASE_URL =
+"https://lskrxpbqeukadpzygopa.supabase.co";
 
-    error.innerHTML="";
 
-    // HTMLアップロード画面
-    if(id==="" && pass==="Hakuo890"){
+const SUPABASE_KEY =
+"sb_publishable_PkZN-OyjXqphhHD-zm_ncw_emBx84M4";
 
-        location.href="upload.html";
-        return;
 
-    }
 
-    // かもめ編集画面
-    if(id==="Hakuolibrary" && pass==="kamome890"){
+const supabaseClient =
+supabase.createClient(
 
-        location.href="kamome-editor.html";
-        return;
+SUPABASE_URL,
 
-    }
+SUPABASE_KEY
 
-    error.innerHTML="ユーザーＩＤとパスワードが違います。";
+);
+
+
+
+
+
+// ==========================
+// ログイン処理
+// ==========================
+
+
+async function login(){
+
+
+const email =
+document
+.getElementById("email")
+.value.trim();
+
+
+
+const password =
+document
+.getElementById("password")
+.value;
+
+
+
+const error =
+document
+.getElementById("error");
+
+
+
+error.textContent="";
+
+
+
+const {
+
+data,
+
+error:authError
 
 }
 
-login.onclick=doLogin;
+=
+await supabaseClient.auth.signInWithPassword({
 
-document.getElementById("password").addEventListener("keypress",function(e){
+email:email,
 
-    if(e.key==="Enter"){
-        doLogin();
-    }
-
-});
-
-document.getElementById("userid").addEventListener("keypress",function(e){
-
-    if(e.key==="Enter"){
-        doLogin();
-    }
+password:password
 
 });
+
+
+
+
+if(authError){
+
+
+error.textContent =
+"メールアドレスまたはパスワードが違います。";
+
+
+console.log(authError);
+
+return;
+
+}
+
+
+
+
+// ログイン成功
+
+location.href="upload.html";
+
+
+}
+
+
+
+
+
+
+document
+.getElementById("login")
+.onclick=login;
+
+
+
+
+
+// Enterキー
+
+document.addEventListener(
+
+"keydown",
+
+function(e){
+
+
+if(e.key==="Enter"){
+
+login();
+
+}
+
+
+}
+
+);
+
+
+
+
+
+
+
+// 既にログイン済みなら移動
+
+async function checkSession(){
+
+
+const {
+
+data:{session}
+
+}
+
+=
+await supabaseClient.auth.getSession();
+
+
+
+if(session){
+
+location.href="upload.html";
+
+}
+
+
+}
+
+
+
+checkSession();
+
+
 
 </script>
 
+
 </body>
+
 </html>
