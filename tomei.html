@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>右側透明グラデーション画像作成</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Yu Gothic","Meiryo",sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+    padding:30px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+input[type=file]{
+    padding:10px;
+}
+
+.rangeBox{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+button{
+    padding:12px 25px;
+    border:none;
+    border-radius:10px;
+    background:#2196f3;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+    transition:.25s;
+}
+
+button:hover{
+    background:#1976d2;
+}
+
+canvas{
+    max-width:100%;
+    display:block;
+    margin:auto;
+    border-radius:10px;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+.info{
+    text-align:center;
+    margin-top:10px;
+    color:#666;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>画像右側 透明グラデーション生成</h1>
+
+<div class="controls">
+
+<input type="file" id="upload" accept="image/*">
+
+<div class="rangeBox">
+<label>グラデーション幅</label>
+
+<input
+type="range"
+id="fade"
+min="5"
+max="80"
+value="30">
+
+<span id="fadeValue">30%</span>
+
+</div>
+
+<button id="download">
+ダウンロード
+</button>
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div class="info">
+画像をアップロードすると自動で生成されます
+</div>
+
+</div>
+
+<script>
+
+const upload=document.getElementById("upload");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+const fade=document.getElementById("fade");
+const fadeValue=document.getElementById("fadeValue");
+
+let img=new Image();
+
+fade.oninput=()=>{
+    fadeValue.innerText=fade.value+"%";
+    if(img.src) draw();
+};
+
+upload.onchange=e=>{
+
+const file=e.target.files[0];
+
+if(!file)return;
+
+const reader=new FileReader();
+
+reader.onload=function(ev){
+
+img.onload=function(){
+
+canvas.width=img.width;
+canvas.height=img.height;
+
+draw();
+
+};
+
+img.src=ev.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+};
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.drawImage(img,0,0);
+
+const start=canvas.width*(1-fade.value/100);
+
+ctx.save();
+
+ctx.globalCompositeOperation="destination-out";
+
+const grad=ctx.createLinearGradient(start,0,canvas.width,0);
+
+grad.addColorStop(0,"rgba(0,0,0,0)");
+grad.addColorStop(1,"rgba(0,0,0,1)");
+
+ctx.fillStyle=grad;
+
+ctx.fillRect(start,0,canvas.width-start,canvas.height);
+
+ctx.restore();
+
+}
+
+document.getElementById("download").onclick=function(){
+
+if(canvas.width===0)return;
+
+const a=document.createElement("a");
+
+a.download="gradient-image.png";
+
+a.href=canvas.toDataURL("image/png");
+
+a.click();
+
+};
+
+</script>
+
+</body>
+</html>
