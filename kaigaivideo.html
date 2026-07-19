@@ -10,146 +10,317 @@
 <link rel="icon" type="image/png" href="icon2.png">
 
 <style>
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body{
+
     font-family:"Yu Gothic","Hiragino Sans","Meiryo",sans-serif;
     min-height:100vh;
+
     display:flex;
     justify-content:center;
     align-items:center;
+
     padding:25px;
+
     background:
         radial-gradient(circle at top left,#dff7ff 0%,transparent 40%),
         radial-gradient(circle at bottom right,#b8ebff 0%,transparent 35%),
         linear-gradient(180deg,#eefcff,#dff6ff,#ffffff);
+
 }
 
 /* ホームボタン */
+
 .home-btn{
+
     position:fixed;
     top:20px;
     left:20px;
+
     padding:10px 18px;
+
     background:rgba(255,255,255,.88);
+
     backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
     border:1px solid rgba(255,255,255,.7);
+
     border-radius:999px;
+
     text-decoration:none;
+
     color:#2d6d8a;
+
     font-size:.9rem;
     font-weight:500;
+
     box-shadow:0 8px 20px rgba(0,0,0,.12);
+
     transition:.25s;
+
     z-index:1000;
+
 }
 
 .home-btn:hover{
+
     background:#2d6d8a;
     color:#fff;
+
     transform:translateY(-2px);
+
 }
+
+/* 全体 */
 
 .wrapper{
+
     width:100%;
     max-width:900px;
+
 }
 
+/* ガラスカード */
+
 .card{
-    background:rgba(255,255,255,0.72);
+
+    background:rgba(255,255,255,.72);
+
     backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+
     border:1px solid rgba(255,255,255,.6);
+
     border-radius:24px;
+
     padding:32px;
+
     box-shadow:0 15px 40px rgba(0,120,180,.12);
+
 }
 
 /* タイトル */
+
 h1{
+
     text-align:center;
+
     color:#2d6d8a;
+
     font-size:clamp(1.3rem,2vw,1.8rem);
+
     font-weight:500;
+
     letter-spacing:.18em;
-    margin-bottom:6px;
+
+    margin-bottom:8px;
+
 }
 
 .subtitle{
+
     text-align:center;
+
     color:#7a9eaf;
+
     font-size:.9rem;
-    margin-bottom:24px;
+
+    margin-bottom:25px;
+
     letter-spacing:.08em;
+
 }
 
 /* 動画 */
+
 .video-area{
+
+    position:relative;
+
     border-radius:18px;
+
     overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
     background:#000;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
 }
 
 video{
+
     display:block;
+
     width:100%;
     height:auto;
+
+}
+
+/* ガラス風再生ボタン */
+
+.glass-play{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:95px;
+    height:95px;
+
+    border:none;
+    outline:none;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    font-size:2.6rem;
+
+    color:#ffffff;
+
+    background:rgba(255,255,255,.18);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.45);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25),
+        inset 0 0 12px rgba(255,255,255,.35);
+
+    transition:
+        transform .25s,
+        opacity .35s,
+        background .25s,
+        box-shadow .25s;
+
+}
+
+.glass-play:hover{
+
+    transform:translate(-50%,-50%) scale(1.08);
+
+    background:rgba(255,255,255,.28);
+
+    box-shadow:
+        0 14px 40px rgba(0,120,180,.25),
+        inset 0 0 16px rgba(255,255,255,.45);
+
+}
+
+.glass-play:active{
+
+    transform:translate(-50%,-50%) scale(.95);
+
+}
+
+.glass-play.hide{
+
+    opacity:0;
+    pointer-events:none;
+
 }
 
 /* フッター */
+
 .footer{
+
     margin-top:18px;
+
     text-align:center;
+
     color:#7f98a6;
+
     font-size:.82rem;
+
 }
 
 /* スマホ */
+
 @media(max-width:600px){
 
-    body{
-        padding:15px;
-    }
+body{
 
-    .home-btn{
-        top:12px;
-        left:12px;
-        padding:8px 14px;
-        font-size:.8rem;
-    }
-
-    .card{
-        padding:18px;
-        border-radius:18px;
-    }
-
-    h1{
-        font-size:1.15rem;
-        letter-spacing:.12em;
-    }
-
-    .subtitle{
-        font-size:.8rem;
-        margin-bottom:16px;
-    }
-
-    .footer{
-        font-size:.75rem;
-    }
+    padding:15px;
 
 }
+
+.home-btn{
+
+    top:12px;
+    left:12px;
+
+    padding:8px 14px;
+
+    font-size:.8rem;
+
+}
+
+.card{
+
+    padding:18px;
+
+    border-radius:18px;
+
+}
+
+h1{
+
+    font-size:1.15rem;
+
+    letter-spacing:.12em;
+
+}
+
+.subtitle{
+
+    font-size:.8rem;
+
+    margin-bottom:18px;
+
+}
+
+.glass-play{
+
+    width:72px;
+    height:72px;
+
+    font-size:2rem;
+
+}
+
+.footer{
+
+    font-size:.74rem;
+
+}
+
+}
+
 </style>
 
 </head>
 
 <body>
 
-<!-- ホームへ戻る -->
-<a href="index.html" class="home-btn">← ホームへ戻る</a>
+<a href="index.html" class="home-btn">
+← ホームへ戻る
+</a>
 
 <div class="wrapper">
 
@@ -162,10 +333,19 @@ Study Tour in Utah 2026
 </div>
 
 <div class="video-area">
-<video controls autoplay muted playsinline preload="auto">
+
+<video id="video" controls playsinline preload="auto">
+
     <source src="kaigaikenshu.mp4" type="video/mp4">
+
     お使いのブラウザは動画再生に対応していません。
+
 </video>
+
+<button id="playButton" class="glass-play">
+▶
+</button>
+
 </div>
 
 <div class="footer">
@@ -175,6 +355,79 @@ Study Tour in Utah 2026
 </div>
 
 </div>
+
+<script>
+
+const video = document.getElementById("video");
+const playButton = document.getElementById("playButton");
+
+// ガラス風ボタンを押したら再生
+playButton.addEventListener("click", () => {
+
+    video.play();
+
+});
+
+// 再生開始でボタンを非表示
+video.addEventListener("play", () => {
+
+    playButton.classList.add("hide");
+
+});
+
+// 一時停止でボタンを表示
+video.addEventListener("pause", () => {
+
+    playButton.classList.remove("hide");
+
+});
+
+// 動画終了で先頭へ戻し、ボタンを表示
+video.addEventListener("ended", () => {
+
+    video.currentTime = 0;
+
+    playButton.classList.remove("hide");
+
+});
+
+// キーボード操作（スペースキー）
+document.addEventListener("keydown", (e) => {
+
+    if (e.code === "Space") {
+
+        e.preventDefault();
+
+        if (video.paused) {
+
+            video.play();
+
+        } else {
+
+            video.pause();
+
+        }
+
+    }
+
+});
+
+// 動画をクリックしても再生・停止できる
+video.addEventListener("click", () => {
+
+    if (video.paused) {
+
+        video.play();
+
+    } else {
+
+        video.pause();
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>
