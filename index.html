@@ -769,8 +769,12 @@ id="overlay">
     📢 お知らせ
   </h2>
 
+
+  <!-- お知らせ① -->
   <div class="news-item">
+
     <button class="news-title">
+
       <span class="news-date">
         ２０２６年７月１８日（土）
       </span>
@@ -782,9 +786,11 @@ id="overlay">
       <span class="news-arrow">
         ＋
       </span>
+
     </button>
 
     <div class="news-content">
+
       <p>
         いつも図書手帳をご利用いただきありがとうございます。<br><br>
 
@@ -793,12 +799,17 @@ id="overlay">
 
         これからも図書手帳をよろしくお願いいたします。
       </p>
+
     </div>
+
   </div>
 
 
+  <!-- お知らせ② -->
   <div class="news-item">
+
     <button class="news-title">
+
       <span class="news-date">
         ２０２６年７月７日（火）
       </span>
@@ -810,9 +821,11 @@ id="overlay">
       <span class="news-arrow">
         ＋
       </span>
+
     </button>
 
     <div class="news-content">
+
       <p>
         図書手帳公式ホームページをご覧いただきありがとうございます。<br><br>
 
@@ -821,12 +834,17 @@ id="overlay">
 
         これからの追加機能もお楽しみに！
       </p>
+
     </div>
+
   </div>
 
 
+  <!-- お知らせ③ -->
   <div class="news-item">
+
     <button class="news-title">
+
       <span class="news-date">
         ２０２６年７月６日（月）
       </span>
@@ -838,9 +856,11 @@ id="overlay">
       <span class="news-arrow">
         ＋
       </span>
+
     </button>
 
     <div class="news-content">
+
       <p>
         図書手帳公式ホームページを公開しました。<br><br>
 
@@ -849,13 +869,23 @@ id="overlay">
 
         ぜひ定期的にご覧ください。
       </p>
+
     </div>
+
   </div>
 
 
-  <!-- 4件目以降も同じように追加するだけ -->
+  <!--
+    ここから下にお知らせを追加するだけでOKです。
+    4件目以降は自動的に非表示になります。
+  -->
+
+
+  <!-- お知らせ④（サンプル） -->
   <div class="news-item">
+
     <button class="news-title">
+
       <span class="news-date">
         ２０２６年６月３０日（火）
       </span>
@@ -867,36 +897,86 @@ id="overlay">
       <span class="news-arrow">
         ＋
       </span>
+
     </button>
 
     <div class="news-content">
+
       <p>
         過去のお知らせの内容です。
       </p>
+
     </div>
+
   </div>
 
 
-  <!-- JavaScriptが必要な場合だけ自動で表示 -->
-  <button class="news-more" type="button">
+  <!-- お知らせ⑤（サンプル） -->
+  <div class="news-item">
+
+    <button class="news-title">
+
+      <span class="news-date">
+        ２０２６年６月２０日（土）
+      </span>
+
+      <span class="news-head">
+        さらに過去のお知らせ
+      </span>
+
+      <span class="news-arrow">
+        ＋
+      </span>
+
+    </button>
+
+    <div class="news-content">
+
+      <p>
+        さらに過去のお知らせの内容です。
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!--
+    もっと見る / 表示数を減らす
+    お知らせが4件以上ある場合だけ表示されます
+  -->
+  <button
+    class="news-more"
+    type="button"
+  >
     もっと見る
   </button>
+
 
 </section>
 
 
 <style>
-/* 4件目以降はJavaScriptで hidden クラスを付けて非表示にします */
+
+/* =========================================
+   4件目以降のお知らせ
+   ========================================= */
+
 .news-item.news-hidden {
   display: none;
 }
 
 
-/* もっと見るボタン */
+/* =========================================
+   もっと見る / 表示数を減らすボタン
+   ========================================= */
+
 .news-more {
+
   display: none;
 
   margin: 25px auto 0;
+
   padding: 10px 30px;
 
   border: 1px solid #ccc;
@@ -906,81 +986,217 @@ id="overlay">
   color: #333;
 
   font-size: 16px;
+  line-height: 1.5;
+
   cursor: pointer;
 
-  transition: 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+
 }
+
+
+/* マウスを乗せたとき */
 
 .news-more:hover {
+
   background: #f5f5f5;
+  border-color: #999;
+
 }
 
 
-/* もっと見るを押した後 */
-.news.more-open .news-more {
-  display: none;
+/* クリック時 */
+
+.news-more:active {
+
+  transform: scale(0.98);
+
 }
+
+
+/* =========================================
+   スマートフォン用
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .news-more {
+
+    width: auto;
+
+    padding: 9px 25px;
+
+    font-size: 15px;
+
+  }
+
+}
+
 </style>
 
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
-  // お知らせのセクション
+
+  /* =========================================
+     お知らせセクションを取得
+     ========================================= */
+
   const news = document.querySelector(".news");
 
-  // お知らせ一覧
+
+  // お知らせが存在しない場合は終了
+  if (!news) {
+    return;
+  }
+
+
+  /* =========================================
+     お知らせ一覧を取得
+     ========================================= */
+
   const newsItems = news.querySelectorAll(".news-item");
 
-  // もっと見るボタン
+
+  /* =========================================
+     ボタンを取得
+     ========================================= */
+
   const moreButton = news.querySelector(".news-more");
 
-  // 最初に表示する件数
+
+  // ボタンが存在しない場合は終了
+  if (!moreButton) {
+    return;
+  }
+
+
+  /* =========================================
+     最初に表示するお知らせの数
+     ========================================= */
+
   const visibleCount = 3;
 
 
-  /*
-   * 4件目以降を非表示にする
-   */
+  /* =========================================
+     4件目以降を非表示にする
+     ========================================= */
+
   newsItems.forEach(function (item, index) {
 
     if (index >= visibleCount) {
+
       item.classList.add("news-hidden");
+
     }
 
   });
 
 
-  /*
-   * お知らせが4件以上ある場合だけ
-   * 「もっと見る」ボタンを表示
-   */
+  /* =========================================
+     お知らせが4件以上ある場合
+     「もっと見る」ボタンを表示
+     ========================================= */
+
   if (newsItems.length > visibleCount) {
 
     moreButton.style.display = "block";
 
-
-    /*
-     * 「もっと見る」をクリック
-     */
-    moreButton.addEventListener("click", function () {
-
-      // 隠れているお知らせを全部表示
-      newsItems.forEach(function (item) {
-        item.classList.remove("news-hidden");
-      });
-
-      // ボタンを消す
-      moreButton.style.display = "none";
-
-      // 状態を記録
-      news.classList.add("more-open");
-
-    });
-
   }
 
+
+  /* =========================================
+     ボタンをクリック
+     ========================================= */
+
+  moreButton.addEventListener("click", function () {
+
+
+    /*
+     * 4件目のお知らせが現在非表示か確認
+     */
+
+    const fourthItem = newsItems[visibleCount];
+
+    const isCollapsed =
+      fourthItem &&
+      fourthItem.classList.contains("news-hidden");
+
+
+    /* =========================================
+       「もっと見る」
+       ↓
+       全件表示
+       ========================================= */
+
+    if (isCollapsed) {
+
+
+      newsItems.forEach(function (item) {
+
+        item.classList.remove("news-hidden");
+
+      });
+
+
+      // ボタンの文字を変更
+
+      moreButton.textContent = "表示数を減らす";
+
+
+    }
+
+
+    /* =========================================
+       「表示数を減らす」
+       ↓
+       新しい3件だけ表示
+       ========================================= */
+
+    else {
+
+
+      newsItems.forEach(function (item, index) {
+
+        if (index >= visibleCount) {
+
+          item.classList.add("news-hidden");
+
+        }
+
+      });
+
+
+      // ボタンの文字を変更
+
+      moreButton.textContent = "もっと見る";
+
+
+      /*
+       * お知らせ欄の上まで戻る
+       */
+
+      news.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "start"
+
+      });
+
+    }
+
+
+  });
+
+
 });
+
 </script>
 
 
