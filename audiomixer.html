@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🔊 Audio Mixer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAEEDD'/%3E%3Cpath d='M10 25h12l15-13v40L22 39H10z' fill='%23333333'/%3E%3Cpath d='M43 22c4 5 4 15 0 20M50 16c8 9 8 23 0 32' fill='none' stroke='%23333333' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#FAEEDD;--panel:#fffaf4;--panel2:#f5e8da;--ink:#2e2925;--muted:#756b63;--line:#dfcfc0;--accent:#6d7f65;--danger:#b85b50;--blue:#567a9b;--shadow:0 12px 35px #5d493020}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"やさしさゴシック","Yu Gothic",Meiryo,sans-serif}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#fffaf4ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:11px;align-items:center;font-weight:800;font-size:19px}.brand .sp{font-size:26px}
+.actions{display:flex;gap:8px;align-items:center}button,select,input{font:inherit}button{border:1px solid var(--line);background:#fffaf4;border-radius:12px;padding:9px 12px;color:var(--ink);cursor:pointer;transition:.18s transform,.18s background}.btn:hover{transform:translateY(-1px);background:#fff}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.danger{background:#fff0ed;color:var(--danger);border-color:#e3b8b0}
+main{max-width:1500px;margin:auto;padding:18px}.grid{display:grid;grid-template-columns:360px minmax(450px,1fr) 340px;gap:16px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}.card h2,.card h3{margin:0 0 12px}.sub{font-size:12px;color:var(--muted)}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;gap:10px;align-items:center}.stack>*+*{margin-top:9px}
+input[type=range]{width:100%;accent-color:var(--accent)}input[type=number]{width:76px;padding:7px;border:1px solid var(--line);border-radius:8px;background:#fff}.select,select{padding:8px;border:1px solid var(--line);border-radius:9px;background:#fffaf4;max-width:100%}
+.meter{height:18px;background:#302c29;border-radius:8px;overflow:hidden;position:relative}.meter .fill{height:100%;width:0;background:linear-gradient(90deg,#75a66b 0 65%,#d3ae55 65% 86%,#c85b50 86%);transition:width .06s}.meter .peak{position:absolute;top:0;bottom:0;width:2px;background:white;left:0}
+.visual{height:190px;width:100%;display:block;background:#1e1b19;border-radius:13px}.mini{height:100px}
+.channels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.channel{padding:12px;border:1px solid var(--line);border-radius:14px;background:#fffdf9}.channel h3{font-size:14px}.badge{font-size:11px;padding:4px 7px;border-radius:999px;background:var(--panel2);color:var(--muted)}
+.faders{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.fader{background:#fffdf9;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}.vertical{writing-mode:vertical-lr;direction:rtl;height:160px;width:28px}.value{font-variant-numeric:tabular-nums;font-weight:700}
+.eq{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}.band{text-align:center}.band label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.band input{height:125px;writing-mode:vertical-lr;direction:rtl}
+.param{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.param label{font-size:11px;color:var(--muted)}.param input,.param select{width:100%;margin-top:4px}
+.preset{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.preset button{font-size:12px}
+.filelist{max-height:180px;overflow:auto}.file{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px}
+.timer{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}.status{font-size:12px;color:var(--muted);min-height:18px}.warning{padding:10px;border-radius:10px;background:#fff2d9;color:#6b5227;font-size:12px}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px}
+@media(max-width:1150px){.grid{grid-template-columns:1fr 1fr}.grid>section:nth-child(2){grid-column:1/-1}.eq{grid-template-columns:repeat(8,1fr)}}
+@media(max-width:760px){header{padding:10px 12px}.brand{font-size:15px}.actions button{padding:7px 9px}.grid{display:block}main{padding:10px}.card{padding:12px;border-radius:14px}.channels,.faders{grid-template-columns:1fr 1fr}.eq{grid-template-columns:repeat(4,1fr)}.param{grid-template-columns:1fr 1fr}.preset{grid-template-columns:repeat(2,1fr)}.visual{height:150px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="sp">🔊</span><span>Audio Mixer</span><span class="badge">LIVE DSP</span></div>
+  <div class="actions">
+    <button id="startBtn" class="primary">▶ 開始</button>
+    <button id="stopBtn">■ 停止</button>
+  </div>
+</header>
+
+<main>
+<div class="warning">※ ブラウザの安全仕様上、「別タブで再生中の音声」を通常のWebページが直接取得することはできません。タブ音声を入力したい場合は、対応ブラウザの「画面共有／タブ共有」で音声共有を許可してください。</div>
+
+<div class="grid">
+<section>
+  <div class="card">
+    <h2>🎙 入力ミキサー</h2>
+    <div class="channels">
+      <div class="channel">
+        <div class="between"><h3>USB / マイク 1</h3><span class="badge">INPUT 1</span></div>
+        <button class="primary" data-mic="0">🎙 接続</button>
+        <input data-vol="0" type="range" min="0" max="2" step=".01" value="1">
+        <div class="between"><span>音量</span><span class="value" data-volv="0">100%</span></div>
+      </div>
+      <div class="channel">
+        <div class="between"><h3>USB / マイク 2</h3><span class="badge">INPUT 2</span></div>
+        <button data-mic="1">🎙 接続</button>
+        <input data-vol="1" type="range" min="0" max="2" step=".01" value="1">
+        <div class="between"><span>音量</span><span class="value" data-volv="1">100%</span></div>
+      </div>
+      <div class="channel">
+        <div class="between"><h3>音声ファイル</h3><span class="badge">FILE</span></div>
+        <input id="files" type="file" accept="audio/*" multiple>
+        <div id="fileList" class="filelist"></div>
+      </div>
+      <div class="channel">
+        <div class="between"><h3>タブ / 画面音声</h3><span class="badge">TAB</span></div>
+        <button id="shareBtn">🖥 音声共有</button>
+        <div class="sub">画面共有ダイアログで「音声を共有」をON</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎚 フェーダー式ミキサー</h2>
+    <div class="faders">
+      <div class="fader"><b>INPUT 1</b><input class="vertical" data-fader="0" type="range" min="0" max="2" step=".01" value="1"><div class="value" data-faderv="0">0 dB</div></div>
+      <div class="fader"><b>INPUT 2</b><input class="vertical" data-fader="1" type="range" min="0" max="2" step=".01" value="1"><div class="value" data-faderv="1">0 dB</div></div>
+      <div class="fader"><b>FILES</b><input class="vertical" data-fader="2" type="range" min="0" max="2" step=".01" value="1"><div class="value" data-faderv="2">0 dB</div></div>
+      <div class="fader"><b>MASTER</b><input class="vertical" id="master" type="range" min="0" max="2" step=".01" value="1"><div class="value" id="masterV">0 dB</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎵 プリセット</h2>
+    <div class="preset">
+      <button data-preset="flat">FLAT</button><button data-preset="bass">BASS</button><button data-preset="vocal">VOCAL</button><button data-preset="rock">ROCK</button><button data-preset="pop">POP</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <div class="between"><h2>📊 リアルタイムモニター</h2><span id="state" class="badge">STOPPED</span></div>
+    <canvas id="spectrum" class="visual"></canvas>
+    <div style="height:10px"></div>
+    <div class="meter"><div id="meterFill" class="fill"></div><div id="meterPeak" class="peak"></div></div>
+    <div class="between"><span class="sub">VU / PEAK</span><span id="db">-∞ dB</span></div>
+    <canvas id="wave" class="visual mini"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="between"><h2>🎚 31バンドEQ</h2><span class="badge">±12 dB</span></div>
+    <div id="eq" class="eq"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎛 パラメトリックEQ</h2>
+    <div class="param">
+      <div><label>LOW FREQ</label><input id="pLowF" type="number" min="20" max="20000" value="80"></div>
+      <div><label>LOW GAIN</label><input id="pLowG" type="number" min="-18" max="18" value="0"></div>
+      <div><label>LOW Q</label><input id="pLowQ" type="number" min=".1" max="20" step=".1" value="0.7"></div>
+      <div><label>MID FREQ</label><input id="pMidF" type="number" min="20" max="20000" value="1000"></div>
+      <div><label>MID GAIN</label><input id="pMidG" type="number" min="-18" max="18" value="0"></div>
+      <div><label>MID Q</label><input id="pMidQ" type="number" min=".1" max="20" step=".1" value="1"></div>
+      <div><label>HIGH FREQ</label><input id="pHighF" type="number" min="20" max="20000" value="8000"></div>
+      <div><label>HIGH GAIN</label><input id="pHighG" type="number" min="-18" max="18" value="0"></div>
+      <div><label>HIGH Q</label><input id="pHighQ" type="number" min=".1" max="20" step=".1" value=".7"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h2>🔊 出力</h2>
+    <label class="sub">出力デバイス</label>
+    <select id="output" class="select" style="width:100%"><option>デバイス一覧を取得するには開始してください</option></select>
+    <div style="height:10px"></div>
+    <div class="between"><b>MASTER</b><span id="outDb">0 dB</span></div>
+    <input id="master2" type="range" min="0" max="2" step=".01" value="1">
+    <button id="monitorBtn">🎧 ヘッドホンモニター ON/OFF</button>
+  </div>
+
+  <div class="card">
+    <h2>🔊 ダイナミクス</h2>
+    <div class="between"><span>リミッター</span><b id="limVal">-1 dB</b></div>
+    <input id="limiter" type="range" min="-12" max="0" step=".1" value="-1">
+    <div class="between"><span>ゲイン</span><b id="gainVal">0 dB</b></div>
+    <input id="gain" type="range" min="-24" max="24" step=".1" value="0">
+  </div>
+
+  <div class="card">
+    <h2>🌊 空間系</h2>
+    <div class="between"><span>ディレイ</span><span id="delayV">0 ms</span></div>
+    <input id="delay" type="range" min="0" max="1000" value="0">
+    <div class="between"><span>リバーブ</span><span id="reverbV">0%</span></div>
+    <input id="reverb" type="range" min="0" max="1" step=".01" value="0">
+    <div class="between"><span>ステレオ幅</span><span id="widthV">100%</span></div>
+    <input id="width" type="range" min="0" max="2" step=".01" value="1">
+  </div>
+
+  <div class="card">
+    <h2>🔴 録音 / 書き出し</h2>
+    <div id="timer" class="timer">00:00</div>
+    <div class="row">
+      <button id="rec" class="danger">● 録音開始</button>
+      <button id="download" disabled>💾 WAV保存</button>
+    </div>
+    <div id="recStatus" class="status"></div>
+  </div>
+
+  <div class="card">
+    <h2>💾 EQ設定</h2>
+    <div class="row">
+      <button id="saveEQ">設定を保存</button>
+      <button id="loadEQ">設定を読み込み</button>
+      <button id="resetEQ">リセット</button>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+<footer>Web Audio API / 31-band graphic EQ / Parametric EQ / Mixer / Recorder</footer>
+
+<script>
+const FREQS=[20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
+let ctx, master, analyser, limiter, inputGain, eq=[], params=[], sources=[], filePlayers=[], dest, mediaRecorder, recChunks=[];
+let recording=false, recStart=0, recTimer;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const dbFromLin=x=>x<=0.0001?-60:20*Math.log10(x);
+const linFromDb=x=>Math.pow(10,x/20);
+
+function makeEQ(){
+  const box=$("#eq");
+  FREQS.forEach((f,i)=>{
+    const d=document.createElement("div"); d.className="band";
+    d.innerHTML=`<label>${f>=1000?(f/1000)+'k':f}</label><input data-eq="${i}" type="range" min="-12" max="12" step=".1" value="0"><div class="value" data-eqv="${i}">0</div>`;
+    box.appendChild(d);
+  });
+}
+makeEQ();
+
+function buildGraph(){
+  ctx=new AudioContext();
+  master=ctx.createGain(); master.gain.value=1;
+  inputGain=ctx.createGain(); inputGain.gain.value=1;
+  analyser=ctx.createAnalyser(); analyser.fftSize=2048; analyser.smoothingTimeConstant=.75;
+  limiter=ctx.createDynamicsCompressor(); limiter.threshold.value=-1; limiter.knee.value=0; limiter.ratio.value=20; limiter.attack.value=.003; limiter.release.value=.15;
+  const low=ctx.createBiquadFilter(); low.type="lowshelf"; low.frequency.value=80;
+  const mid=ctx.createBiquadFilter(); mid.type="peaking"; mid.frequency.value=1000; mid.Q.value=1;
+  const high=ctx.createBiquadFilter(); high.type="highshelf"; high.frequency.value=8000;
+  params=[low,mid,high];
+  eq=FREQS.map(f=>{let n=ctx.createBiquadFilter();n.type="peaking";n.frequency.value=f;n.Q.value=1.15;n.gain.value=0;return n});
+  let chain=inputGain;
+  eq.forEach(n=>{chain.connect(n);chain=n});
+  chain.connect(low);low.connect(mid);mid.connect(high);high.connect(limiter);
+  limiter.connect(master);master.connect(analyser);analyser.connect(ctx.destination);
+  dest=ctx.createMediaStreamDestination();
+  master.connect(dest);
+  return ctx.resume();
+}
+async function ensure(){if(!ctx){await buildGraph()} if(ctx.state==="suspended") await ctx.resume(); await refreshDevices(); $("#state").textContent="RUNNING"}
+
+async function addMic(index){
+  await ensure();
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:2,echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const src=ctx.createMediaStreamSource(stream), g=ctx.createGain(); g.gain.value=1;
+    src.connect(g); g.connect(inputGain);
+    sources[index]={src,g,stream};
+    $$("[data-mic]").find(b=>b.dataset.mic==index).textContent="● 接続中";
+  }catch(e){alert("マイクにアクセスできません: "+e.message)}
+}
+$$("[data-mic]").forEach(b=>b.onclick=()=>addMic(+b.dataset.mic));
+
+$("#shareBtn").onclick=async()=>{
+  await ensure();
+  try{
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+    if(!stream.getAudioTracks().length){alert("音声共有が許可されていません。共有ダイアログで「音声を共有」をONにしてください。");return}
+    const src=ctx.createMediaStreamSource(stream); src.connect(inputGain);
+    stream.getVideoTracks().forEach(t=>t.stop());
+  }catch(e){console.log(e)}
+};
+
+$("#files").onchange=async e=>{
+  await ensure(); $("#fileList").innerHTML="";
+  [...e.target.files].forEach((file,i)=>{
+    const url=URL.createObjectURL(file), a=new Audio(url); a.crossOrigin="anonymous"; a.controls=true;
+    a.style.width="100%"; a.preload="auto";
+    const row=document.createElement("div");row.className="file";row.innerHTML=`<span>${file.name}</span>`;
+    row.appendChild(a); $("#fileList").appendChild(row);
+    const src=ctx.createMediaElementSource(a),g=ctx.createGain();src.connect(g);g.connect(inputGain);
+    filePlayers.push({a,g});
+  });
+};
+
+function setMaster(v){$("#master").value=v;$("#master2").value=v;if(master)master.gain.value=v;$("#masterV").textContent=(dbFromLin(v)).toFixed(1)+" dB";$("#outDb").textContent=(dbFromLin(v)).toFixed(1)+" dB"}
+$("#master").oninput=e=>setMaster(+e.target.value);$("#master2").oninput=e=>setMaster(+e.target.value);
+
+$$("[data-vol]").forEach(x=>x.oninput=()=>{const i=+x.dataset.vol;if(sources[i])sources[i].g.gain.value=+x.value; $(`[data-volv="${i}"]`).textContent=Math.round(+x.value*100)+"%"});
+$$("[data-fader]").forEach(x=>x.oninput=()=>{$(`[data-faderv="${x.dataset.fader}"]`).textContent=dbFromLin(+x.value).toFixed(1)+" dB"});
+$$("[data-eq]").forEach(x=>x.oninput=()=>{const i=+x.dataset.eq;if(eq[i])eq[i].gain.value=+x.value;$(`[data-eqv="${i}"]`).textContent=(+x.value).toFixed(1)});
+
+$("#gain").oninput=e=>{if(inputGain)inputGain.gain.value=linFromDb(+e.target.value);$("#gainVal").textContent=e.target.value+" dB"};
+$("#limiter").oninput=e=>{if(limiter)limiter.threshold.value=+e.target.value;$("#limVal").textContent=e.target.value+" dB"};
+$("#delay").oninput=e=>$("#delayV").textContent=e.target.value+" ms";
+$("#reverb").oninput=e=>$("#reverbV").textContent=Math.round(e.target.value*100)+"%";
+$("#width").oninput=e=>$("#widthV").textContent=Math.round(e.target.value*100)+"%";
+
+["Low","Mid","High"].forEach((n,i)=>{
+  $(`#p${n}F`).oninput=e=>params[i].frequency.value=+e.target.value;
+  $(`#p${n}G`).oninput=e=>params[i].gain.value=+e.target.value;
+  $(`#p${n}Q`).oninput=e=>params[i].Q.value=+e.target.value;
+});
+
+const presets={
+flat:Array(31).fill(0),
+bass:[4,4,4,3,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+vocal:[-3,-3,-2,-1,0,2,3,4,5,4,3,2,1,0,0,0,1,2,3,3,2,1,0,0,-1,-2,-2,-2,-1,-1,-1],
+rock:[4,3,3,2,1,0,-1,-2,-1,0,2,3,3,2,1,0,1,2,3,3,2,1,0,2,3,4,4,3,2,2,2],
+pop:[-2,-2,-1,0,2,3,2,1,0,-1,-1,0,1,2,2,1,0,0,1,2,3,3,2,1,1,2,3,4,3,2,1]
+};
+$$("[data-preset]").forEach(b=>b.onclick=()=>applyPreset(b.dataset.preset));
+function applyPreset(name){presets[name].forEach((v,i)=>{$(`[data-eq="${i}"]`).value=v;$(`[data-eqv="${i}"]`).textContent=v.toFixed(1);if(eq[i])eq[i].gain.value=v})}
+
+$("#saveEQ").onclick=()=>{
+ const data={eq:FREQS.map((_,i)=>+ $(`[data-eq="${i}"]`).value),params:["Low","Mid","High"].map(n=>[$(`#p${n}F`).value,$(`#p${n}G`).value,$(`#p${n}Q`).value]),gain:$("#gain").value,limiter:$("#limiter").value};
+ localStorage.setItem("audioMixerEQ",JSON.stringify(data)); alert("EQ設定を保存しました。");
+};
+$("#loadEQ").onclick=()=>{
+ const d=JSON.parse(localStorage.getItem("audioMixerEQ")||"null");if(!d){alert("保存された設定がありません。");return}
+ d.eq.forEach((v,i)=>{$(`[data-eq="${i}"]`).value=v;$(`[data-eqv="${i}"]`).textContent=(+v).toFixed(1);if(eq[i])eq[i].gain.value=v});
+ d.params.forEach((v,i)=>{const n=["Low","Mid","High"][i];["F","G","Q"].forEach((k,j)=>$(`#p${n}${k}`).value=v[j])});
+ $("#gain").value=d.gain;$("#limiter").value=d.limiter;$("#gain").dispatchEvent(new Event("input"));$("#limiter").dispatchEvent(new Event("input"));
+ if(params.length)d.params.forEach((v,i)=>{params[i].frequency.value=+v[0];params[i].gain.value=+v[1];params[i].Q.value=+v[2]});
+};
+$("#resetEQ").onclick=()=>{applyPreset("flat");["Low","Mid","High"].forEach(n=>{$(`#p${n}F`).value={Low:80,Mid:1000,High:8000}[n];$(`#p${n}G`).value=0;$(`#p${n}Q`).value={Low:.7,Mid:1,High:.7}[n]});if(params.length){params[0].frequency.value=80;params[0].gain.value=0;params[0].Q.value=.7;params[1].frequency.value=1000;params[1].gain.value=0;params[1].Q.value=1;params[2].frequency.value=8000;params[2].gain.value=0;params[2].Q.value=.7}};
+
+$("#startBtn").onclick=ensure;
+$("#stopBtn").onclick=()=>{if(ctx)ctx.suspend();$("#state").textContent="STOPPED"};
+$("#monitorBtn").onclick=()=>alert("ヘッドホンモニターはOS/ブラウザの出力デバイス設定と併用してください。下の出力デバイス選択に対応するブラウザではスピーカーを切り替えられます。");
+
+async function refreshDevices(){
+ if(!navigator.mediaDevices?.enumerateDevices)return;
+ const devs=await navigator.mediaDevices.enumerateDevices(), out=$("#output");out.innerHTML="";
+ devs.filter(d=>d.kind==="audiooutput").forEach(d=>{const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||"Audio Output";out.appendChild(o)});
+}
+$("#output").onchange=async e=>{
+ if(ctx?.setSinkId){try{await ctx.setSinkId(e.target.value)}catch(err){console.log(err)}}else alert("このブラウザではWeb Audioの出力先切替に対応していません。");
+};
+
+const sc=$("#spectrum"),wc=$("#wave"),sx=sc.getContext("2d"),wx=wc.getContext("2d");
+function resize(c){const r=c.getBoundingClientRect(),d=devicePixelRatio;c.width=r.width*d;c.height=r.height*d;return [r.width,r.height,d]}
+function draw(){
+ requestAnimationFrame(draw); if(!analyser)return;
+ const [w,h,d]=resize(sc);sx.clearRect(0,0,w*d,h*d);
+ const a=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(a);
+ sx.fillStyle="#1e1b19";sx.fillRect(0,0,w*d,h*d);sx.lineWidth=2*d;sx.strokeStyle="#8faf88";sx.beginPath();
+ a.forEach((v,i)=>{const x=i/a.length*w*d,y=h*d-(v/255)*h*d;i?sx.lineTo(x,y):sx.moveTo(x,y)});sx.stroke();
+ const [ww,hh,dd]=resize(wc);wx.fillStyle="#1e1b19";wx.fillRect(0,0,ww*dd,hh*dd);
+ const t=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(t);wx.strokeStyle="#d6b27b";wx.lineWidth=1.5*dd;wx.beginPath();
+ t.forEach((v,i)=>{const x=i/(t.length-1)*ww*dd,y=(v/255)*hh*dd;i?wx.lineTo(x,y):wx.moveTo(x,y)});wx.stroke();
+ let sum=0;for(const v of t){let q=(v-128)/128;sum+=q*q}let rms=Math.sqrt(sum/t.length),db=20*Math.log10(rms||.00001),pct=Math.max(0,Math.min(100,(db+60)/60));
+ $("#meterFill").style.width=pct+"%";$("#meterPeak").style.left=Math.min(99,pct)+"%";$("#db").textContent=db.toFixed(1)+" dB";
+}
+draw();
+
+$("#rec").onclick=async()=>{
+ await ensure();
+ if(!recording){
+   recChunks=[];mediaRecorder=new MediaRecorder(dest.stream,{mimeType:"audio/webm"});
+   mediaRecorder.ondataavailable=e=>{if(e.data.size)recChunks.push(e.data)};
+   mediaRecorder.onstop=async()=>{const blob=new Blob(recChunks,{type:"audio/webm"});const ab=await blob.arrayBuffer();const wav=await webmToWav(ab);$("#download").disabled=false;$("#download").onclick=()=>downloadBlob(wav,"audio-mixer.wav");$("#recStatus").textContent="録音をWAVに変換しました。保存できます。"};
+   mediaRecorder.start();recording=true;recStart=Date.now();$("#rec").textContent="■ 録音停止";tick();
+ }else{mediaRecorder.stop();recording=false;$("#rec").textContent="● 録音開始";clearInterval(recTimer)}
+};
+function tick(){clearInterval(recTimer);recTimer=setInterval(()=>{let s=Math.floor((Date.now()-recStart)/1000);$("#timer").textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`},250)}
+function downloadBlob(b,n){const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+async function webmToWav(ab){
+ const ac=new AudioContext(),buf=await ac.decodeAudioData(ab),ch=Math.min(2,buf.numberOfChannels),len=buf.length;
+ const out=new ArrayBuffer(44+len*ch*2),v=new DataView(out);
+ const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+ ws(0,"RIFF");v.setUint32(4,36+len*ch*2,true);ws(8,"WAVE");ws(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,buf.sampleRate,true);v.setUint32(28,buf.sampleRate*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);ws(36,"data");v.setUint32(40,len*ch*2,true);
+ let o=44,channels=[];for(let c=0;c<ch;c++)channels.push(buf.getChannelData(c));
+ for(let i=0;i<len;i++)for(let c=0;c<ch;c++){let x=Math.max(-1,Math.min(1,channels[c][i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2}
+ return new Blob([out],{type:"audio/wav"});
+}
+navigator.mediaDevices?.addEventListener?.("devicechange",refreshDevices);
+</script>
+</body>
+</html>
