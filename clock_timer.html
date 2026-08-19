@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アナログ時計 & タイマー</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    background: #111;
+    color: white;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  /* 時計 */
+  .clock {
+    position: relative;
+    width: min(70vw, 70vh, 650px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, #fafafa 0%, #e9e9e9 70%, #ccc 100%);
+    border: clamp(8px, 1.2vw, 16px) solid #333;
+    box-shadow:
+      0 0 0 4px #777,
+      0 15px 40px rgba(0,0,0,.5),
+      inset 0 0 30px rgba(0,0,0,.15);
+    flex-shrink: 0;
+  }
+
+  /* 数字と目盛りを別の円周に配置し、重ならないようにする */
+  .number {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    color: #111;
+    font-size: clamp(20px, 5vw, 52px);
+    font-weight: 700;
+  }
+
+  .number span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateY(calc(min(31vw, 31vh, 202px) * -1))
+      rotate(calc(var(--angle) * -1));
+  }
+
+  .n12 { --angle: 0deg; }
+  .n1  { --angle: 30deg; }
+  .n2  { --angle: 60deg; }
+  .n3  { --angle: 90deg; }
+  .n4  { --angle: 120deg; }
+  .n5  { --angle: 150deg; }
+  .n6  { --angle: 180deg; }
+  .n7  { --angle: 210deg; }
+  .n8  { --angle: 240deg; }
+  .n9  { --angle: 270deg; }
+  .n10 { --angle: 300deg; }
+  .n11 { --angle: 330deg; }
+
+  .tick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 47%;
+    transform-origin: 50% 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .tick::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 10px;
+    background: #333;
+    transform: translateX(-50%);
+  }
+
+  .tick.major::after {
+    width: 4px;
+    height: 18px;
+  }
+
+  /* デジタル時計 */
+  .digital-clock {
+    position: absolute;
+    left: 50%;
+    top: 62%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    font-family: "DS-Digital", "Digital-7 Mono", "Courier New", monospace;
+    font-size: clamp(24px, 5vw, 58px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #111;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  }
+
+  /* 時計の針 */
+  .hand {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform-origin: 50% 100%;
+    border-radius: 999px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  .hour {
+    width: 7px;
+    height: 25%;
+    background: #111;
+  }
+
+  .minute {
+    width: 5px;
+    height: 34%;
+    background: #222;
+  }
+
+  .second {
+    width: 2px;
+    height: 39%;
+    background: #e53935;
+  }
+
+  .center {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e53935;
+    border: 3px solid #222;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  /* タイマー */
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #222;
+    padding: 12px 18px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.35);
+  }
+
+  .timer-display {
+    min-width: 130px;
+    text-align: center;
+    font-size: 34px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  input {
+    width: 65px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: #444;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: white;
+    background: #444;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  button:hover {
+    background: #555;
+  }
+
+  button.primary {
+    background: #1976d2;
+  }
+
+  button.primary:hover {
+    background: #2196f3;
+  }
+
+  button.danger {
+    background: #c62828;
+  }
+
+  button.danger:hover {
+    background: #e53935;
+  }
+
+  .fullscreen {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+  }
+
+  /* タイマー終了 */
+  body.finished {
+    animation: flash .7s infinite alternate;
+  }
+
+  @keyframes flash {
+    from { background: #111; }
+    to   { background: #7f0000; }
+  }
+
+  /* 全画面時 */
+  body.fullscreen-mode #app {
+    gap: 0;
+  }
+
+  body.fullscreen-mode .clock {
+    width: min(85vw, 85vh, 900px);
+  }
+
+  body.fullscreen-mode .timer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: .9;
+  }
+
+  @media (max-width: 700px) {
+    .clock {
+      width: min(82vw, 82vh);
+    }
+
+    .timer {
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 95vw;
+    }
+
+    .fullscreen {
+      right: 10px;
+      top: 10px;
+      padding: 8px 12px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div class="clock" id="clock">
+
+    <div class="number">
+      <span class="n12">12</span>
+      <span class="n1">1</span>
+      <span class="n2">2</span>
+      <span class="n3">3</span>
+      <span class="n4">4</span>
+      <span class="n5">5</span>
+      <span class="n6">6</span>
+      <span class="n7">7</span>
+      <span class="n8">8</span>
+      <span class="n9">9</span>
+      <span class="n10">10</span>
+      <span class="n11">11</span>
+    </div>
+
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(0deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(6deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(12deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(18deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(24deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(30deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(36deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(42deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(48deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(54deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(60deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(66deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(72deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(78deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(84deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(90deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(96deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(102deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(108deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(114deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(120deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(126deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(132deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(138deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(144deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(150deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(156deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(162deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(168deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(174deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(180deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(186deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(192deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(198deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(204deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(210deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(216deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(222deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(228deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(234deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(240deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(246deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(252deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(258deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(264deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(270deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(276deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(282deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(288deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(294deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(300deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(306deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(312deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(318deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(324deg)"></div>
+    <div class="tick major" style="transform:translate(-50%,-100%) rotate(330deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(336deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(342deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(348deg)"></div>
+    <div class="tick" style="transform:translate(-50%,-100%) rotate(354deg)"></div>
+
+    <div class="digital-clock" id="digitalClock">00:00:00</div>
+
+    <div class="hand hour" id="hour"></div>
+    <div class="hand minute" id="minute"></div>
+    <div class="hand second" id="second"></div>
+    <div class="center"></div>
+
+  </div>
+
+  <div class="timer">
+
+    <div>
+      <input id="minutes" type="number" min="0" max="999" value="5">
+      分
+      <input id="seconds" type="number" min="0" max="59" value="0">
+      秒
+    </div>
+
+    <div class="timer-display" id="timerDisplay">
+      05:00
+    </div>
+
+    <button class="primary" id="startBtn">スタート</button>
+    <button id="resetBtn">リセット</button>
+
+  </div>
+
+  <button class="fullscreen" id="fullscreenBtn">
+    ⛶ 全画面
+  </button>
+
+</div>
+
+<script>
+/* =========================
+   アナログ時計
+========================= */
+
+const hourHand = document.getElementById("hour");
+const minuteHand = document.getElementById("minute");
+const secondHand = document.getElementById("second");
+const digitalClock = document.getElementById("digitalClock");
+
+function updateClock() {
+  const now = new Date();
+
+  const hours = now.getHours() % 12;
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const milliseconds = now.getMilliseconds();
+
+  digitalClock.textContent =
+    String(now.getHours()).padStart(2, "0") + ":" +
+    String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+
+  const secondAngle =
+    seconds * 6 + milliseconds * 0.006;
+
+  const minuteAngle =
+    minutes * 6 + seconds * 0.1;
+
+  const hourAngle =
+    hours * 30 + minutes * 0.5;
+
+  hourHand.style.transform =
+    `translateX(-50%) rotate(${hourAngle}deg)`;
+
+  minuteHand.style.transform =
+    `translateX(-50%) rotate(${minuteAngle}deg)`;
+
+  secondHand.style.transform =
+    `translateX(-50%) rotate(${secondAngle}deg)`;
+
+  requestAnimationFrame(updateClock);
+}
+
+updateClock();
+
+
+/* =========================
+   タイマー
+========================= */
+
+const minutesInput = document.getElementById("minutes");
+const secondsInput = document.getElementById("seconds");
+const timerDisplay = document.getElementById("timerDisplay");
+const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+let remaining = 300;
+let timerId = null;
+let running = false;
+
+function getInputTime() {
+  let min = parseInt(minutesInput.value) || 0;
+  let sec = parseInt(secondsInput.value) || 0;
+
+  sec = Math.max(0, Math.min(59, sec));
+  min = Math.max(0, min);
+
+  return min * 60 + sec;
+}
+
+function formatTime(totalSeconds) {
+  const min = Math.floor(totalSeconds / 60);
+  const sec = totalSeconds % 60;
+
+  return String(min).padStart(2, "0") +
+         ":" +
+         String(sec).padStart(2, "0");
+}
+
+function updateTimerDisplay() {
+  timerDisplay.textContent = formatTime(remaining);
+}
+
+function startTimer() {
+  if (running) {
+    clearInterval(timerId);
+    running = false;
+    startBtn.textContent = "再開";
+    return;
+  }
+
+  if (remaining <= 0) {
+    remaining = getInputTime();
+  }
+
+  if (remaining <= 0) return;
+
+  running = true;
+  startBtn.textContent = "一時停止";
+
+  timerId = setInterval(() => {
+    remaining--;
+
+    updateTimerDisplay();
+
+    if (remaining <= 0) {
+      clearInterval(timerId);
+      running = false;
+      startBtn.textContent = "スタート";
+
+      // 終了時のアラーム
+      document.body.classList.add("finished");
+
+      // 音を鳴らす
+      beep();
+
+      setTimeout(() => {
+        document.body.classList.remove("finished");
+      }, 5000);
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(timerId);
+
+  running = false;
+  remaining = getInputTime();
+
+  startBtn.textContent = "スタート";
+  document.body.classList.remove("finished");
+
+  updateTimerDisplay();
+}
+
+startBtn.addEventListener("click", startTimer);
+resetBtn.addEventListener("click", resetTimer);
+
+minutesInput.addEventListener("change", () => {
+  if (!running) resetTimer();
+});
+
+secondsInput.addEventListener("change", () => {
+  if (!running) resetTimer();
+});
+
+
+/* =========================
+   アラーム音
+========================= */
+
+function beep() {
+  try {
+    const AudioContext =
+      window.AudioContext || window.webkitAudioContext;
+
+    const ctx = new AudioContext();
+
+    [0, 0.25, 0.5].forEach(delay => {
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.frequency.value = 880;
+      oscillator.type = "sine";
+
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        ctx.currentTime + delay + 0.2
+      );
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+
+      oscillator.start(ctx.currentTime + delay);
+      oscillator.stop(ctx.currentTime + delay + 0.2);
+    });
+  } catch (e) {
+    console.log("Audio is not available.");
+  }
+}
+
+
+/* =========================
+   全画面表示
+========================= */
+
+const fullscreenBtn =
+  document.getElementById("fullscreenBtn");
+
+fullscreenBtn.addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      document.body.classList.add("fullscreen-mode");
+      fullscreenBtn.textContent = "⛶ 全画面解除";
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    document.body.classList.remove("fullscreen-mode");
+    fullscreenBtn.textContent = "⛶ 全画面";
+  }
+});
+
+
+/* =========================
+   キーボード操作
+========================= */
+
+document.addEventListener("keydown", e => {
+
+  // Space：スタート / 一時停止
+  if (e.code === "Space") {
+    e.preventDefault();
+    startTimer();
+  }
+
+  // R：リセット
+  if (e.key.toLowerCase() === "r") {
+    resetTimer();
+  }
+
+  // F：全画面
+  if (e.key.toLowerCase() === "f") {
+    fullscreenBtn.click();
+  }
+});
+
+updateTimerDisplay();
+</script>
+
+</body>
+</html>
