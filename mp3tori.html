@@ -1,0 +1,3994 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>MP3 トリミング・合成ツール</title>
+
+<style>
+
+/* =========================================================
+   基本
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: #FAEEDD;
+    color: #333;
+
+    font-family:
+        "Yu Gothic",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+}
+
+
+/* =========================================================
+   ヘッダー
+========================================================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 24px;
+
+    background: rgba(255,255,255,.96);
+
+    box-shadow:
+        0 2px 12px rgba(0,0,0,.08);
+
+    backdrop-filter: blur(8px);
+}
+
+header h1 {
+    margin: 0;
+
+    font-size: 22px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   メイン
+========================================================= */
+
+.container {
+    width: min(
+        1200px,
+        calc(100% - 30px)
+    );
+
+    margin:
+        30px auto
+        70px;
+}
+
+
+/* =========================================================
+   説明
+========================================================= */
+
+.notice {
+    background: #fff;
+
+    border-radius: 16px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.06);
+
+    line-height: 1.8;
+}
+
+.notice strong {
+    color: #73563d;
+}
+
+
+/* =========================================================
+   ドロップエリア
+========================================================= */
+
+.drop-area {
+
+    border:
+        3px dashed #c5a484;
+
+    background:
+        rgba(255,255,255,.78);
+
+    border-radius: 20px;
+
+    padding:
+        45px 20px;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        border-color .2s,
+        transform .2s,
+        box-shadow .2s;
+}
+
+.drop-area:hover,
+.drop-area.dragover {
+
+    background: #fff;
+
+    border-color: #73563d;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.08);
+}
+
+.drop-icon {
+    font-size: 46px;
+    margin-bottom: 8px;
+}
+
+.drop-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.drop-sub {
+    margin-top: 8px;
+    color: #777;
+    font-size: 14px;
+}
+
+#fileInput {
+    display: none;
+}
+
+
+/* =========================================================
+   ツールバー
+========================================================= */
+
+.toolbar {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin:
+        20px 0;
+}
+
+button {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding:
+        11px 17px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    background: #fff;
+
+    color: #333;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+    transition:
+        transform .15s,
+        box-shadow .15s,
+        opacity .15s;
+}
+
+button:hover:not(:disabled) {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 5px 14px rgba(0,0,0,.12);
+}
+
+button:active:not(:disabled) {
+
+    transform:
+        translateY(0);
+}
+
+button:disabled {
+
+    opacity: .42;
+
+    cursor: not-allowed;
+}
+
+.primary {
+    background: #73563d;
+    color: #fff;
+}
+
+.success {
+    background: #4f7958;
+    color: #fff;
+}
+
+.danger {
+    background: #9d5050;
+    color: #fff;
+}
+
+
+/* =========================================================
+   タイムライン
+========================================================= */
+
+#timeline {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+}
+
+.empty {
+
+    background:
+        rgba(255,255,255,.75);
+
+    border-radius: 16px;
+
+    padding:
+        45px 20px;
+
+    text-align: center;
+
+    color: #777;
+}
+
+
+/* =========================================================
+   クリップ
+========================================================= */
+
+.clip {
+
+    background: #fff;
+
+    border-radius: 17px;
+
+    padding: 16px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.07);
+
+    animation:
+        clipIn .25s ease;
+}
+
+@keyframes clipIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =========================================================
+   クリップヘッダー
+========================================================= */
+
+.clip-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 13px;
+}
+
+.clip-number {
+
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #73563d;
+
+    color: #fff;
+
+    font-weight: bold;
+}
+
+.clip-name {
+
+    flex: 1;
+
+    min-width: 0;
+
+    font-weight: bold;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.clip-actions {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+}
+
+.small-btn {
+
+    padding:
+        7px 10px;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   波形
+========================================================= */
+
+.wave-wrap {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 150px;
+
+    background: #f5f1ed;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    cursor: crosshair;
+
+    user-select: none;
+
+    touch-action: none;
+}
+
+.wave {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+}
+
+
+/* =========================================================
+   選択範囲
+========================================================= */
+
+.selection {
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    background:
+        rgba(115,86,61,.16);
+
+    border-top:
+        2px solid rgba(115,86,61,.35);
+
+    border-bottom:
+        2px solid rgba(115,86,61,.35);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   トリミングハンドル
+========================================================= */
+
+.trim-handle {
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    width: 20px;
+
+    z-index: 20;
+
+    cursor: ew-resize;
+
+    touch-action: none;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.trim-handle::before {
+
+    content: "";
+
+    width: 5px;
+
+    height: 64px;
+
+    border-radius: 5px;
+
+    background: #73563d;
+
+    box-shadow:
+        0 0 0 2px rgba(255,255,255,.8);
+
+    transition:
+        width .12s,
+        height .12s;
+}
+
+.trim-handle:hover::before {
+
+    width: 7px;
+
+    height: 76px;
+}
+
+.left-handle {
+
+    transform:
+        translateX(-50%);
+}
+
+.right-handle {
+
+    transform:
+        translateX(50%);
+}
+
+
+/* =========================================================
+   ハンドル上部マーカー
+========================================================= */
+
+.handle-marker {
+
+    position: absolute;
+
+    top: 8px;
+
+    width: 0;
+    height: 0;
+
+    border-left:
+        7px solid transparent;
+
+    border-right:
+        7px solid transparent;
+
+    border-top:
+        10px solid #73563d;
+}
+
+.left-handle .handle-marker {
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+}
+
+.right-handle .handle-marker {
+
+    right: 50%;
+
+    transform:
+        translateX(50%);
+}
+
+
+/* =========================================================
+   再生位置
+========================================================= */
+
+.playhead {
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    width: 2px;
+
+    background: #d13d3d;
+
+    pointer-events: none;
+
+    z-index: 30;
+
+    display: none;
+}
+
+
+/* =========================================================
+   波形上の時間表示
+========================================================= */
+
+.wave-time {
+
+    position: absolute;
+
+    bottom: 7px;
+
+    padding:
+        3px 7px;
+
+    border-radius: 6px;
+
+    background:
+        rgba(255,255,255,.85);
+
+    color: #666;
+
+    font-size: 11px;
+
+    pointer-events: none;
+
+    z-index: 40;
+}
+
+.wave-time.left {
+    left: 8px;
+}
+
+.wave-time.right {
+    right: 8px;
+}
+
+
+/* =========================================================
+   時間入力
+========================================================= */
+
+.time-controls {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+
+    margin-top: 13px;
+}
+
+.time-box {
+
+    background: #f8f6f3;
+
+    border-radius: 11px;
+
+    padding: 11px;
+}
+
+.time-box label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+.time-input-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+.time-input {
+
+    width: 100%;
+
+    min-width: 0;
+
+    padding: 8px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 7px;
+
+    background: #fff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+}
+
+.range {
+
+    width: 100%;
+
+    margin-top: 8px;
+
+    accent-color: #73563d;
+}
+
+
+/* =========================================================
+   クリップ情報
+========================================================= */
+
+.clip-info {
+
+    margin-top: 10px;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+.clip-info strong {
+    color: #73563d;
+}
+
+
+/* =========================================================
+   書き出し
+========================================================= */
+
+.export-area {
+
+    background: #fff;
+
+    border-radius: 17px;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.07);
+}
+
+.export-title {
+
+    font-weight: bold;
+
+    font-size: 17px;
+
+    margin-bottom: 14px;
+}
+
+.settings {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+.filename {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.filename input {
+
+    width: 230px;
+
+    max-width: 100%;
+
+    padding: 9px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+}
+
+.output-info {
+
+    margin-top: 13px;
+
+    padding: 11px;
+
+    background: #f8f6f3;
+
+    border-radius: 9px;
+
+    color: #666;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   ステータス
+========================================================= */
+
+.status {
+
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 15px 17px;
+
+    background: #fff;
+
+    border-radius: 13px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.06);
+}
+
+.status.show {
+    display: block;
+}
+
+.status-text {
+
+    white-space: pre-wrap;
+
+    line-height: 1.6;
+}
+
+.progress {
+
+    width: 100%;
+
+    height: 9px;
+
+    margin-top: 11px;
+
+    background: #eee;
+
+    border-radius: 99px;
+
+    overflow: hidden;
+}
+
+.progress-bar {
+
+    width: 0%;
+
+    height: 100%;
+
+    background: #73563d;
+
+    transition:
+        width .15s;
+}
+
+
+/* =========================================================
+   出力音声プレイヤー
+========================================================= */
+
+.preview-area {
+
+    display: none;
+
+    background: #fff;
+
+    border-radius: 17px;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,.07);
+}
+
+.preview-area.show {
+    display: block;
+}
+
+.preview-area h2 {
+
+    margin:
+        0 0 13px;
+
+    font-size: 17px;
+}
+
+#previewAudio {
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   レスポンシブ
+========================================================= */
+
+@media (max-width: 700px) {
+
+    header {
+
+        height: 64px;
+
+        padding:
+            0 15px;
+    }
+
+    header h1 {
+        font-size: 18px;
+    }
+
+    .container {
+
+        width:
+            calc(100% - 20px);
+
+        margin-top: 20px;
+    }
+
+    .drop-area {
+
+        padding:
+            35px 15px;
+    }
+
+    .time-controls {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .clip-header {
+
+        align-items:
+            flex-start;
+    }
+
+    .clip-actions {
+
+        justify-content:
+            flex-end;
+    }
+
+    .wave-wrap {
+
+        height: 115px;
+    }
+
+    .filename {
+
+        width: 100%;
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+    }
+
+    .filename input {
+
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   ダーク処理中オーバーレイ
+========================================================= */
+
+.busy-overlay {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    background:
+        rgba(0,0,0,.35);
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+}
+
+.busy-overlay.show {
+
+    display: flex;
+}
+
+.busy-box {
+
+    width:
+        min(90%, 430px);
+
+    background: #fff;
+
+    border-radius: 17px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.2);
+}
+
+.spinner {
+
+    width: 42px;
+    height: 42px;
+
+    margin:
+        0 auto 15px;
+
+    border:
+        4px solid #eee;
+
+    border-top-color:
+        #73563d;
+
+    border-radius: 50%;
+
+    animation:
+        spin .8s linear infinite;
+}
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>
+        🎵 MP3 トリミング・合成ツール
+    </h1>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- =====================================================
+         説明
+    ====================================================== -->
+
+    <section class="notice">
+
+        <strong>
+            高音質MP3編集モード
+        </strong>
+
+        <br>
+
+        MP3のサンプルレート、チャンネル数、
+        ビットレートなどが異なっていても、
+        自動的に形式を統一して結合できます。
+
+        <br><br>
+
+        書き出し時は
+        <strong>
+            48kHz / ステレオ / 320kbps
+        </strong>
+        に変換します。
+
+        <br><br>
+
+        <strong>
+            ✂️ 波形左右のハンドル
+        </strong>
+        をドラッグすると、
+        そのMP3の使用範囲を変更できます。
+
+    </section>
+
+
+    <!-- =====================================================
+         アップロード
+    ====================================================== -->
+
+    <section
+        class="drop-area"
+        id="dropArea"
+    >
+
+        <div class="drop-icon">
+            🎵
+        </div>
+
+        <div class="drop-title">
+            MP3ファイルをここにドロップ
+        </div>
+
+        <div class="drop-sub">
+            またはクリックして複数のMP3を選択
+        </div>
+
+    </section>
+
+
+    <input
+        type="file"
+        id="fileInput"
+        accept=".mp3,audio/mpeg"
+        multiple
+    >
+
+
+    <!-- =====================================================
+         操作
+    ====================================================== -->
+
+    <div class="toolbar">
+
+        <button
+            id="addButton"
+            class="primary"
+        >
+            ＋ MP3を追加
+        </button>
+
+        <button
+            id="playAllButton"
+            disabled
+        >
+            ▶ すべて再生
+        </button>
+
+        <button
+            id="stopButton"
+            disabled
+        >
+            ■ 停止
+        </button>
+
+        <button
+            id="clearButton"
+            class="danger"
+            disabled
+        >
+            全削除
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         タイムライン
+    ====================================================== -->
+
+    <section id="timeline">
+
+        <div class="empty">
+
+            MP3を追加すると、
+            ここに波形タイムラインが表示されます。
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         書き出し
+    ====================================================== -->
+
+    <section class="export-area">
+
+        <div class="export-title">
+            💾 MP3を書き出す
+        </div>
+
+
+        <div class="settings">
+
+            <div class="filename">
+
+                <label for="outputName">
+                    ファイル名
+                </label>
+
+                <input
+                    id="outputName"
+                    type="text"
+                    value="edited_audio"
+                    maxlength="100"
+                >
+
+            </div>
+
+
+            <button
+                id="exportButton"
+                class="success"
+                disabled
+            >
+                🎧 MP3として書き出す
+            </button>
+
+        </div>
+
+
+        <div class="output-info">
+
+            出力形式：
+            <strong>
+                MP3 / 48kHz / Stereo / 320kbps
+            </strong>
+
+            <br>
+
+            入力MP3の形式が違っていても、
+            書き出し時に統一して結合します。
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         プレビュー
+    ====================================================== -->
+
+    <section
+        id="previewArea"
+        class="preview-area"
+    >
+
+        <h2>
+            🎧 書き出した音声を確認
+        </h2>
+
+        <audio
+            id="previewAudio"
+            controls
+        ></audio>
+
+    </section>
+
+
+    <!-- =====================================================
+         ステータス
+    ====================================================== -->
+
+    <section
+        id="status"
+        class="status"
+    >
+
+        <div
+            id="statusText"
+            class="status-text"
+        >
+            準備中…
+        </div>
+
+        <div class="progress">
+
+            <div
+                id="progressBar"
+                class="progress-bar"
+            ></div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<!-- =========================================================
+     処理中オーバーレイ
+========================================================= -->
+
+<div
+    id="busyOverlay"
+    class="busy-overlay"
+>
+
+    <div class="busy-box">
+
+        <div class="spinner"></div>
+
+        <strong>
+            音声を処理しています
+        </strong>
+
+        <p>
+            ブラウザを閉じないでください。
+        </p>
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+/* =========================================================
+   FFmpeg
+========================================================= */
+
+import {
+    FFmpeg
+}
+from
+"https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js";
+
+import {
+    fetchFile,
+    toBlobURL
+}
+from
+"https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js";
+
+
+/* =========================================================
+   FFmpegインスタンス
+========================================================= */
+
+const ffmpeg =
+    new FFmpeg();
+
+let ffmpegLoaded =
+    false;
+
+let processing =
+    false;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
+
+const dropArea =
+    document.getElementById(
+        "dropArea"
+    );
+
+const addButton =
+    document.getElementById(
+        "addButton"
+    );
+
+const timeline =
+    document.getElementById(
+        "timeline"
+    );
+
+const playAllButton =
+    document.getElementById(
+        "playAllButton"
+    );
+
+const stopButton =
+    document.getElementById(
+        "stopButton"
+    );
+
+const clearButton =
+    document.getElementById(
+        "clearButton"
+    );
+
+const exportButton =
+    document.getElementById(
+        "exportButton"
+    );
+
+const outputName =
+    document.getElementById(
+        "outputName"
+    );
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+const statusText =
+    document.getElementById(
+        "statusText"
+    );
+
+const progressBar =
+    document.getElementById(
+        "progressBar"
+    );
+
+const previewArea =
+    document.getElementById(
+        "previewArea"
+    );
+
+const previewAudio =
+    document.getElementById(
+        "previewAudio"
+    );
+
+const busyOverlay =
+    document.getElementById(
+        "busyOverlay"
+    );
+
+
+/* =========================================================
+   データ
+========================================================= */
+
+const clips = [];
+
+let currentAudio =
+    null;
+
+let currentClip =
+    null;
+
+let audioContext =
+    null;
+
+
+/* =========================================================
+   AudioContext
+========================================================= */
+
+function getAudioContext() {
+
+    if (!audioContext) {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+    }
+
+    return audioContext;
+
+}
+
+
+/* =========================================================
+   FFmpegロード
+========================================================= */
+
+async function loadFFmpeg() {
+
+    if (ffmpegLoaded) {
+        return;
+    }
+
+    showStatus(
+        "音声処理エンジンを準備しています…"
+    );
+
+
+    const baseURL =
+        "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
+
+
+    await ffmpeg.load({
+
+        coreURL:
+            await toBlobURL(
+                `${baseURL}/ffmpeg-core.js`,
+                "text/javascript"
+            ),
+
+        wasmURL:
+            await toBlobURL(
+                `${baseURL}/ffmpeg-core.wasm`,
+                "application/wasm"
+            )
+
+    });
+
+
+    ffmpegLoaded =
+        true;
+
+
+    hideStatus();
+
+}
+
+
+/* =========================================================
+   ファイル選択
+========================================================= */
+
+addButton.addEventListener(
+    "click",
+    () => {
+
+        if (processing) {
+            return;
+        }
+
+        fileInput.click();
+
+    }
+);
+
+
+fileInput.addEventListener(
+    "change",
+    async event => {
+
+        await addFiles(
+            event.target.files
+        );
+
+        fileInput.value = "";
+
+    }
+);
+
+
+/* =========================================================
+   ドラッグ＆ドロップ
+========================================================= */
+
+dropArea.addEventListener(
+    "dragover",
+    event => {
+
+        event.preventDefault();
+
+        if (processing) {
+            return;
+        }
+
+        dropArea.classList.add(
+            "dragover"
+        );
+
+    }
+);
+
+
+dropArea.addEventListener(
+    "dragleave",
+    () => {
+
+        dropArea.classList.remove(
+            "dragover"
+        );
+
+    }
+);
+
+
+dropArea.addEventListener(
+    "drop",
+    async event => {
+
+        event.preventDefault();
+
+        dropArea.classList.remove(
+            "dragover"
+        );
+
+        if (processing) {
+            return;
+        }
+
+        await addFiles(
+            event.dataTransfer.files
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ファイル追加
+========================================================= */
+
+async function addFiles(fileList) {
+
+    const files =
+        Array.from(fileList)
+        .filter(
+            file => {
+
+                const name =
+                    file.name.toLowerCase();
+
+                return (
+                    file.type === "audio/mpeg" ||
+                    name.endsWith(".mp3")
+                );
+
+            }
+        );
+
+
+    if (!files.length) {
+
+        alert(
+            "MP3ファイルを選択してください。"
+        );
+
+        return;
+
+    }
+
+
+    showStatus(
+        `${files.length}個のMP3を解析しています…`
+    );
+
+
+    try {
+
+        for (
+            let i = 0;
+            i < files.length;
+            i++
+        ) {
+
+            showProgress(
+                (
+                    i /
+                    files.length
+                ) * 100,
+                `${i + 1}/${files.length}：${files[i].name}`
+            );
+
+
+            await addSingleFile(
+                files[i]
+            );
+
+        }
+
+
+        renderTimeline();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "MP3の読み込み中にエラーが発生しました。\n\n" +
+            error.message
+        );
+
+    } finally {
+
+        hideStatus();
+
+    }
+
+}
+
+
+/* =========================================================
+   1つのMP3を解析
+========================================================= */
+
+async function addSingleFile(file) {
+
+    const arrayBuffer =
+        await file.arrayBuffer();
+
+
+    const context =
+        getAudioContext();
+
+
+    /*
+       波形を作るためだけにデコードする。
+
+       AudioBuffer自体はclipsに保存しない。
+       これによって複数MP3を読み込んだときの
+       メモリ消費を大幅に抑える。
+    */
+
+    const audioBuffer =
+        await context.decodeAudioData(
+            arrayBuffer.slice(0)
+        );
+
+
+    const duration =
+        audioBuffer.duration;
+
+
+    const peaks =
+        createPeaks(
+            audioBuffer,
+            1400
+        );
+
+
+    clips.push({
+
+        id:
+            crypto.randomUUID(),
+
+        file,
+
+        name:
+            file.name,
+
+        duration,
+
+        start:
+            0,
+
+        end:
+            duration,
+
+        peaks,
+
+        objectURL:
+            URL.createObjectURL(
+                file
+            )
+
+    });
+
+}
+
+
+/* =========================================================
+   波形データ作成
+========================================================= */
+
+function createPeaks(
+    audioBuffer,
+    resolution
+) {
+
+    const channel =
+        audioBuffer.getChannelData(
+            0
+        );
+
+
+    const peaks =
+        new Float32Array(
+            resolution
+        );
+
+
+    const blockSize =
+        Math.max(
+            1,
+            Math.floor(
+                channel.length /
+                resolution
+            )
+        );
+
+
+    for (
+        let i = 0;
+        i < resolution;
+        i++
+    ) {
+
+        const start =
+            i * blockSize;
+
+        const end =
+            Math.min(
+                start + blockSize,
+                channel.length
+            );
+
+
+        let max =
+            0;
+
+
+        for (
+            let j = start;
+            j < end;
+            j++
+        ) {
+
+            const value =
+                Math.abs(
+                    channel[j]
+                );
+
+
+            if (
+                value > max
+            ) {
+
+                max =
+                    value;
+
+            }
+
+        }
+
+
+        peaks[i] =
+            max;
+
+    }
+
+
+    return peaks;
+
+}
+
+
+/* =========================================================
+   タイムライン描画
+========================================================= */
+
+function renderTimeline() {
+
+    timeline.innerHTML = "";
+
+
+    if (!clips.length) {
+
+        timeline.innerHTML = `
+            <div class="empty">
+                MP3を追加すると、
+                ここに波形タイムラインが表示されます。
+            </div>
+        `;
+
+        updateButtons();
+
+        return;
+
+    }
+
+
+    clips.forEach(
+        (clip, index) => {
+
+            timeline.appendChild(
+                createClipElement(
+                    clip,
+                    index
+                )
+            );
+
+        }
+    );
+
+
+    updateButtons();
+
+}
+
+
+/* =========================================================
+   クリップUI
+========================================================= */
+
+function createClipElement(
+    clip,
+    index
+) {
+
+    const element =
+        document.createElement(
+            "article"
+        );
+
+
+    element.className =
+        "clip";
+
+
+    element.innerHTML = `
+
+        <div class="clip-header">
+
+            <div class="clip-number">
+                ${index + 1}
+            </div>
+
+            <div
+                class="clip-name"
+                title="${escapeHTML(clip.name)}"
+            >
+                ${escapeHTML(clip.name)}
+            </div>
+
+            <div class="clip-actions">
+
+                <button
+                    class="small-btn play-btn"
+                    title="この音声を再生"
+                >
+                    ▶
+                </button>
+
+                <button
+                    class="small-btn up-btn"
+                    title="上へ移動"
+                    ${index === 0 ? "disabled" : ""}
+                >
+                    ↑
+                </button>
+
+                <button
+                    class="small-btn down-btn"
+                    title="下へ移動"
+                    ${index === clips.length - 1 ? "disabled" : ""}
+                >
+                    ↓
+                </button>
+
+                <button
+                    class="small-btn danger delete-btn"
+                    title="削除"
+                >
+                    削除
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="wave-wrap">
+
+            <canvas class="wave"></canvas>
+
+            <div class="selection"></div>
+
+            <div
+                class="trim-handle left-handle"
+                title="開始位置"
+            >
+                <span class="handle-marker"></span>
+            </div>
+
+            <div
+                class="trim-handle right-handle"
+                title="終了位置"
+            >
+                <span class="handle-marker"></span>
+            </div>
+
+            <div class="playhead"></div>
+
+            <div class="wave-time left">
+                00:00.00
+            </div>
+
+            <div class="wave-time right">
+                ${formatTime(clip.duration)}
+            </div>
+
+        </div>
+
+
+        <div class="time-controls">
+
+            <div class="time-box">
+
+                <label>
+                    ✂️ 開始位置
+                </label>
+
+                <div class="time-input-row">
+
+                    <input
+                        class="time-input start-input"
+                        type="number"
+                        min="0"
+                        max="${clip.duration}"
+                        step="0.01"
+                        value="${clip.start.toFixed(2)}"
+                    >
+
+                    <span>秒</span>
+
+                </div>
+
+                <input
+                    class="range start-range"
+                    type="range"
+                    min="0"
+                    max="${clip.duration}"
+                    step="0.01"
+                    value="${clip.start}"
+                >
+
+            </div>
+
+
+            <div class="time-box">
+
+                <label>
+                    ✂️ 終了位置
+                </label>
+
+                <div class="time-input-row">
+
+                    <input
+                        class="time-input end-input"
+                        type="number"
+                        min="0"
+                        max="${clip.duration}"
+                        step="0.01"
+                        value="${clip.end.toFixed(2)}"
+                    >
+
+                    <span>秒</span>
+
+                </div>
+
+                <input
+                    class="range end-range"
+                    type="range"
+                    min="0"
+                    max="${clip.duration}"
+                    step="0.01"
+                    value="${clip.end}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="clip-info">
+
+            元の長さ：
+            <strong>
+                ${formatTime(clip.duration)}
+            </strong>
+
+           　
+            
+            使用する長さ：
+            <strong class="used-time">
+                ${formatTime(
+                    clip.end -
+                    clip.start
+                )}
+            </strong>
+
+        </div>
+
+    `;
+
+
+    const waveWrap =
+        element.querySelector(
+            ".wave-wrap"
+        );
+
+    const canvas =
+        element.querySelector(
+            ".wave"
+        );
+
+    const selection =
+        element.querySelector(
+            ".selection"
+        );
+
+    const leftHandle =
+        element.querySelector(
+            ".left-handle"
+        );
+
+    const rightHandle =
+        element.querySelector(
+            ".right-handle"
+        );
+
+    const playhead =
+        element.querySelector(
+            ".playhead"
+        );
+
+    const leftTime =
+        element.querySelector(
+            ".wave-time.left"
+        );
+
+    const rightTime =
+        element.querySelector(
+            ".wave-time.right"
+        );
+
+    const usedTime =
+        element.querySelector(
+            ".used-time"
+        );
+
+
+    drawWaveform(
+        canvas,
+        clip
+    );
+
+
+    /* =====================================================
+       表示更新
+    ==================================================== */
+
+    function updateVisuals() {
+
+        const startPercent =
+            (
+                clip.start /
+                clip.duration
+            ) * 100;
+
+
+        const endPercent =
+            (
+                clip.end /
+                clip.duration
+            ) * 100;
+
+
+        selection.style.left =
+            `${startPercent}%`;
+
+        selection.style.width =
+            `${endPercent - startPercent}%`;
+
+
+        leftHandle.style.left =
+            `${startPercent}%`;
+
+        rightHandle.style.left =
+            `${endPercent}%`;
+
+
+        leftTime.textContent =
+            formatTime(
+                clip.start
+            );
+
+        rightTime.textContent =
+            formatTime(
+                clip.end
+            );
+
+
+        usedTime.textContent =
+            formatTime(
+                clip.end -
+                clip.start
+            );
+
+    }
+
+
+    updateVisuals();
+
+
+    /* =====================================================
+       開始位置入力
+    ==================================================== */
+
+    const startInput =
+        element.querySelector(
+            ".start-input"
+        );
+
+    const startRange =
+        element.querySelector(
+            ".start-range"
+        );
+
+
+    function setStart(value) {
+
+        value =
+            Number(value);
+
+
+        if (
+            !Number.isFinite(value)
+        ) {
+
+            return;
+
+        }
+
+
+        value =
+            clamp(
+                value,
+                0,
+                clip.end - 0.01
+            );
+
+
+        clip.start =
+            value;
+
+
+        startInput.value =
+            value.toFixed(2);
+
+        startRange.value =
+            value;
+
+
+        updateVisuals();
+
+    }
+
+
+    startInput.addEventListener(
+        "input",
+        () => {
+
+            setStart(
+                startInput.value
+            );
+
+        }
+    );
+
+
+    startRange.addEventListener(
+        "input",
+        () => {
+
+            setStart(
+                startRange.value
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       終了位置入力
+    ==================================================== */
+
+    const endInput =
+        element.querySelector(
+            ".end-input"
+        );
+
+    const endRange =
+        element.querySelector(
+            ".end-range"
+        );
+
+
+    function setEnd(value) {
+
+        value =
+            Number(value);
+
+
+        if (
+            !Number.isFinite(value)
+        ) {
+
+            return;
+
+        }
+
+
+        value =
+            clamp(
+                value,
+                clip.start + 0.01,
+                clip.duration
+            );
+
+
+        clip.end =
+            value;
+
+
+        endInput.value =
+            value.toFixed(2);
+
+        endRange.value =
+            value;
+
+
+        updateVisuals();
+
+    }
+
+
+    endInput.addEventListener(
+        "input",
+        () => {
+
+            setEnd(
+                endInput.value
+            );
+
+        }
+    );
+
+
+    endRange.addEventListener(
+        "input",
+        () => {
+
+            setEnd(
+                endRange.value
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       ハンドルドラッグ
+    ==================================================== */
+
+    setupHandleDrag(
+        leftHandle,
+        waveWrap,
+        ratio => {
+
+            const time =
+                ratio *
+                clip.duration;
+
+
+            setStart(
+                time
+            );
+
+        }
+    );
+
+
+    setupHandleDrag(
+        rightHandle,
+        waveWrap,
+        ratio => {
+
+            const time =
+                ratio *
+                clip.duration;
+
+
+            setEnd(
+                time
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       波形クリック
+    ==================================================== */
+
+    waveWrap.addEventListener(
+        "pointerdown",
+        event => {
+
+            if (
+                event.target.closest(
+                    ".trim-handle"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            const ratio =
+                getWaveRatio(
+                    waveWrap,
+                    event.clientX
+                );
+
+
+            const time =
+                ratio *
+                clip.duration;
+
+
+            playhead.style.left =
+                `${ratio * 100}%`;
+
+            playhead.style.display =
+                "block";
+
+
+            playFromClip(
+                clip,
+                time
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       再生
+    ==================================================== */
+
+    element
+        .querySelector(".play-btn")
+        .addEventListener(
+            "click",
+            () => {
+
+                playFromClip(
+                    clip,
+                    clip.start
+                );
+
+            }
+        );
+
+
+    /* =====================================================
+       削除
+    ==================================================== */
+
+    element
+        .querySelector(".delete-btn")
+        .addEventListener(
+            "click",
+            () => {
+
+                stopAudio();
+
+
+                const position =
+                    clips.indexOf(
+                        clip
+                    );
+
+
+                if (
+                    position !== -1
+                ) {
+
+                    clips.splice(
+                        position,
+                        1
+                    );
+
+                }
+
+
+                URL.revokeObjectURL(
+                    clip.objectURL
+                );
+
+
+                renderTimeline();
+
+            }
+        );
+
+
+    /* =====================================================
+       上へ
+    ==================================================== */
+
+    element
+        .querySelector(".up-btn")
+        .addEventListener(
+            "click",
+            () => {
+
+                const position =
+                    clips.indexOf(
+                        clip
+                    );
+
+
+                if (
+                    position > 0
+                ) {
+
+                    [
+                        clips[position - 1],
+                        clips[position]
+                    ] =
+                    [
+                        clips[position],
+                        clips[position - 1]
+                    ];
+
+
+                    renderTimeline();
+
+                }
+
+            }
+        );
+
+
+    /* =====================================================
+       下へ
+    ==================================================== */
+
+    element
+        .querySelector(".down-btn")
+        .addEventListener(
+            "click",
+            () => {
+
+                const position =
+                    clips.indexOf(
+                        clip
+                    );
+
+
+                if (
+                    position >= 0 &&
+                    position <
+                        clips.length - 1
+                ) {
+
+                    [
+                        clips[position],
+                        clips[position + 1]
+                    ] =
+                    [
+                        clips[position + 1],
+                        clips[position]
+                    ];
+
+
+                    renderTimeline();
+
+                }
+
+            }
+        );
+
+
+    return element;
+
+}
+
+
+/* =========================================================
+   ハンドルドラッグ
+========================================================= */
+
+function setupHandleDrag(
+    handle,
+    waveWrap,
+    callback
+) {
+
+    let dragging =
+        false;
+
+
+    handle.addEventListener(
+        "pointerdown",
+        event => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            dragging =
+                true;
+
+
+            try {
+
+                handle.setPointerCapture(
+                    event.pointerId
+                );
+
+            } catch {}
+
+
+            document.body.style.userSelect =
+                "none";
+
+        }
+    );
+
+
+    handle.addEventListener(
+        "pointermove",
+        event => {
+
+            if (!dragging) {
+                return;
+            }
+
+
+            const ratio =
+                getWaveRatio(
+                    waveWrap,
+                    event.clientX
+                );
+
+
+            callback(
+                ratio
+            );
+
+        }
+    );
+
+
+    const endDrag =
+        event => {
+
+            if (!dragging) {
+                return;
+            }
+
+
+            dragging =
+                false;
+
+
+            try {
+
+                handle.releasePointerCapture(
+                    event.pointerId
+                );
+
+            } catch {}
+
+
+            document.body.style.userSelect =
+                "";
+
+        };
+
+
+    handle.addEventListener(
+        "pointerup",
+        endDrag
+    );
+
+    handle.addEventListener(
+        "pointercancel",
+        endDrag
+    );
+
+}
+
+
+/* =========================================================
+   波形上のX座標 → 0～1
+========================================================= */
+
+function getWaveRatio(
+    element,
+    clientX
+) {
+
+    const rect =
+        element.getBoundingClientRect();
+
+
+    return clamp(
+        (
+            clientX -
+            rect.left
+        ) /
+        rect.width,
+        0,
+        1
+    );
+
+}
+
+
+/* =========================================================
+   波形描画
+========================================================= */
+
+function drawWaveform(
+    canvas,
+    clip
+) {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const ratio =
+        window.devicePixelRatio ||
+        1;
+
+
+    const width =
+        Math.max(
+            1,
+            Math.floor(
+                rect.width *
+                ratio
+            )
+        );
+
+
+    const height =
+        Math.max(
+            1,
+            Math.floor(
+                rect.height *
+                ratio
+            )
+        );
+
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+
+    const context =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    context.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
+    );
+
+
+    const cssWidth =
+        rect.width;
+
+    const cssHeight =
+        rect.height;
+
+
+    context.clearRect(
+        0,
+        0,
+        cssWidth,
+        cssHeight
+    );
+
+
+    const center =
+        cssHeight / 2;
+
+
+    const peaks =
+        clip.peaks;
+
+
+    const step =
+        cssWidth /
+        peaks.length;
+
+
+    context.beginPath();
+
+
+    for (
+        let i = 0;
+        i < peaks.length;
+        i++
+    ) {
+
+        const x =
+            i * step;
+
+
+        const amplitude =
+            peaks[i] *
+            center *
+            .92;
+
+
+        context.moveTo(
+            x,
+            center -
+                amplitude
+        );
+
+
+        context.lineTo(
+            x,
+            center +
+                amplitude
+        );
+
+    }
+
+
+    context.strokeStyle =
+        "#73563d";
+
+    context.lineWidth =
+        1;
+
+
+    context.stroke();
+
+
+    /* 中央線 */
+
+    context.beginPath();
+
+    context.moveTo(
+        0,
+        center
+    );
+
+    context.lineTo(
+        cssWidth,
+        center
+    );
+
+    context.strokeStyle =
+        "rgba(115,86,61,.15)";
+
+    context.lineWidth =
+        1;
+
+    context.stroke();
+
+}
+
+
+/* =========================================================
+   個別再生
+========================================================= */
+
+function playFromClip(
+    clip,
+    startTime
+) {
+
+    stopAudio();
+
+
+    currentClip =
+        clip;
+
+
+    currentAudio =
+        new Audio(
+            clip.objectURL
+        );
+
+
+    currentAudio.currentTime =
+        clamp(
+            startTime,
+            0,
+            clip.duration
+        );
+
+
+    currentAudio.play()
+        .then(
+            () => {
+
+                stopButton.disabled =
+                    false;
+
+            }
+        )
+        .catch(
+            error =>
+                console.error(
+                    error
+                )
+        );
+
+
+    currentAudio.addEventListener(
+        "timeupdate",
+        () => {
+
+            if (
+                !currentAudio ||
+                currentClip !== clip
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                currentAudio.currentTime >=
+                clip.end
+            ) {
+
+                stopAudio();
+
+            }
+
+        }
+    );
+
+
+    currentAudio.addEventListener(
+        "ended",
+        stopAudio
+    );
+
+}
+
+
+/* =========================================================
+   全部再生
+========================================================= */
+
+playAllButton.addEventListener(
+    "click",
+    async () => {
+
+        if (
+            processing ||
+            !clips.length
+        ) {
+
+            return;
+
+        }
+
+
+        stopAudio();
+
+
+        for (
+            const clip of clips
+        ) {
+
+            if (
+                clip.end <=
+                clip.start
+            ) {
+
+                continue;
+
+            }
+
+
+            await playClipPromise(
+                clip
+            );
+
+        }
+
+    }
+);
+
+
+function playClipPromise(
+    clip
+) {
+
+    return new Promise(
+        resolve => {
+
+            const audio =
+                new Audio(
+                    clip.objectURL
+                );
+
+
+            currentAudio =
+                audio;
+
+            currentClip =
+                clip;
+
+
+            audio.currentTime =
+                clip.start;
+
+
+            let finished =
+                false;
+
+
+            const finish =
+                () => {
+
+                    if (finished) {
+                        return;
+                    }
+
+                    finished =
+                        true;
+
+                    audio.pause();
+
+                    audio.removeEventListener(
+                        "timeupdate",
+                        check
+                    );
+
+                    resolve();
+
+                };
+
+
+            const check =
+                () => {
+
+                    if (
+                        audio.currentTime >=
+                        clip.end
+                    ) {
+
+                        finish();
+
+                    }
+
+                };
+
+
+            audio.addEventListener(
+                "timeupdate",
+                check
+            );
+
+
+            audio.addEventListener(
+                "ended",
+                finish,
+                {
+                    once: true
+                }
+            );
+
+
+            audio.play()
+                .catch(
+                    finish
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   停止
+========================================================= */
+
+stopButton.addEventListener(
+    "click",
+    stopAudio
+);
+
+
+function stopAudio() {
+
+    if (
+        currentAudio
+    ) {
+
+        try {
+
+            currentAudio.pause();
+
+            currentAudio.src =
+                "";
+
+        } catch {}
+
+    }
+
+
+    currentAudio =
+        null;
+
+    currentClip =
+        null;
+
+
+    stopButton.disabled =
+        true;
+
+}
+
+
+/* =========================================================
+   全削除
+========================================================= */
+
+clearButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            processing ||
+            !clips.length
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "すべてのMP3を削除しますか？"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        stopAudio();
+
+
+        clips.forEach(
+            clip => {
+
+                try {
+
+                    URL.revokeObjectURL(
+                        clip.objectURL
+                    );
+
+                } catch {}
+
+            }
+        );
+
+
+        clips.length =
+            0;
+
+
+        previewAudio.pause();
+
+        previewAudio.removeAttribute(
+            "src"
+        );
+
+        previewAudio.load();
+
+        previewArea.classList.remove(
+            "show"
+        );
+
+
+        renderTimeline();
+
+    }
+);
+
+
+/* =========================================================
+   MP3書き出し
+========================================================= */
+
+exportButton.addEventListener(
+    "click",
+    exportMP3
+);
+
+
+async function exportMP3() {
+
+    if (
+        processing ||
+        !clips.length
+    ) {
+
+        return;
+
+    }
+
+
+    const validClips =
+        clips.filter(
+            clip =>
+                clip.end >
+                clip.start + 0.01
+        );
+
+
+    if (
+        !validClips.length
+    ) {
+
+        alert(
+            "使用する音声範囲がありません。"
+        );
+
+        return;
+
+    }
+
+
+    processing =
+        true;
+
+
+    updateButtons();
+
+
+    busyOverlay.classList.add(
+        "show"
+    );
+
+
+    try {
+
+        await loadFFmpeg();
+
+
+        showProgress(
+            0,
+            "MP3の書き出しを開始しています…"
+        );
+
+
+        /*
+           FFmpegの仮想ファイルシステムに
+           残っているファイルを整理
+        */
+
+        await cleanupFFmpegFiles();
+
+
+        const normalizedFiles =
+            [];
+
+
+        /* =================================================
+           各MP3を共通形式へ変換
+        ================================================= */
+
+        for (
+            let i = 0;
+            i < validClips.length;
+            i++
+        ) {
+
+            const clip =
+                validClips[i];
+
+
+            const inputName =
+                `source_${i}.mp3`;
+
+
+            const normalizedName =
+                `normalized_${i}.mp3`;
+
+
+            const progress =
+                (
+                    i /
+                    validClips.length
+                ) * 75;
+
+
+            showProgress(
+                progress,
+                `音声 ${i + 1}/${validClips.length} を変換しています…\n${clip.name}`
+            );
+
+
+            /*
+               元MP3を書き込む
+            */
+
+            await ffmpeg.writeFile(
+                inputName,
+                await fetchFile(
+                    clip.file
+                )
+            );
+
+
+            /*
+               ここが重要。
+
+               入力MP3の形式が違っていても、
+
+               48000Hz
+               Stereo
+               320kbps
+
+               に統一する。
+
+               つまり、
+               異なるMP3でも確実に結合できる。
+            */
+
+            const result =
+                await ffmpeg.exec([
+
+                    "-ss",
+                    String(
+                        clip.start
+                    ),
+
+                    "-i",
+                    inputName,
+
+                    "-t",
+                    String(
+                        clip.end -
+                        clip.start
+                    ),
+
+                    "-map",
+                    "0:a:0",
+
+                    "-vn",
+
+                    "-ar",
+                    "48000",
+
+                    "-ac",
+                    "2",
+
+                    "-c:a",
+                    "libmp3lame",
+
+                    "-b:a",
+                    "320k",
+
+                    "-id3v2_version",
+                    "3",
+
+                    normalizedName
+
+                ]);
+
+
+            if (
+                result !== 0
+            ) {
+
+                throw new Error(
+                    `${clip.name} の音声変換に失敗しました。`
+                );
+
+            }
+
+
+            normalizedFiles.push(
+                normalizedName
+            );
+
+
+            /*
+               入力ファイルはすぐ削除。
+            */
+
+            try {
+
+                await ffmpeg.deleteFile(
+                    inputName
+                );
+
+            } catch {}
+
+        }
+
+
+        /* =================================================
+           concatリスト
+        ================================================= */
+
+        showProgress(
+            78,
+            "複数の音声を結合しています…"
+        );
+
+
+        const concatText =
+            normalizedFiles
+                .map(
+                    file =>
+                        `file '${file}'`
+                )
+                .join("\n");
+
+
+        await ffmpeg.writeFile(
+            "concat.txt",
+            new TextEncoder().encode(
+                concatText
+            )
+        );
+
+
+        /* =================================================
+           結合
+        ================================================= */
+
+        const concatResult =
+            await ffmpeg.exec([
+
+                "-f",
+                "concat",
+
+                "-safe",
+                "0",
+
+                "-i",
+                "concat.txt",
+
+                "-map",
+                "0:a:0",
+
+                "-c",
+                "copy",
+
+                "-id3v2_version",
+                "3",
+
+                "final_output.mp3"
+
+            ]);
+
+
+        if (
+            concatResult !== 0
+        ) {
+
+            throw new Error(
+                "MP3の結合に失敗しました。"
+            );
+
+        }
+
+
+        /* =================================================
+           出力
+        ================================================= */
+
+        showProgress(
+            94,
+            "完成したMP3を準備しています…"
+        );
+
+
+        const data =
+            await ffmpeg.readFile(
+                "final_output.mp3"
+            );
+
+
+        /*
+           Uint8Arrayをコピーしておく。
+        */
+
+        const outputData =
+            new Uint8Array(
+                data
+            );
+
+
+        const blob =
+            new Blob(
+                [outputData],
+                {
+                    type:
+                        "audio/mpeg"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        /* =================================================
+           プレビュー
+        ================================================= */
+
+        previewAudio.src =
+            url;
+
+        previewArea.classList.add(
+            "show"
+        );
+
+
+        /* =================================================
+           ダウンロード
+        ================================================= */
+
+        let filename =
+            outputName.value.trim();
+
+
+        if (!filename) {
+
+            filename =
+                "edited_audio";
+
+        }
+
+
+        filename =
+            filename
+                .replace(
+                    /\.mp3$/i,
+                    ""
+                );
+
+
+        filename +=
+            ".mp3";
+
+
+        const anchor =
+            document.createElement(
+                "a"
+            );
+
+
+        anchor.href =
+            url;
+
+        anchor.download =
+            filename;
+
+
+        document.body.appendChild(
+            anchor
+        );
+
+
+        anchor.click();
+
+
+        anchor.remove();
+
+
+        showProgress(
+            100,
+            "🎉 完成しました！\n" +
+            filename
+        );
+
+
+        /*
+           プレビュー用URLなので
+           ページを閉じるまで保持する。
+        */
+
+
+        await cleanupFFmpegFiles();
+
+
+        setTimeout(
+            () => {
+
+                hideStatus();
+
+            },
+            2000
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "EXPORT ERROR:",
+            error
+        );
+
+
+        showProgress(
+            0,
+            "❌ 書き出しに失敗しました。"
+        );
+
+
+        alert(
+            "MP3の書き出しに失敗しました。\n\n" +
+            error.message
+        );
+
+
+    } finally {
+
+        processing =
+            false;
+
+
+        busyOverlay.classList.remove(
+            "show"
+        );
+
+
+        updateButtons();
+
+    }
+
+}
+
+
+/* =========================================================
+   FFmpeg一時ファイル削除
+========================================================= */
+
+async function cleanupFFmpegFiles() {
+
+    try {
+
+        const files =
+            await ffmpeg.listDir(
+                "/"
+            );
+
+
+        for (
+            const file of files
+        ) {
+
+            const name =
+                file.name;
+
+
+            if (
+                name.startsWith(
+                    "source_"
+                ) ||
+                name.startsWith(
+                    "normalized_"
+                ) ||
+                name ===
+                    "concat.txt" ||
+                name ===
+                    "final_output.mp3"
+            ) {
+
+                try {
+
+                    await ffmpeg.deleteFile(
+                        name
+                    );
+
+                } catch {}
+
+            }
+
+        }
+
+    } catch (
+        error
+    ) {
+
+        console.warn(
+            "cleanup failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ボタン状態
+========================================================= */
+
+function updateButtons() {
+
+    const hasClips =
+        clips.length > 0;
+
+
+    addButton.disabled =
+        processing;
+
+
+    playAllButton.disabled =
+        !hasClips ||
+        processing;
+
+
+    stopButton.disabled =
+        !currentAudio;
+
+
+    clearButton.disabled =
+        !hasClips ||
+        processing;
+
+
+    exportButton.disabled =
+        !hasClips ||
+        processing;
+
+}
+
+
+/* =========================================================
+   ステータス
+========================================================= */
+
+function showStatus(
+    text
+) {
+
+    status.classList.add(
+        "show"
+    );
+
+
+    statusText.textContent =
+        text;
+
+}
+
+
+function hideStatus() {
+
+    status.classList.remove(
+        "show"
+    );
+
+}
+
+
+function showProgress(
+    percent,
+    text
+) {
+
+    showStatus(
+        text
+    );
+
+
+    progressBar.style.width =
+        `${clamp(
+            percent,
+            0,
+            100
+        )}%`;
+
+}
+
+
+/* =========================================================
+   時間表示
+========================================================= */
+
+function formatTime(
+    seconds
+) {
+
+    if (
+        !Number.isFinite(
+            seconds
+        )
+    ) {
+
+        return "00:00.00";
+
+    }
+
+
+    seconds =
+        Math.max(
+            0,
+            seconds
+        );
+
+
+    const minutes =
+        Math.floor(
+            seconds / 60
+        );
+
+
+    const sec =
+        seconds -
+        minutes * 60;
+
+
+    return (
+        String(
+            minutes
+        ).padStart(
+            2,
+            "0"
+        ) +
+        ":" +
+        sec.toFixed(
+            2
+        ).padStart(
+            5,
+            "0"
+        )
+    );
+
+}
+
+
+/* =========================================================
+   数値制限
+========================================================= */
+
+function clamp(
+    value,
+    min,
+    max
+) {
+
+    return Math.min(
+        Math.max(
+            value,
+            min
+        ),
+        max
+    );
+
+}
+
+
+/* =========================================================
+   HTMLエスケープ
+========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   ウィンドウサイズ変更
+========================================================= */
+
+let resizeTimer =
+    null;
+
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        clearTimeout(
+            resizeTimer
+        );
+
+
+        resizeTimer =
+            setTimeout(
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".clip"
+                        )
+                        .forEach(
+                            (
+                                element,
+                                index
+                            ) => {
+
+                                const clip =
+                                    clips[index];
+
+
+                                if (!clip) {
+                                    return;
+                                }
+
+
+                                const canvas =
+                                    element.querySelector(
+                                        ".wave"
+                                    );
+
+
+                                drawWaveform(
+                                    canvas,
+                                    clip
+                                );
+
+                            }
+                        );
+
+                },
+                150
+            );
+
+    }
+);
+
+
+/* =========================================================
+   ページを閉じるときにObjectURLを解放
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        clips.forEach(
+            clip => {
+
+                try {
+
+                    URL.revokeObjectURL(
+                        clip.objectURL
+                    );
+
+                } catch {}
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   初期化
+========================================================= */
+
+updateButtons();
+
+</script>
+
+</body>
+</html>
