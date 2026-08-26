@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wi-Fi 快適度モニター</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+            -apple-system, BlinkMacSystemFont, "Segoe UI",
+            "Noto Sans JP", sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 760px;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+    }
+
+    .header p {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .card {
+        background: rgba(30, 41, 59, .9);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.3);
+        backdrop-filter: blur(10px);
+    }
+
+    /* 快適度 */
+    .score-area {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .score-circle {
+        width: 190px;
+        height: 190px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background:
+            radial-gradient(circle at center, #1e293b 64%, transparent 65%),
+            conic-gradient(#22c55e 0deg, #22c55e 0deg, #334155 0deg);
+        transition: background .5s ease;
+    }
+
+    .score {
+        font-size: 54px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .score-unit {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-top: 5px;
+    }
+
+    .status {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .status.good {
+        color: #4ade80;
+    }
+
+    .status.normal {
+        color: #facc15;
+    }
+
+    .status.bad {
+        color: #fb923c;
+    }
+
+    .status.very-bad {
+        color: #f87171;
+    }
+
+    /* 測定値 */
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .metric {
+        background: #0f172a;
+        border-radius: 14px;
+        padding: 18px 12px;
+        text-align: center;
+    }
+
+    .metric-icon {
+        font-size: 22px;
+        margin-bottom: 7px;
+    }
+
+    .metric-label {
+        color: #94a3b8;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+    .metric-unit {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    /* 接続状態 */
+    .connection {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #0f172a;
+        padding: 15px 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .connection-label {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 10px #22c55e;
+    }
+
+    .dot.offline {
+        background: #ef4444;
+        box-shadow: 0 0 10px #ef4444;
+    }
+
+    /* グラフ */
+    .chart-container {
+        height: 150px;
+        background: #0f172a;
+        border-radius: 14px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ボタン */
+    .controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    button {
+        flex: 1;
+        border: 0;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        color: white;
+        background: #2563eb;
+        transition: .2s;
+    }
+
+    button:hover {
+        background: #3b82f6;
+        transform: translateY(-1px);
+    }
+
+    button.secondary {
+        background: #334155;
+    }
+
+    button.secondary:hover {
+        background: #475569;
+    }
+
+    .info {
+        margin-top: 18px;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.7;
+        text-align: center;
+    }
+
+    @media (max-width: 600px) {
+        .card {
+            padding: 20px;
+        }
+
+        .metrics {
+            grid-template-columns: 1fr;
+        }
+
+        .score-circle {
+            width: 160px;
+            height: 160px;
+        }
+
+        .score {
+            font-size: 45px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>📶 Wi-Fi 快適度モニター</h1>
+        <p>通信速度・遅延・接続状態をリアルタイム測定</p>
+    </div>
+
+    <div class="card">
+
+        <div class="score-area">
+            <div class="score-circle" id="scoreCircle">
+                <div class="score" id="score">--</div>
+                <div class="score-unit">/ 100</div>
+            </div>
+
+            <div class="status" id="status">
+                測定中...
+            </div>
+        </div>
+
+        <div class="metrics">
+
+            <div class="metric">
+                <div class="metric-icon">🚀</div>
+                <div class="metric-label">通信速度</div>
+                <div>
+                    <span class="metric-value" id="speed">--</span>
+                    <span class="metric-unit">Mbps</span>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-icon">⚡</div>
+                <div class="metric-label">遅延</div>
+                <div>
+                    <span class="metric-value" id="latency">--</span>
+                    <span class="metric-unit">ms</span>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-icon">📡</div>
+                <div class="metric-label">接続状態</div>
+                <div>
+                    <span class="metric-value" id="connectionValue">--</span>
+                    <span class="metric-unit">%</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="connection">
+            <div class="connection-label">
+                インターネット接続
+            </div>
+
+            <div class="connection-status">
+                <span class="dot" id="connectionDot"></span>
+                <span id="connectionText">確認中...</span>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+
+        <div class="controls">
+            <button onclick="startMonitoring()">
+                ▶ 測定開始
+            </button>
+
+            <button class="secondary" onclick="stopMonitoring()">
+                ■ 停止
+            </button>
+        </div>
+
+        <div class="info">
+            ※ ブラウザの制限により、Wi-Fiの電波強度（RSSI/dBm）そのものは取得できません。<br>
+            通信速度・遅延・接続状態から総合的な快適度を算出しています。
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+/* =========================================
+   設定
+========================================= */
+
+// 通信速度測定用ファイル
+// 実際の運用では自分のサーバーに置くのがおすすめです。
+const SPEED_TEST_URL =
+    "https://speed.cloudflare.com/__down?bytes=5000000";
+
+// 測定間隔
+const INTERVAL = 5000;
+
+// グラフに表示するデータ数
+const MAX_POINTS = 30;
+
+
+/* =========================================
+   状態
+========================================= */
+
+let timer = null;
+let measuring = false;
+
+let history = [];
+
+
+/* =========================================
+   DOM
+========================================= */
+
+const scoreEl = document.getElementById("score");
+const statusEl = document.getElementById("status");
+const speedEl = document.getElementById("speed");
+const latencyEl = document.getElementById("latency");
+const connectionValueEl =
+    document.getElementById("connectionValue");
+
+const connectionTextEl =
+    document.getElementById("connectionText");
+
+const connectionDot =
+    document.getElementById("connectionDot");
+
+const scoreCircle =
+    document.getElementById("scoreCircle");
+
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
+
+
+/* =========================================
+   接続状態
+========================================= */
+
+function updateConnectionStatus() {
+
+    if (navigator.onLine) {
+
+        connectionTextEl.textContent = "オンライン";
+        connectionDot.classList.remove("offline");
+
+    } else {
+
+        connectionTextEl.textContent = "オフライン";
+        connectionDot.classList.add("offline");
+
+    }
+
+    return navigator.onLine;
+}
+
+
+/* =========================================
+   遅延測定
+========================================= */
+
+async function measureLatency() {
+
+    const start = performance.now();
+
+    try {
+
+        await fetch(
+            "https://www.cloudflare.com/cdn-cgi/trace?cache=" +
+            Date.now(),
+            {
+                method: "HEAD",
+                cache: "no-store",
+                mode: "cors"
+            }
+        );
+
+        return Math.round(performance.now() - start);
+
+    } catch (e) {
+
+        return null;
+
+    }
+}
+
+
+/* =========================================
+   通信速度測定
+========================================= */
+
+async function measureSpeed() {
+
+    const start = performance.now();
+
+    try {
+
+        const response = await fetch(
+            SPEED_TEST_URL +
+            "&cache=" +
+            Date.now(),
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Download failed");
+        }
+
+        const data = await response.arrayBuffer();
+
+        const end = performance.now();
+
+        const seconds = (end - start) / 1000;
+
+        const bits = data.byteLength * 8;
+
+        const mbps =
+            bits / seconds / 1000000;
+
+        return Math.round(mbps * 10) / 10;
+
+    } catch (e) {
+
+        return null;
+
+    }
+}
+
+
+/* =========================================
+   快適度計算
+========================================= */
+
+function calculateSpeedScore(speed) {
+
+    if (speed === null) return 0;
+
+    // 100Mbps以上を満点
+    return Math.min(
+        100,
+        (speed / 100) * 100
+    );
+}
+
+
+function calculateLatencyScore(latency) {
+
+    if (latency === null) return 0;
+
+    if (latency <= 20) return 100;
+    if (latency <= 50) return 90;
+    if (latency <= 80) return 75;
+    if (latency <= 120) return 60;
+    if (latency <= 200) return 40;
+
+    return 20;
+}
+
+
+function calculateConnectionScore() {
+
+    return navigator.onLine ? 100 : 0;
+
+}
+
+
+function calculateComfort(speed, latency) {
+
+    const speedScore =
+        calculateSpeedScore(speed);
+
+    const latencyScore =
+        calculateLatencyScore(latency);
+
+    const connectionScore =
+        calculateConnectionScore();
+
+    /*
+       速度 50%
+       遅延 35%
+       接続 15%
+    */
+
+    return Math.round(
+        speedScore * 0.50 +
+        latencyScore * 0.35 +
+        connectionScore * 0.15
+    );
+}
+
+
+/* =========================================
+   快適度表示
+========================================= */
+
+function updateScore(score) {
+
+    scoreEl.textContent = score;
+
+    let color;
+    let text;
+    let className;
+
+    if (score >= 80) {
+
+        color = "#22c55e";
+        text = "とても快適";
+        className = "good";
+
+    } else if (score >= 60) {
+
+        color = "#84cc16";
+        text = "快適";
+
+        className = "good";
+
+    } else if (score >= 40) {
+
+        color = "#facc15";
+        text = "普通";
+
+        className = "normal";
+
+    } else if (score >= 20) {
+
+        color = "#fb923c";
+        text = "やや不安定";
+
+        className = "bad";
+
+    } else {
+
+        color = "#ef4444";
+        text = "不安定";
+
+        className = "very-bad";
+    }
+
+    statusEl.textContent = text;
+
+    statusEl.className =
+        "status " + className;
+
+    const degrees =
+        score * 3.6;
+
+    scoreCircle.style.background =
+        `radial-gradient(circle at center,
+        #1e293b 64%,
+        transparent 65%),
+        conic-gradient(
+        ${color} 0deg,
+        ${color} ${degrees}deg,
+        #334155 ${degrees}deg
+        )`;
+}
+
+
+/* =========================================
+   グラフ
+========================================= */
+
+function drawChart() {
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.clearRect(0, 0, width, height);
+
+    if (history.length < 2) return;
+
+    // グリッド
+    ctx.strokeStyle =
+        "rgba(255,255,255,.06)";
+
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 4; i++) {
+
+        const y =
+            height -
+            (height / 4) * i;
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+
+        ctx.stroke();
+    }
+
+    // グラフ
+    ctx.beginPath();
+
+    history.forEach((value, index) => {
+
+        const x =
+            index /
+            (MAX_POINTS - 1) *
+            width;
+
+        const y =
+            height -
+            (value / 100) *
+            height;
+
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+
+    });
+
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 塗りつぶし
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+
+    const gradient =
+        ctx.createLinearGradient(
+            0, 0, 0, height
+        );
+
+    gradient.addColorStop(
+        0,
+        "rgba(56,189,248,.25)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(56,189,248,0)"
+    );
+
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+}
+
+
+/* =========================================
+   1回測定
+========================================= */
+
+async function measure() {
+
+    updateConnectionStatus();
+
+    if (!navigator.onLine) {
+
+        speedEl.textContent = "--";
+        latencyEl.textContent = "--";
+        connectionValueEl.textContent = "0";
+
+        updateScore(0);
+
+        return;
+    }
+
+    connectionValueEl.textContent = "100";
+
+    // 並列測定
+    const [latency, speed] =
+        await Promise.all([
+            measureLatency(),
+            measureSpeed()
+        ]);
+
+    speedEl.textContent =
+        speed !== null ? speed : "--";
+
+    latencyEl.textContent =
+        latency !== null ? latency : "--";
+
+    const score =
+        calculateComfort(
+            speed,
+            latency
+        );
+
+    updateScore(score);
+
+    history.push(score);
+
+    if (history.length > MAX_POINTS) {
+        history.shift();
+    }
+
+    drawChart();
+}
+
+
+/* =========================================
+   モニタリング開始
+========================================= */
+
+async function startMonitoring() {
+
+    if (measuring) return;
+
+    measuring = true;
+
+    await measure();
+
+    timer = setInterval(
+        measure,
+        INTERVAL
+    );
+}
+
+
+/* =========================================
+   停止
+========================================= */
+
+function stopMonitoring() {
+
+    measuring = false;
+
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
+
+}
+
+
+/* =========================================
+   イベント
+========================================= */
+
+window.addEventListener(
+    "online",
+    updateConnectionStatus
+);
+
+window.addEventListener(
+    "offline",
+    updateConnectionStatus
+);
+
+window.addEventListener(
+    "resize",
+    drawChart
+);
+
+
+/* 初期化 */
+
+updateConnectionStatus();
+drawChart();
+
+startMonitoring();
+
+</script>
+
+</body>
+</html>

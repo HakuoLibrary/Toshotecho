@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>QR Studio - QRコードジェネレーター</title>
+
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+
+    /* =========================================
+       BASIC
+    ========================================= */
+
+    :root {
+      --bg: #09090b;
+      --card: rgba(24, 24, 27, 0.88);
+      --card-light: #18181b;
+      --border: rgba(255, 255, 255, 0.1);
+
+      --text: #fafafa;
+      --muted: #a1a1aa;
+
+      --accent: #8b5cf6;
+      --accent2: #ec4899;
+
+      --input: #27272a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        Meiryo,
+        sans-serif;
+
+      color: var(--text);
+
+      background:
+        radial-gradient(
+          circle at 10% 10%,
+          rgba(139, 92, 246, 0.18),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 90% 20%,
+          rgba(236, 72, 153, 0.14),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 50% 100%,
+          rgba(59, 130, 246, 0.12),
+          transparent 30%
+        ),
+        var(--bg);
+    }
+
+
+    /* =========================================
+       LAYOUT
+    ========================================= */
+
+    .wrapper {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 55px 0;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 38px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+
+      margin: 0 auto 18px;
+
+      border-radius: 20px;
+
+      display: grid;
+      place-items: center;
+
+      font-size: 30px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--accent),
+          var(--accent2)
+        );
+
+      box-shadow:
+        0 15px 40px rgba(139, 92, 246, 0.28);
+    }
+
+    h1 {
+      margin: 0;
+
+      font-size:
+        clamp(28px, 5vw, 44px);
+
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+
+      color: var(--muted);
+
+      font-size: 15px;
+    }
+
+    .app {
+      display: grid;
+
+      grid-template-columns:
+        1.15fr
+        0.85fr;
+
+      gap: 22px;
+
+      align-items: start;
+    }
+
+
+    /* =========================================
+       PANEL
+    ========================================= */
+
+    .panel {
+      background: var(--card);
+
+      border: 1px solid var(--border);
+
+      border-radius: 26px;
+
+      padding: 26px;
+
+      backdrop-filter: blur(18px);
+
+      box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.25);
+    }
+
+
+    /* =========================================
+       TABS
+    ========================================= */
+
+    .tabs {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 8px;
+
+      padding: 5px;
+
+      background:
+        rgba(255, 255, 255, 0.045);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 15px;
+
+      margin-bottom: 25px;
+    }
+
+    .tab {
+      border: 0;
+
+      border-radius: 11px;
+
+      padding: 12px 8px;
+
+      background: transparent;
+
+      color: var(--muted);
+
+      font-size: 14px;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+    }
+
+    .tab:hover {
+      color: white;
+
+      background:
+        rgba(255, 255, 255, 0.06);
+    }
+
+    .tab.active {
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(139, 92, 246, 0.95),
+          rgba(168, 85, 247, 0.85)
+        );
+
+      box-shadow:
+        0 5px 18px
+        rgba(139, 92, 246, 0.22);
+    }
+
+
+    /* =========================================
+       FORM
+    ========================================= */
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      margin-bottom: 8px;
+
+      color: #e4e4e7;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+
+      border:
+        1px solid rgba(255, 255, 255, 0.09);
+
+      border-radius: 12px;
+
+      padding: 13px 14px;
+
+      background: var(--input);
+
+      color: white;
+
+      outline: none;
+
+      font: inherit;
+
+      transition: 0.2s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #71717a;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color:
+        rgba(139, 92, 246, 0.8);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(139, 92, 246, 0.12);
+    }
+
+    textarea {
+      min-height: 125px;
+
+      resize: vertical;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .grid2 {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 14px;
+    }
+
+
+    /* =========================================
+       WIFI
+    ========================================= */
+
+    .wifi-security {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 14px;
+    }
+
+
+    /* =========================================
+       COLOR
+    ========================================= */
+
+    .color-row {
+      display: grid;
+
+      grid-template-columns:
+        58px 1fr;
+
+      gap: 10px;
+
+      align-items: center;
+    }
+
+    input[type="color"] {
+      width: 58px;
+      height: 48px;
+
+      padding: 4px;
+
+      cursor: pointer;
+
+      border-radius: 12px;
+    }
+
+    .hex-input {
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+      text-transform: uppercase;
+    }
+
+    .transparent-row {
+      margin-top: 9px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 9px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      cursor: pointer;
+    }
+
+    .transparent-row input {
+      width: auto;
+
+      accent-color: var(--accent);
+
+      cursor: pointer;
+    }
+
+
+    /* =========================================
+       RANGE
+    ========================================= */
+
+    .range-wrapper {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+    }
+
+    input[type="range"] {
+      padding: 0;
+
+      accent-color: var(--accent);
+
+      cursor: pointer;
+    }
+
+    .range-value {
+      min-width: 50px;
+
+      text-align: right;
+
+      color: #d4d4d8;
+
+      font-size: 13px;
+    }
+
+
+    /* =========================================
+       PREVIEW PANEL
+    ========================================= */
+
+    .preview-panel {
+      position: sticky;
+
+      top: 20px;
+
+      text-align: center;
+    }
+
+    .preview-title {
+      font-size: 14px;
+
+      font-weight: 700;
+
+      margin-bottom: 20px;
+
+      color: #e4e4e7;
+    }
+
+
+    /* =========================================
+       QR STAGE
+    ========================================= */
+
+    .qr-stage {
+      width: 100%;
+
+      min-height: 400px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 28px;
+
+      border-radius: 20px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      /*
+        チェッカーボード
+        ＝透明部分を見やすくする背景
+      */
+
+      background-image:
+        linear-gradient(
+          45deg,
+          #202024 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          -45deg,
+          #202024 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          45deg,
+          transparent 75%,
+          #202024 75%
+        ),
+        linear-gradient(
+          -45deg,
+          transparent 75%,
+          #202024 75%
+        );
+
+      background-size: 20px 20px;
+
+      background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
+
+      background-color: #151518;
+    }
+
+    /*
+      透明背景表示時
+    */
+
+    .qr-stage.transparent {
+      background-image:
+        linear-gradient(
+          45deg,
+          #dedede 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          -45deg,
+          #dedede 25%,
+          transparent 25%
+        ),
+        linear-gradient(
+          45deg,
+          transparent 75%,
+          #dedede 75%
+        ),
+        linear-gradient(
+          -45deg,
+          transparent 75%,
+          #dedede 75%
+        );
+
+      background-size: 20px 20px;
+
+      background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
+
+      background-color: #fff;
+    }
+
+
+    /* =========================================
+       QR CONTAINER
+    ========================================= */
+
+    #qrcode {
+      width: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      line-height: normal;
+
+      text-align: center;
+    }
+
+    /*
+      QRコード自体
+    */
+
+    #qrcode canvas,
+    #qrcode img {
+      display: block;
+
+      max-width: 100%;
+
+      height: auto;
+
+      flex-shrink: 1;
+    }
+
+
+    /* =========================================
+       EMPTY PREVIEW
+    ========================================= */
+
+    .empty {
+      width: 100%;
+
+      min-height: 280px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      text-align: center;
+
+      color: #a1a1aa;
+
+      user-select: none;
+
+      padding: 20px;
+    }
+
+    .empty-icon {
+      width: 68px;
+      height: 68px;
+
+      margin-bottom: 18px;
+
+      display: grid;
+
+      place-items: center;
+
+      border-radius: 20px;
+
+      color: #c4b5fd;
+
+      font-size: 30px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(139, 92, 246, 0.18),
+          rgba(236, 72, 153, 0.12)
+        );
+
+      border:
+        1px solid
+        rgba(139, 92, 246, 0.25);
+
+      box-shadow:
+        0 12px 35px
+        rgba(139, 92, 246, 0.12);
+    }
+
+    .empty-title {
+      color: #e4e4e7;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
+      margin-bottom: 6px;
+    }
+
+    .empty-text {
+      color: #71717a;
+
+      font-size: 12px;
+
+      line-height: 1.8;
+    }
+
+
+    /* =========================================
+       DOWNLOAD
+    ========================================= */
+
+    .download {
+      width: 100%;
+
+      margin-top: 20px;
+
+      border: 0;
+
+      border-radius: 14px;
+
+      padding: 15px;
+
+      color: white;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--accent),
+          var(--accent2)
+        );
+
+      box-shadow:
+        0 12px 30px
+        rgba(139, 92, 246, 0.22);
+
+      transition: 0.2s;
+    }
+
+    .download:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 16px 35px
+        rgba(139, 92, 246, 0.3);
+    }
+
+    .download:active {
+      transform: translateY(0);
+    }
+
+
+    /* =========================================
+       INFO
+    ========================================= */
+
+    .info {
+      margin-top: 18px;
+
+      padding: 13px 15px;
+
+      border-radius: 12px;
+
+      background:
+        rgba(255, 255, 255, 0.04);
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      line-height: 1.7;
+    }
+
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+
+    .footer {
+      text-align: center;
+
+      color: #71717a;
+
+      font-size: 12px;
+
+      margin-top: 30px;
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 850px) {
+
+      .wrapper {
+        padding: 30px 0;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        position: static;
+      }
+
+      .qr-stage {
+        min-height: 330px;
+      }
+
+    }
+
+
+    @media (max-width: 520px) {
+
+      .wrapper {
+        width:
+          min(100% - 20px, 1180px);
+      }
+
+      .panel {
+        padding: 18px;
+
+        border-radius: 20px;
+      }
+
+      .grid2,
+      .wifi-security {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        gap: 4px;
+      }
+
+      .tab {
+        font-size: 12px;
+      }
+
+      .qr-stage {
+        min-height: 280px;
+
+        padding: 18px;
+      }
+
+      .empty {
+        min-height: 220px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <div class="wrapper">
+
+    <!-- =====================================
+         HEADER
+    ====================================== -->
+
+    <header class="header">
+
+      <div class="logo">
+        ▦
+      </div>
+
+      <h1>
+        QR Studio
+      </h1>
+
+      <p class="subtitle">
+        Webサイト・テキスト・Wi-Fiを美しいQRコードに
+      </p>
+
+    </header>
+
+
+    <!-- =====================================
+         APP
+    ====================================== -->
+
+    <main class="app">
+
+
+      <!-- ===================================
+           LEFT PANEL
+      ==================================== -->
+
+      <section class="panel">
+
+
+        <!-- TABS -->
+
+        <div class="tabs">
+
+          <button
+            class="tab active"
+            data-type="url"
+          >
+            🌐 Webサイト
+          </button>
+
+          <button
+            class="tab"
+            data-type="text"
+          >
+            ✎ テキスト
+          </button>
+
+          <button
+            class="tab"
+            data-type="wifi"
+          >
+            📶 Wi-Fi
+          </button>
+
+        </div>
+
+
+        <!-- =================================
+             URL
+        ================================== -->
+
+        <div
+          class="form-section active"
+          id="url-section"
+        >
+
+          <div class="field">
+
+            <label for="urlInput">
+              WebサイトURL
+            </label>
+
+            <input
+              id="urlInput"
+              type="url"
+              placeholder="https://example.com"
+              autocomplete="off"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+             TEXT
+        ================================== -->
+
+        <div
+          class="form-section"
+          id="text-section"
+        >
+
+          <div class="field">
+
+            <label for="textInput">
+              テキスト
+            </label>
+
+            <textarea
+              id="textInput"
+              placeholder="QRコードにしたいテキストを入力してください"
+            ></textarea>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+             WIFI
+        ================================== -->
+
+        <div
+          class="form-section"
+          id="wifi-section"
+        >
+
+          <div class="field">
+
+            <label for="ssidInput">
+              Wi-Fiネットワーク名（SSID）
+            </label>
+
+            <input
+              id="ssidInput"
+              type="text"
+              placeholder="My Wi-Fi"
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="passwordInput">
+              パスワード
+            </label>
+
+            <input
+              id="passwordInput"
+              type="text"
+              placeholder="password123"
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="wifi-security">
+
+
+            <div class="field">
+
+              <label for="securityInput">
+                暗号化方式
+              </label>
+
+              <select id="securityInput">
+
+                <option value="WPA">
+                  WPA / WPA2 / WPA3
+                </option>
+
+                <option value="WEP">
+                  WEP
+                </option>
+
+                <option value="nopass">
+                  暗号化なし
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="hiddenInput">
+                ステルスSSID
+              </label>
+
+              <select id="hiddenInput">
+
+                <option value="false">
+                  いいえ
+                </option>
+
+                <option value="true">
+                  はい
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- DIVIDER -->
+
+        <hr
+          style="
+            border: 0;
+            border-top:
+              1px solid
+              rgba(255,255,255,.07);
+            margin: 25px 0;
+          "
+        >
+
+
+        <!-- =================================
+             COLORS
+        ================================== -->
+
+        <div class="grid2">
+
+
+          <!-- QR COLOR -->
+
+          <div class="field">
+
+            <label>
+              QRコードの色
+            </label>
+
+            <div class="color-row">
+
+              <input
+                type="color"
+                id="qrColor"
+                value="#000000"
+              >
+
+              <input
+                type="text"
+                id="qrHex"
+                class="hex-input"
+                value="#000000"
+                maxlength="7"
+                placeholder="#000000"
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- BACKGROUND COLOR -->
+
+          <div class="field">
+
+            <label>
+              背景の色
+            </label>
+
+            <div class="color-row">
+
+              <input
+                type="color"
+                id="bgColor"
+                value="#FFFFFF"
+              >
+
+              <input
+                type="text"
+                id="bgHex"
+                class="hex-input"
+                value="#FFFFFF"
+                maxlength="7"
+                placeholder="#FFFFFF"
+              >
+
+            </div>
+
+
+            <label class="transparent-row">
+
+              <input
+                type="checkbox"
+                id="transparentBg"
+              >
+
+              背景を透明にする
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+             SIZE / MARGIN
+        ================================== -->
+
+        <div class="grid2">
+
+
+          <!-- SIZE -->
+
+          <div class="field">
+
+            <label>
+              QRコードの大きさ
+            </label>
+
+            <div class="range-wrapper">
+
+              <input
+                type="range"
+                id="sizeInput"
+                min="128"
+                max="1000"
+                step="16"
+                value="320"
+              >
+
+              <span
+                class="range-value"
+                id="sizeValue"
+              >
+                320px
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- MARGIN -->
+
+          <div class="field">
+
+            <label>
+              余白
+            </label>
+
+            <div class="range-wrapper">
+
+              <input
+                type="range"
+                id="marginInput"
+                min="0"
+                max="30"
+                step="1"
+                value="4"
+              >
+
+              <span
+                class="range-value"
+                id="marginValue"
+              >
+                4px
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================
+           RIGHT PANEL
+      ==================================== -->
+
+      <section class="panel preview-panel">
+
+
+        <div class="preview-title">
+          QRコード プレビュー
+        </div>
+
+
+        <!-- =================================
+             QR PREVIEW
+        ================================== -->
+
+        <div
+          class="qr-stage"
+          id="qrStage"
+        >
+
+          <div id="qrcode">
+
+            <!--
+              初期状態
+              ここにはQRコードを表示しない
+            -->
+
+            <div class="empty">
+
+              <div class="empty-icon">
+                ▦
+              </div>
+
+              <div class="empty-title">
+                QRコードのプレビュー
+              </div>
+
+              <div class="empty-text">
+                左側に内容を入力すると<br>
+                ここにQRコードが表示されます
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+             DOWNLOAD
+        ================================== -->
+
+        <button
+          class="download"
+          id="downloadBtn"
+        >
+          ↓ PNGでダウンロード
+        </button>
+
+
+        <!-- =================================
+             INFO
+        ================================== -->
+
+        <div class="info">
+
+          QRコードは入力内容をもとに
+          ブラウザ上で生成されます。
+
+          Wi-Fi QRコードはスマートフォンの
+          カメラなどから読み取ることで、
+          Wi-Fi接続情報を利用できます。
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <div class="footer">
+      QR Studio — Simple & Beautiful QR Generator
+    </div>
+
+  </div>
+
+
+
+  <script>
+
+    /* =========================================
+       VARIABLES
+    ========================================= */
+
+    let currentType = "url";
+
+    const qrcodeElement =
+      document.getElementById("qrcode");
+
+    const qrStage =
+      document.getElementById("qrStage");
+
+    const qrColor =
+      document.getElementById("qrColor");
+
+    const qrHex =
+      document.getElementById("qrHex");
+
+    const bgColor =
+      document.getElementById("bgColor");
+
+    const bgHex =
+      document.getElementById("bgHex");
+
+    const transparentBg =
+      document.getElementById("transparentBg");
+
+    const sizeInput =
+      document.getElementById("sizeInput");
+
+    const marginInput =
+      document.getElementById("marginInput");
+
+    const sizeValue =
+      document.getElementById("sizeValue");
+
+    const marginValue =
+      document.getElementById("marginValue");
+
+
+    /* =========================================
+       EMPTY PREVIEW
+    ========================================= */
+
+    function showEmptyPreview() {
+
+      qrcodeElement.replaceChildren();
+
+      const empty =
+        document.createElement("div");
+
+      empty.className = "empty";
+
+      empty.innerHTML = `
+        <div class="empty-icon">
+          ▦
+        </div>
+
+        <div class="empty-title">
+          QRコードのプレビュー
+        </div>
+
+        <div class="empty-text">
+          左側に内容を入力すると<br>
+          ここにQRコードが表示されます
+        </div>
+      `;
+
+      qrcodeElement.appendChild(empty);
+
+    }
+
+
+    /* =========================================
+       TAB
+    ========================================= */
+
+    document
+      .querySelectorAll(".tab")
+      .forEach(tab => {
+
+        tab.addEventListener("click", () => {
+
+          document
+            .querySelectorAll(".tab")
+            .forEach(t => {
+
+              t.classList.remove("active");
+
+            });
+
+
+          document
+            .querySelectorAll(".form-section")
+            .forEach(section => {
+
+              section.classList.remove("active");
+
+            });
+
+
+          tab.classList.add("active");
+
+
+          currentType =
+            tab.dataset.type;
+
+
+          const section =
+            document.getElementById(
+              currentType + "-section"
+            );
+
+
+          if (section) {
+            section.classList.add("active");
+          }
+
+
+          generateQR();
+
+        });
+
+      });
+
+
+    /* =========================================
+       HEX VALIDATION
+    ========================================= */
+
+    function validHex(value) {
+
+      return /^#[0-9A-Fa-f]{6}$/.test(value);
+
+    }
+
+
+    /* =========================================
+       COLOR SYNC
+    ========================================= */
+
+    function syncColorPicker(
+      picker,
+      text
+    ) {
+
+      picker.addEventListener(
+        "input",
+        () => {
+
+          text.value =
+            picker.value.toUpperCase();
+
+          generateQR();
+
+        }
+      );
+
+
+      text.addEventListener(
+        "input",
+        () => {
+
+          let value =
+            text.value.trim();
+
+
+          if (!value.startsWith("#")) {
+
+            value =
+              "#" + value;
+
+          }
+
+
+          value =
+            value.toUpperCase();
+
+
+          text.value =
+            value;
+
+
+          if (validHex(value)) {
+
+            picker.value =
+              value;
+
+            generateQR();
+
+          }
+
+        }
+      );
+
+
+      text.addEventListener(
+        "blur",
+        () => {
+
+          const value =
+            text.value.trim();
+
+
+          if (!validHex(value)) {
+
+            text.value =
+              picker.value.toUpperCase();
+
+          }
+
+        }
+      );
+
+    }
+
+
+    syncColorPicker(
+      qrColor,
+      qrHex
+    );
+
+    syncColorPicker(
+      bgColor,
+      bgHex
+    );
+
+
+    /* =========================================
+       TRANSPARENT BACKGROUND
+    ========================================= */
+
+    transparentBg.addEventListener(
+      "change",
+      () => {
+
+        if (transparentBg.checked) {
+
+          qrStage.classList.add(
+            "transparent"
+          );
+
+        } else {
+
+          qrStage.classList.remove(
+            "transparent"
+          );
+
+        }
+
+
+        generateQR();
+
+      }
+    );
+
+
+    /* =========================================
+       SIZE
+    ========================================= */
+
+    sizeInput.addEventListener(
+      "input",
+      () => {
+
+        sizeValue.textContent =
+          sizeInput.value + "px";
+
+        generateQR();
+
+      }
+    );
+
+
+    /* =========================================
+       MARGIN
+    ========================================= */
+
+    marginInput.addEventListener(
+      "input",
+      () => {
+
+        marginValue.textContent =
+          marginInput.value + "px";
+
+        generateQR();
+
+      }
+    );
+
+
+    /* =========================================
+       INPUT EVENTS
+    ========================================= */
+
+    [
+      "urlInput",
+      "textInput",
+      "ssidInput",
+      "passwordInput",
+      "securityInput",
+      "hiddenInput"
+
+    ].forEach(id => {
+
+      const element =
+        document.getElementById(id);
+
+
+      if (!element) {
+        return;
+      }
+
+
+      element.addEventListener(
+        "input",
+        generateQR
+      );
+
+
+      element.addEventListener(
+        "change",
+        generateQR
+      );
+
+    });
+
+
+    /* =========================================
+       ESCAPE WIFI
+    ========================================= */
+
+    function escapeWifi(value) {
+
+      return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/;/g, "\\;")
+        .replace(/,/g, "\\,")
+        .replace(/:/g, "\\:");
+
+    }
+
+
+    /* =========================================
+       GET QR CONTENT
+    ========================================= */
+
+    function getQRContent() {
+
+
+      /* -------------------------------
+         URL
+      -------------------------------- */
+
+      if (currentType === "url") {
+
+        return document
+          .getElementById("urlInput")
+          .value
+          .trim();
+
+      }
+
+
+      /* -------------------------------
+         TEXT
+      -------------------------------- */
+
+      if (currentType === "text") {
+
+        return document
+          .getElementById("textInput")
+          .value;
+
+      }
+
+
+      /* -------------------------------
+         WIFI
+      -------------------------------- */
+
+      if (currentType === "wifi") {
+
+        const ssid =
+          document
+            .getElementById("ssidInput")
+            .value;
+
+
+        const password =
+          document
+            .getElementById("passwordInput")
+            .value;
+
+
+        const security =
+          document
+            .getElementById("securityInput")
+            .value;
+
+
+        const hidden =
+          document
+            .getElementById("hiddenInput")
+            .value;
+
+
+        if (!ssid) {
+
+          return "";
+
+        }
+
+
+        return (
+          "WIFI:" +
+          "T:" +
+          escapeWifi(security) +
+          ";" +
+          "S:" +
+          escapeWifi(ssid) +
+          ";" +
+          "P:" +
+          escapeWifi(password) +
+          ";" +
+          "H:" +
+          hidden +
+          ";;"
+        );
+
+      }
+
+
+      return "";
+
+    }
+
+
+    /* =========================================
+       GENERATE QR
+    ========================================= */
+
+    function generateQR() {
+
+      const content =
+        getQRContent();
+
+
+      /*
+        重要：
+        古いQRコードや文字を完全に削除
+      */
+
+      qrcodeElement.replaceChildren();
+
+
+      /* -------------------------------
+         EMPTY
+      -------------------------------- */
+
+      if (!content) {
+
+        showEmptyPreview();
+
+        return;
+
+      }
+
+
+      const size =
+        Number(sizeInput.value);
+
+
+      const foreground =
+        qrColor.value;
+
+
+      const background =
+        transparentBg.checked
+          ? "rgba(0,0,0,0)"
+          : bgColor.value;
+
+
+      /* -------------------------------
+         QR CODE
+      -------------------------------- */
+
+      new QRCode(
+        qrcodeElement,
+        {
+
+          text: content,
+
+          width: size,
+
+          height: size,
+
+          colorDark:
+            foreground,
+
+          colorLight:
+            background,
+
+          correctLevel:
+            QRCode.CorrectLevel.H
+
+        }
+      );
+
+
+      /*
+        QRコード生成後
+      */
+
+      setTimeout(() => {
+
+        const canvas =
+          qrcodeElement
+            .querySelector("canvas");
+
+
+        const image =
+          qrcodeElement
+            .querySelector("img");
+
+
+        /*
+          Canvas
+        */
+
+        if (canvas) {
+
+          canvas.style.width =
+            size + "px";
+
+          canvas.style.height =
+            size + "px";
+
+          canvas.style.margin =
+            marginInput.value + "px";
+
+          canvas.style.maxWidth =
+            "100%";
+
+          canvas.style.height =
+            "auto";
+
+        }
+
+
+        /*
+          IMG
+        */
+
+        if (image) {
+
+          image.style.width =
+            size + "px";
+
+          image.style.height =
+            size + "px";
+
+          image.style.margin =
+            marginInput.value + "px";
+
+          image.style.maxWidth =
+            "100%";
+
+          image.style.height =
+            "auto";
+
+        }
+
+      }, 30);
+
+    }
+
+
+    /* =========================================
+       DOWNLOAD PNG
+    ========================================= */
+
+    document
+      .getElementById("downloadBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          const canvas =
+            qrcodeElement
+              .querySelector("canvas");
+
+
+          if (!canvas) {
+
+            alert(
+              "まずQRコードを生成してください。"
+            );
+
+            return;
+
+          }
+
+
+          const size =
+            Number(sizeInput.value);
+
+
+          const margin =
+            Number(marginInput.value);
+
+
+          /*
+            ダウンロード用Canvas
+          */
+
+          const output =
+            document.createElement(
+              "canvas"
+            );
+
+
+          const outputSize =
+            size + margin * 2;
+
+
+          output.width =
+            outputSize;
+
+          output.height =
+            outputSize;
+
+
+          const ctx =
+            output.getContext("2d");
+
+
+          /*
+            背景
+          */
+
+          if (!transparentBg.checked) {
+
+            ctx.fillStyle =
+              bgColor.value;
+
+            ctx.fillRect(
+              0,
+              0,
+              outputSize,
+              outputSize
+            );
+
+          }
+
+
+          /*
+            QRコード
+          */
+
+          ctx.drawImage(
+            canvas,
+            margin,
+            margin,
+            size,
+            size
+          );
+
+
+          /*
+            PNG保存
+          */
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+
+          link.download =
+            "qr-code.png";
+
+
+          link.href =
+            output.toDataURL(
+              "image/png"
+            );
+
+
+          link.click();
+
+        }
+      );
+
+
+    /* =========================================
+       INITIALIZE
+    ========================================= */
+
+    sizeValue.textContent =
+      sizeInput.value + "px";
+
+
+    marginValue.textContent =
+      marginInput.value + "px";
+
+
+    /*
+      初期状態では
+      プレビュー画面をきれいに表示
+    */
+
+    showEmptyPreview();
+
+  </script>
+
+</body>
+</html>
