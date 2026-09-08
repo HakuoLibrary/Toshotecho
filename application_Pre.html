@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申し込み｜図書手帳公式ホームページ</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;background:#FAEEDD;color:#444;overflow-x:hidden}
+.header{position:fixed;top:0;left:0;width:100%;height:80px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;background:rgba(255,255,255,.72);backdrop-filter:blur(12px);box-shadow:0 5px 20px rgba(0,0,0,.08);z-index:1000}
+.logo img{height:52px;width:auto;display:block;transition:.25s}.logo img:hover{transform:scale(1.05)}
+.menu-btn{width:56px;height:56px;border:0;border-radius:50%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.15);transition:.3s}
+.menu-btn:hover{transform:scale(1.05)}.menu-btn span{width:26px;height:3px;background:#444;border-radius:20px;transition:.35s}
+.menu-btn.active span:nth-child(1){transform:translateY(9px) rotate(45deg)}.menu-btn.active span:nth-child(2){opacity:0}.menu-btn.active span:nth-child(3){transform:translateY(-9px) rotate(-45deg)}
+.menu{position:fixed;top:0;right:-320px;width:300px;height:100vh;background:#fff;padding-top:90px;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.12);transition:.35s;z-index:999}.menu.open{right:0}
+.menu a{padding:18px 24px;text-decoration:none;font-weight:bold;color:#444;transition:.25s}.menu a:hover{background:#FAEEDD;padding-left:36px;color:#B67832}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.3s;z-index:998}.overlay.show{opacity:1;pointer-events:auto}
+.page-title{margin-top:120px;text-align:center;color:#8B5A2B;font-size:38px;animation:fadeIn 1s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rule-box,.form-wrap{max-width:1000px;margin:40px auto;padding:30px;background:#fff;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+.rule-content{height:500px;overflow-y:auto;padding:25px;line-height:2;border:1px solid #E8D5BB;border-radius:12px;background:#FFFDF8}
+.terms h2,.terms h3{color:#5c4937}.terms p{margin:12px 0}
+.agree-area{max-width:1000px;margin:30px auto 60px;padding:0 30px;text-align:center}
+.agree-label{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:22px;font-weight:bold;font-size:17px}.agree-label input{width:20px;height:20px;accent-color:#B67832}
+.agree-button,.submit-button,.back-button{display:inline-block;padding:16px 38px;border:0;border-radius:999px;font-size:17px;font-weight:bold;cursor:pointer;transition:.3s}
+.agree-button,.submit-button{background:#B67832;color:#fff;box-shadow:0 10px 20px rgba(182,120,50,.25)}.agree-button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.agree-button:not(:disabled):hover,.submit-button:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 15px 30px rgba(182,120,50,.35)}
+.form-section{display:none}.form-section.show{display:block;animation:sectionIn .45s ease}
+@keyframes sectionIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.form-intro{text-align:center;margin-bottom:30px}.form-intro h2{color:#8B5A2B;margin-bottom:10px}
+.notice{background:#FFF8ED;border-left:5px solid #B67832;padding:14px 16px;border-radius:10px;margin-bottom:25px;line-height:1.8}
+.question{margin:0 0 34px}.question-head{background:#EAF4F7;border-radius:8px;padding:16px 20px 18px}
+.q-number{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:46px;padding:0 10px;background:#B07A00;color:#fff;border-radius:0 0 5px 5px;font-weight:bold;font-size:19px;margin:-16px 0 13px 0}
+.question-title{font-size:22px;line-height:1.6}.required{color:#d22;font-size:.75em;margin-left:7px}.question-desc{margin-top:8px;line-height:1.65;white-space:pre-line}.question-desc.red{color:#e33}
+.question-body{padding:18px 0 0}
+input[type=text],input[type=date],select,textarea{width:100%;border:0;border-radius:8px;background:#F7F7F7;padding:15px 16px;font:inherit;font-size:18px;color:#555;outline:0;transition:.25s}
+textarea{min-height:180px;resize:vertical;line-height:1.7}
+input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(182,120,50,.18);background:#fff}
+.field-note{font-size:13px;color:#777;margin-top:7px}.radio-list{display:flex;flex-direction:column;gap:24px}
+.radio-item{display:flex;align-items:flex-start;gap:13px;cursor:pointer;font-size:18px;line-height:1.5}.radio-item input{margin-top:4px;width:22px;height:22px;accent-color:#B67832;flex:none}
+.design-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.design-card{position:relative;cursor:pointer}.design-card input{position:absolute;opacity:0;pointer-events:none}
+.design-visual{background:#F7F7F7;border:3px solid transparent;border-radius:12px;overflow:hidden;transition:.25s;text-align:center}.design-visual img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee}
+.design-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:#999;font-weight:bold;background:#eee;line-height:1.6}
+.design-name{padding:12px 8px;font-weight:bold;background:#fff}.design-card input:checked+.design-visual{border-color:#B67832;box-shadow:0 0 0 3px rgba(182,120,50,.15)}.design-card:hover .design-visual{transform:translateY(-2px)}
+.error{color:#c62828;background:#fff1f1;border-radius:8px;padding:10px 13px;margin-top:12px;display:none}.error.show{display:block}
+.nav-buttons{text-align:center;margin:35px 0 15px}.confirm-panel{background:#FFFDF8;border:1px solid #E8D5BB;border-radius:14px;padding:22px;margin-bottom:25px}
+.confirm-row{display:grid;grid-template-columns:230px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid #eadfce}.confirm-row:last-child{border-bottom:0}.confirm-label{font-weight:bold;color:#8B5A2B}.confirm-value{white-space:pre-wrap;word-break:break-word}
+.back-button{background:#eee;color:#555;margin-right:10px}.back-button:hover{background:#e2e2e2;transform:translateY(-2px)}
+.loading{display:none;text-align:center;padding:35px}.loading.show{display:block}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:#B67832;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
+@keyframes spin{to{transform:rotate(360deg)}}.complete{display:none;text-align:center;padding:55px 25px}.complete.show{display:block;animation:sectionIn .5s ease}
+.complete-icon{width:78px;height:78px;border-radius:50%;background:#B67832;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px}.complete h2{color:#8B5A2B;margin-bottom:15px}
+.small-warning{font-size:13px;color:#777;margin-top:18px;line-height:1.7}#offlineOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:20px}#offlineOverlay.show{display:flex}.offline-card{width:min(520px,100%);background:#fff;border-radius:22px;padding:40px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}.offline-icon{font-size:58px;margin-bottom:12px}.offline-card h2{color:#8B5A2B;margin-bottom:12px}.offline-card p{line-height:1.8;margin-bottom:24px}.reload-button{border:0;border-radius:999px;background:#B67832;color:#fff;font:inherit;font-weight:bold;padding:15px 38px;cursor:pointer;box-shadow:0 8px 20px rgba(182,120,50,.25)}.reload-button:hover{transform:translateY(-2px)}
+footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-top:50px}
+.confirm-layer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:2000;overflow:auto;padding:30px 15px}.confirm-layer-inner{max-width:900px;margin:40px auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 15px 45px rgba(0,0,0,.2)}
+@media(max-width:768px){
+.header{height:75px;padding:0 15px}.logo img{height:45px}.menu{width:260px}.page-title{font-size:30px;margin-top:105px}
+.rule-box,.form-wrap{margin:30px 15px;padding:20px}.rule-content{height:450px;padding:15px;font-size:14px}.agree-area{padding:0 15px}.agree-button{width:100%;font-size:16px}
+.question-title{font-size:19px}.question-head{padding:15px 14px 16px}.q-number{margin:-15px 0 10px -1px}.radio-list{gap:20px}.radio-item{font-size:17px}
+.design-grid{grid-template-columns:1fr;gap:20px}.confirm-row{grid-template-columns:1fr;gap:5px}.back-button,.submit-button{width:100%;margin:0 0 12px}
+}
+@media(min-width:769px) and (max-width:1050px){.design-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="offlineOverlay" aria-live="assertive"><div class="offline-card"><div class="offline-icon">📡</div><h2>Wi-Fiに接続していません</h2><p>インターネット接続を確認してください。<br>接続したあと、「再読み込み」を押してください。</p><button class="reload-button" id="reloadButton">再読み込み</button></div></div>
+
+<header class="header">
+<a href="index.html" class="logo"><img src="icon.png" alt="図書手帳"></a>
+<button class="menu-btn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+</header>
+<nav class="menu" id="menu">
+<a href="index.html">HOME</a><a href="application.html">申し込み</a><a href="features.html">特徴</a><a href="movie.html">紹介動画</a><a href="mutter.html">かもめんのつぶやき</a>
+<a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener noreferrer">蔵書検索（Ａ・Ｂ棟共通）</a><a href="character.html">キャラクター紹介</a><a href="tool.html">お役立ちツール</a>
+</nav>
+<div class="overlay" id="overlay"></div>
+
+<h1 class="page-title">申し込み</h1>
+
+<section class="rule-box">
+<h2>利用規約</h2><br>
+<div class="rule-content" id="ruleContent">
+<div class="terms">
+<h2>図書手帳利用規約</h2>
+<p>東京都立白鷗高等学校附属中学校Ｂ棟図書室<br>図書手帳発行担当</p><br>
+<p>この度は、図書手帳の発行の申請および図書手帳をご利用いただきましてありがとうございます。<br>
+この利用規約（以下「本規約」といいます。）は、東京都立白鷗高等学校附属中学校Ｂ棟図書室図書手帳発行担当が図書手帳を提供するサービスの利用条件を定めるものです。<br>
+このサービスを利用する者は、本規約を最後まで確認・同意の上、このサービスを利用するものとします。<br>
+利用者の皆様によりよくご利用いただけますように、規約の遵守をお願い致します。</p><hr>
+<h3>目次</h3>
+<p>第１条　　定義<br>第２条　　目的・適用<br>第３条　　利用登録およびそれに関連する個人情報の取り扱い<br>第４条　　禁止事項<br>第５条　　本サービスの提供の停止等<br>第６条　　免責事項<br>第７条　　利用規約の変更<br>第８条　　準拠法・裁判管轄<br>第９条　　利用登録の方法<br>第１０条　図書手帳の紛失・再発行</p><hr>
+<h3>第１条（定義）</h3>
+<p>本規約における用語の定義は以下の通りとします。</p>
+<p>（１）本サービス<br>東京都立白鷗高等学校附属中学校図書室の図書手帳発行担当が提供する、図書手帳を発行するサービスのこと</p>
+<p>（２）利用者<br>本サービスを利用する者のこと</p>
+<p>（３）図書手帳<br>利用者の利便性向上のために当運営が発行する、学籍番号およびバーコード等が掲載された印刷物のこと</p>
+<p>（４）当運営<br>東京都立白鷗高等学校附属中学校図書室の、図書手帳を発行する団体および人物のこと</p>
+<p>（５）利用登録<br>第９条にあるリンクおよびＢ棟図書室周辺等に掲示されたＱＲコード®からフォームにアクセスし、それを送信完了すること<br>※「ＱＲコード®」は株式会社デンソーウェーブの登録商標です。</p>
+<p>（６）登録データ<br>利用者が当運営の指定したフォームを経由し、当運営に送信した情報およびアップロードした画像のこと</p><hr>
+<h3>第２条（目的・適用）</h3><p>本規約は、本サービスの利用に関する条件やルールを定めることを目的とします。利用者は、本規約に同意した上で本サービスを利用するものとします。</p><hr>
+<h3>第３条（利用登録およびそれに関連する個人情報の取り扱い）</h3>
+<p>本サービスの利用を希望する者は、本サービスの定める方法（第９条に掲載）により利用登録を申請するものとします。<br>
+当運営は、利用登録によって利用者の学籍番号を取得します。登録データは図書手帳の発行およびそれに係る事務作業のみに使用します。なお、第三者への情報提供は行っておりません。<br>
+また、図書手帳の発行およびそれに係る事務作業の完了後、登録データの保持は行っておりません。</p>
+<p>当運営は、利用者に以下の事由があると判断した場合、利用登録を承認しないことがあります。</p>
+<p>・虚偽の事項を届け出た場合<br>・過去１ヶ月以内に規約違反をした者からの申請である場合<br>・図書手帳発行申込フォームに不適切な文言を書き込んだ場合<br>・その他、当運営が利用登録を適当でないと判断した場合</p><hr>
+<h3>第４条（禁止事項）</h3>
+<p>利用者は、本サービスの利用にあたり、以下に定める行為をしてはなりません。<br>また、これらのいずれかに違反した場合、規約違反となります。</p>
+<p>・法令または公序良俗に違反する行為<br>・犯罪に関連する行為<br>・本サービスの運営を妨害する行為<br>・他の利用者の情報を不正に収集・利用する行為<br>・当運営の知的財産権を侵害する行為<br>・利用者自身のものではない、他の利用者の図書手帳を発行・使用・所持する行為<br>・その他、当運営が不適切と判断する行為</p><hr>
+<h3>第５条（本サービスの提供の停止等）</h3>
+<p>当運営は、以下の場合には利用者に事前に通知することなく本サービスの全部または一部の提供を停止または終了、変更することができます。<br>また、提供を停止した際、復旧までに時間がかかる場合があります。</p>
+<p>・本サービスに係るシステムの保守点検を行う場合<br>・火災・停電・天災など不可抗力により提供が困難となった場合<br>・原価高騰などにより、無償での提供が困難となった場合<br>・その他、当運営が本サービスの提供および維持が困難と判断した場合</p><hr>
+<h3>第６条（免責事項）</h3><p>当運営は、本サービスに関して利用者に生じた損害について、一切の責任を負いません。<br>当運営は、利用者間または利用者と第三者との間において生じたトラブルについて、一切の責任を負いません。</p><hr>
+<h3>第７条（利用規約の変更）</h3><p>当運営は、必要と判断した場合には、利用者に通知することなく本規約を変更することができます。<br>変更後の規約は、本規約に掲載した時点から効力を生じるものとします。<br>また、本規約の最終変更日は、本規約下部に掲載しています。</p><hr>
+<h3>第８条（準拠法・裁判管轄）</h3><p>本規約の解釈にあたっては、日本法を準拠法とします。本サービスに関してトラブルが生じた場合には、当運営の所在地を管轄する裁判所を専属的合意管轄とします。</p><hr>
+<h3>第９条（利用登録の方法）</h3><p>本サービスを利用するにあたり、利用登録を行う必要があります。<br>
+利用登録の方法は、専用フォームでの回答のみです。<br>
+専用フォームを利用者が送信完了したと同時に、利用者はこの利用規約に同意したとみなします。<br>
+第５条に則り、当運営が事前に予告なくフォームを一時的に閉鎖する場合があります。<br>
+利用登録は利用者自身が以下のボタンから行うものとします。<br>
+利用登録が不十分な場合は、当該する発行は受け付けないものとします。<br>
+また、不具合・送信ボタンの押し忘れ等により送信が完了できなかった場合も同等です。</p><hr>
+<h3>第１０条（図書手帳の紛失・再発行）</h3><p>利用者が図書手帳を紛失した場合、再発行することができます。第９条に則り再度利用登録を行ってください。<br>
+また、新年度になる際、「１年度のみ有効」で発行した利用者のバーコードが無効となるため、第９条に則り、再度利用登録を行ってください。新年度になる際、当運営から再発行することはありません。</p>
+<p style="text-align:right"><br><br>この利用規約の最終変更日：２０２６年９月４日（金）</p>
+</div></div>
+</section>
+
+<section class="agree-area">
+<label class="agree-label"><input type="checkbox" id="termsAgree"><span>利用規約に同意します。</span></label>
+<button class="agree-button" id="startButton" disabled>申し込みを始める</button>
+</section>
+
+<section class="form-section" id="formSection">
+<div class="form-wrap">
+<div class="form-intro"><h2>図書手帳 発行申込フォーム</h2><p>必要事項を入力してください。<span class="required">*</span> は必須項目です。</p></div>
+<div class="notice">入力内容は、送信前に確認画面で確認できます。<br>「この内容で申し込む」を押すまで送信されません。
+お渡し方法によって、表示される質問が変わります。</div>
+
+<form id="applicationForm" method="post">
+<input type="hidden" name="_subject" value="【図書手帳】発行申込">
+<input type="hidden" name="_cc" value="2024025226@metro.ed.jp">
+<input type="hidden" name="_template" value="table">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_cc" value="2024025226@metro.ed.jp">
+<input type="hidden" name="利用規約への同意" value="同意済み">
+
+<div class="question">
+<div class="question-head"><div class="question-title">あなたの学年を選択してください。<span class="required">*</span></div><div class="question-desc">間違えないでください！</div></div>
+<div class="question-body"><select id="grade" name="質問１_学年"><option value="">答えの選択</option><option>１年</option><option>２年</option><option>３年</option><option>４年</option><option>５年</option><option>６年</option><option>教職員</option></select></div>
+</div>
+
+<div class="question" id="q2"><div class="question-head"><div class="question-title">お名前を例にならって、　漢字→ふりがな　の順で入力してください。<span class="required">*</span></div><div class="question-desc">例：白鷗太郎　はくおうたろう</div></div>
+<div class="question-body"><input type="text" id="name" name="質問２_名前" placeholder="回答を入力してください" maxlength="100"></div></div>
+
+<div class="question" id="q3"><div class="question-head"><div class="question-title">あなたの組を選択してください。<span class="required">*</span></div><div class="question-desc">間違えないでください！</div></div>
+<div class="question-body"><select id="classNo" name="質問３_組"><option value="">答えの選択</option></select></div></div>
+
+<div class="question" id="q4"><div class="question-head"><div class="question-title">あなたの出席番号を選択してください。<span class="required">*</span></div><div class="question-desc">間違えないでください！</div></div>
+<div class="question-body"><select id="attendance" name="質問４_出席番号"><option value="">答えの選択</option></select></div></div>
+
+<div class="question"><div class="question-head"><div class="question-title">図書手帳の種類を選んでください。<span class="required">*</span></div>
+<div class="question-desc">・「１年度のみ有効」は、従来通り学籍番号（４桁）がバーコードになっています。
+メリット：バーコードが小さい
+デメリット：進級・年度が変わると使えなくなる
+
+・「白鷗在籍中はずっと有効」は、利用者ＩＤ（８桁・こちらで検索します）がバーコードになっています。
+メリット：白鷗在籍中はずっと有効なので、大切な１冊（特注品など）をずっと使える
+デメリット：バーコードが大きい</div></div>
+<div class="question-body"><div class="radio-list">
+<label class="radio-item"><input type="radio" name="質問５_図書手帳の種類" value="１年度のみ有効（バーコードは学籍番号）">１年度のみ有効（バーコードは学籍番号）</label>
+<label class="radio-item"><input type="radio" name="質問５_図書手帳の種類" value="白鷗在籍中はずっと有効（バーコードは利用者ＩＤ）">白鷗在籍中はずっと有効（バーコードは利用者ＩＤ）</label>
+</div></div></div>
+
+<div class="question" id="q6"><div class="question-head"><div class="question-title">下の質問の選択肢の画像を見て、表紙の「○○○○」の部分に入れる文言を入力してください。<span class="required">*</span></div>
+<div class="question-desc">・文字数の上限は１３文字までです。
+・入れたい文言が無い場合、「（スペース）」を入力してください。
+・このままコピーして掲載するので誤字などの間違いが無いようにしてください。
+・最大で６年間使う、ということを踏まえて入力してください。</div></div>
+<div class="question-body"><input type="text" id="coverText" name="質問６_表紙に入れる文言" maxlength="13" placeholder="１３文字以内で入力してください"><div class="field-note" id="coverCount">０ / １３文字</div></div></div>
+
+<div class="question"><div class="question-head"><div class="question-title">図書手帳の色とデザインを選択してください。<span class="required">*</span></div>
+<div class="question-desc red">・この画像はイメージです。実際には校章とロゴの背景もその色になります。
+・画像を挿入したい場合は、白色にすることをおすすめします。
+・白色を選択した場合、普通のコピー用紙ではなく、上質紙に印刷します。（裏移り防止のため）
+・「おまかせ」を選択すると、期間限定カラー（オレンジなど）になります。
+・現在発行を受け付けているのは、新図書手帳です。新図書手帳はカレンダーやスタンプカードなどがついています。</div></div>
+<div class="question-body"><div class="design-grid" id="designGrid"></div></div></div>
+
+<div class="question"><div class="question-head"><div class="question-title">図書手帳のお渡し方法を選択してください。<span class="required">*</span></div>
+<div class="question-desc">・「Ｂ棟図書室のカウンター」を選択した場合、受け取る日を選択することができます。
+・「Ｂ棟職員室前のレターボックスに投函」を選択した場合、発行ができ次第投函します。（中学１・２年生のみ）
+・「Ａ棟職員室前のレターボックスに投函」を選択した場合、発行ができ次第投函します。（中学３年生以上のみ）</div></div>
+<div class="question-body"><div class="radio-list">
+<label class="radio-item"><input type="radio" name="質問８_お渡し方法" value="Ｂ棟図書室のカウンター">Ｂ棟図書室のカウンター</label>
+<label class="radio-item"><input type="radio" name="質問８_お渡し方法" value="Ｂ棟職員室前のレターボックスに投函">Ｂ棟職員室前のレターボックスに投函</label>
+<label class="radio-item"><input type="radio" name="質問８_お渡し方法" value="Ａ棟職員室前のレターボックスに投函">Ａ棟職員室前のレターボックスに投函</label>
+</div></div></div>
+
+<div class="question" id="q9"><div class="question-head"><div class="question-title">図書手帳は、いつ発行してほしいですか。<span class="required">*</span></div>
+<div class="question-desc">今日の日付を選んだ場合、ご希望に添えない場合があります。
+また、土日祝日やＢ棟図書室が閉館している日を選んだ場合、次の図書室が開館している日に発行することとして扱います。</div></div>
+<div class="question-body"><input type="date" id="issueDate" name="質問９_発行希望日"></div></div>
+
+<div class="question" id="q10"><div class="question-head"><div class="question-title">特注ページはどのようなデザインにしますか？　できるだけ詳しく書いてください。<span class="required">*</span></div>
+<div class="question-desc">・現在発行を受け付けている新図書手帳は、２ページ目が特注ページとなっています。
+・特注ページには、あなたが挿入したい画像や文言、自分で描いたイラスト、ＱＲコードなど、何でも挿入できます。（不適切なものを除く。）
+・そのページに挿入したいことをこの欄に入力してください。（文言の場合、パソコンのデフォルトまたは手書き文字フォントへの変更が可能です。）
+・スペースに空きがあれば、複数のコンテンツを挿入することも可能です。
+・名前などの個人情報の掲載はおやめください。</div></div>
+<div class="question-body"><textarea id="customDesign" name="質問１０_特注ページのデザイン" placeholder="回答を入力してください。できるだけ詳しく書いてください。"></textarea></div></div>
+
+<div class="nav-buttons"><button type="button" class="submit-button" id="confirmButton">入力内容を確認する</button></div>
+<div class="error" id="formError"></div>
+</form>
+
+<div class="loading" id="loading"><div class="spinner"></div><strong>送信しています…</strong><p>そのままお待ちください。</p></div>
+<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">この画面が表示される前にページを閉じた場合、送信が完了していない可能性があります。</p></div>
+</div></section>
+
+<div class="confirm-layer" id="confirmLayer">
+<div class="confirm-layer-inner">
+<div class="form-intro"><h2>入力内容の確認</h2><p>以下の内容で間違いがないか確認してください。</p></div>
+<div class="confirm-panel" id="confirmPanel"></div>
+<div class="nav-buttons"><button type="button" class="back-button" id="layerBack">入力画面に戻る</button><button type="button" class="submit-button" id="layerSubmit">この内容で申し込む</button></div>
+<p class="small-warning">「この内容で申し込む」を押すと、指定したメールアドレスへ送信されます。</p>
+</div></div>
+
+<footer>© ２０２６ 図書手帳公式ホームページ</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+/* ===== EmailJS設定 ===== */
+const EMAILJS_PUBLIC_KEY = "aZpA2sQwoAVmga5wa";
+const EMAILJS_SERVICE_ID = "service_ezbs7ob";
+const EMAILJS_TEMPLATE_ID = "template_qurqdme";
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+</script>
+<script>
+/* ===== ここだけ変更すれば選択肢・画像を変更できます ===== */
+const CLASS_OPTIONS=["１組","２組","３組","４組","５組","６組"];
+const ATTENDANCE_MAX=40;
+const DESIGNS=[
+{name:"デザイン１",file:"design1.png"},{name:"デザイン２",file:"design2.png"},
+{name:"デザイン３",file:"design3.png"},{name:"デザイン４",file:"design4.png"},
+{name:"デザイン５",file:"design5.png"},{name:"デザイン６",file:"design6.png"},
+{name:"デザイン７",file:"design7.png"},{name:"デザイン８",file:"design8.png"}
+];
+/* ↑ design1.png～design8.pngを同じフォルダに置けば本物の画像に差し替えられます。 */
+
+const $=id=>document.getElementById(id);
+const menuBtn=$("menuBtn"),menu=$("menu"),overlay=$("overlay");
+function closeMenu(){menu.classList.remove("open");overlay.classList.remove("show");menuBtn.classList.remove("active")}
+menuBtn.addEventListener("click",()=>{const x=menu.classList.toggle("open");overlay.classList.toggle("show",x);menuBtn.classList.toggle("active",x)});
+overlay.addEventListener("click",closeMenu);
+
+
+/* ===== オフライン表示 ===== */
+const offlineOverlay=$("offlineOverlay");
+const updateNetworkState=()=>offlineOverlay.classList.toggle("show",!navigator.onLine);
+window.addEventListener("online",updateNetworkState);
+window.addEventListener("offline",updateNetworkState);
+$("reloadButton").addEventListener("click",()=>location.reload());
+updateNetworkState();
+
+/* 規約 */
+const rule=$("ruleContent"),agree=$("termsAgree"),start=$("startButton");let termsRead=false;
+rule.addEventListener("scroll",()=>{if(rule.scrollTop+rule.clientHeight>=rule.scrollHeight-5){termsRead=true;agree.disabled=false;start.disabled=!agree.checked}});
+agree.addEventListener("change",()=>start.disabled=!(termsRead&&agree.checked));
+start.addEventListener("click",()=>{$("formSection").classList.add("show");setTimeout(()=>$("formSection").scrollIntoView({behavior:"smooth",block:"start"}),50)});
+
+/* 選択肢 */
+CLASS_OPTIONS.forEach(v=>$("classNo").add(new Option(v,v)));
+for(let i=1;i<=ATTENDANCE_MAX;i++){const v=String(i).padStart(2,"０")+"番";$("attendance").add(new Option(v,v))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+DESIGNS.forEach(d=>{
+ const label=document.createElement("label");label.className="design-card";
+ label.innerHTML=`<input type="radio" name="質問７_色とデザイン" value="${esc(d.name)}"><div class="design-visual">
+ <img src="${esc(d.file)}" alt="${esc(d.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+ <div class="design-placeholder" style="display:none">${esc(d.name)}<br>画像枠</div><div class="design-name">${esc(d.name)}</div></div>`;
+ $("designGrid").appendChild(label);
+});
+
+/* 分岐 */
+function checked(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||""}
+function show(id,on){$(id).style.display=on?"block":"none";$(id).dataset.active=on?"1":"0"}
+function updateBranches(){
+ const g=$("grade").value,teacher=g==="教職員";
+ show("q2",teacher);show("q3",!!g&&!teacher);show("q4",!!g&&!teacher);
+ const t=checked("質問５_図書手帳の種類");
+ show("q6",teacher||t.includes("白鷗在籍中はずっと有効"));
+ const d=checked("質問８_お渡し方法");
+ show("q9",d==="Ｂ棟図書室のカウンター");show("q10",!!d);
+}
+$("grade").addEventListener("change",updateBranches);
+document.querySelectorAll('input[name="質問５_図書手帳の種類"],input[name="質問８_お渡し方法"]').forEach(x=>x.addEventListener("change",updateBranches));
+updateBranches();
+
+/* 文字数 */
+$("coverText").addEventListener("input",()=>{$("coverCount").textContent=`${$("coverText").value.length} / １３文字`});
+
+/* バリデーション */
+const val=id=>$(id).value.trim();
+function active(id){return $(id).dataset.active!=="0"}
+function error(msg){const e=$("formError");e.textContent=msg;e.classList.add("show");e.scrollIntoView({behavior:"smooth",block:"center"})}
+function validate(){
+ $("formError").classList.remove("show");
+ if(!val("grade")){error("学年を選択してください。");return false}
+ if(val("grade")==="教職員"){if(!val("name")){error("お名前を入力してください。");return false}}
+ else{if(!val("classNo")){error("組を選択してください。");return false}if(!val("attendance")){error("出席番号を選択してください。");return false}}
+ const t=checked("質問５_図書手帳の種類");if(!t){error("図書手帳の種類を選択してください。");return false}
+ if(active("q6")&&(!val("coverText")||$("coverText").value.length>13)){error("表紙に入れる文言は１３文字以内で入力してください。文言が無い場合は「（スペース）」と入力してください。");return false}
+ if(!checked("質問７_色とデザイン")){error("色とデザインを選択してください。");return false}
+ const d=checked("質問８_お渡し方法");if(!d){error("お渡し方法を選択してください。");return false}
+ if(active("q9")&&!val("issueDate")){error("発行希望日を入力してください。");return false}
+ if(active("q10")&&!val("customDesign")){error("特注ページのデザインを入力してください。");return false}
+ return true
+}
+
+/* 確認画面 */
+const form=$("applicationForm"),layer=$("confirmLayer"),panel=$("confirmPanel");
+$("confirmButton").addEventListener("click",()=>{
+ if(!validate())return;
+ const rows=[["利用規約への同意","同意済み"],["学年",val("grade")]];
+ if(active("q2"))rows.push(["名前",val("name")]);
+ if(active("q3"))rows.push(["組",val("classNo")]);
+ if(active("q4"))rows.push(["出席番号",val("attendance")]);
+ rows.push(["図書手帳の種類",checked("質問５_図書手帳の種類")]);
+ if(active("q6"))rows.push(["表紙に入れる文言",val("coverText")]);
+ rows.push(["色とデザイン",checked("質問７_色とデザイン")],["お渡し方法",checked("質問８_お渡し方法")]);
+ if(active("q9"))rows.push(["発行希望日",val("issueDate")]);
+ if(active("q10"))rows.push(["特注ページのデザイン",val("customDesign")]);
+ panel.innerHTML=rows.map(r=>`<div class="confirm-row"><div class="confirm-label">${esc(r[0])}</div><div class="confirm-value">${esc(r[1])}</div></div>`).join("");
+ layer.style.display="block";document.body.style.overflow="hidden";
+});
+$("layerBack").addEventListener("click",()=>{layer.style.display="none";document.body.style.overflow=""});
+
+/* ===== EmailJSでメール送信 =====
+   EmailJSのテンプレート側で送信先を
+   maoshimao52@gmail.com
+   2024025226@metro.ed.jp
+   の2件に設定してください。
+*/
+$("layerSubmit").addEventListener("click",async()=>{
+ const submitButton=$("layerSubmit");
+ if(EMAILJS_PUBLIC_KEY.includes("YOUR_")||EMAILJS_SERVICE_ID.includes("YOUR_")||EMAILJS_TEMPLATE_ID.includes("YOUR_")){
+  alert("EmailJSの設定がまだ完了していません。HTML内のEMAILJS_PUBLIC_KEY / EMAILJS_SERVICE_ID / EMAILJS_TEMPLATE_IDを設定してください。");
+  return;
+ }
+ layer.style.display="none";
+ document.body.style.overflow="";
+ form.style.display="none";
+ $("loading").classList.add("show");
+ submitButton.disabled=true;
+ try{
+  // 確認画面で表示した内容を1つのメール本文として送信
+  let applicationData=[];
+  panel.querySelectorAll(".confirm-row").forEach(row=>{
+   const label=row.querySelector(".confirm-label")?.textContent||"";
+   const value=row.querySelector(".confirm-value")?.textContent||"";
+   applicationData.push(label+"："+value);
+  });
+  const templateParams={
+   application_data:applicationData.join("\n\n"),
+   subject:"【図書手帳】発行申込"
+  };
+  await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,templateParams);
+  $("loading").classList.remove("show");
+  $("complete").classList.add("show");
+  window.scrollTo({top:$("formSection").offsetTop-90,behavior:"smooth"});
+ }catch(e){
+  console.error(e);
+  $("loading").classList.remove("show");
+  form.style.display="";
+  submitButton.disabled=false;
+  alert("送信に失敗しました。インターネット接続とEmailJSの設定を確認して、もう一度お試しください。");
+ }
+});
+</script>
+</body>
+</html>
