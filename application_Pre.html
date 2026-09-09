@@ -245,7 +245,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 </form>
 
 <div class="loading" id="loading"><div class="spinner"></div><strong>送信しています…</strong><p>そのままお待ちください。</p></div>
-<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">この画面が表示される前にページを閉じた場合、送信が完了していない可能性があります。</p><a class="complete-home-button" href="index.html">ホームへ戻る</a></div>
+<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">このページは閉じて構いません。</p><a class="complete-home-button" href="index.html">ホームへ戻る</a></div>
 </div></section>
 
 <div class="confirm-layer" id="confirmLayer">
@@ -253,7 +253,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 <div class="form-intro"><h2>入力内容の確認</h2><p>以下の内容で間違いがないか確認してください。</p></div>
 <div class="confirm-panel" id="confirmPanel"></div>
 <div class="nav-buttons"><button type="button" class="back-button" id="layerBack">入力画面に戻る</button><button type="button" class="submit-button" id="layerSubmit">この内容で申し込む</button></div>
-<p class="small-warning">「この内容で申し込む」を押すと、指定したメールアドレスへ送信されます。</p>
+<p class="small-warning">「この内容で申し込む」を押すと、入力内容が送信されます。</p>
 </div></div>
 
 <footer>© ２０２６ 図書手帳公式ホームページ</footer>
@@ -364,7 +364,8 @@ $("confirmButton").addEventListener("click",()=>{
  $("formSection").style.display="none";
 layer.style.display="block";
 document.body.style.overflow="";
-window.scrollTo({top:0,behavior:"smooth"});
+const confirmY=layer.getBoundingClientRect().top+window.scrollY-90;
+ window.scrollTo({top:Math.max(0,confirmY),behavior:"smooth"});
 });
 $("layerBack").addEventListener("click",()=>{
  layer.style.display="none";
@@ -412,7 +413,7 @@ $("layerSubmit").addEventListener("click",async()=>{
   $("loading").classList.remove("show");
   form.style.display="";
   submitButton.disabled=false;
-  alert("送信に失敗しました。インターネット接続とEmailJSの設定を確認して、もう一度お試しください。");
+  alert("送信に失敗しました。インターネット接続を確認して、もう一度お試しください。");
  }
 });
 </script>
