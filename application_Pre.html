@@ -46,7 +46,13 @@ input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{box-sh
 .design-visual{display:block;cursor:pointer;border:3px solid transparent;border-radius:15px;overflow:hidden;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.06);transition:.2s;text-align:center}
 .design-card:hover .design-visual{transform:translateY(-2px);box-shadow:0 7px 18px rgba(0,0,0,.10)}
 .design-card input:checked+.design-visual{border-color:#9a6b4f;box-shadow:0 0 0 3px rgba(154,107,79,.18)}
-.design-visual img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee}
+.design-visual img{
+    display:block;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    background:#eee;
+}
 .design-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:#999;font-weight:bold;background:#eee;line-height:1.6}
 .design-name{display:block;padding:10px;text-align:center;font-weight:bold;background:#fff}
 .error{color:#c62828;background:#fff1f1;border-radius:8px;padding:10px 13px;margin-top:12px;display:none}.error.show{display:block}
