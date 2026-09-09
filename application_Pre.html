@@ -40,25 +40,54 @@ textarea{min-height:180px;resize:vertical;line-height:1.7}
 input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(182,120,50,.18);background:#fff}
 .field-note{font-size:13px;color:#777;margin-top:7px}.radio-list{display:flex;flex-direction:column;gap:24px}
 .radio-item{display:flex;align-items:flex-start;gap:13px;cursor:pointer;font-size:18px;line-height:1.5}.radio-item input{margin-top:4px;width:22px;height:22px;accent-color:#B67832;flex:none}
-.design-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.design-card{position:relative;cursor:pointer}.design-card input{position:absolute;opacity:0;pointer-events:none}
-.design-visual{background:#F7F7F7;border:3px solid transparent;border-radius:12px;overflow:hidden;transition:.25s;text-align:center}.design-visual img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee}
+.design-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.design-card{position:relative;cursor:pointer}
+.design-card input{position:absolute;opacity:0;pointer-events:none}
+.design-visual{display:block;cursor:pointer;border:3px solid transparent;border-radius:15px;overflow:hidden;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.06);transition:.2s;text-align:center}
+.design-card:hover .design-visual{transform:translateY(-2px);box-shadow:0 7px 18px rgba(0,0,0,.10)}
+.design-card input:checked+.design-visual{border-color:#9a6b4f;box-shadow:0 0 0 3px rgba(154,107,79,.18)}
+.design-visual img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee}
 .design-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:#999;font-weight:bold;background:#eee;line-height:1.6}
-.design-name{padding:12px 8px;font-weight:bold;background:#fff}.design-card input:checked+.design-visual{border-color:#B67832;box-shadow:0 0 0 3px rgba(182,120,50,.15)}.design-card:hover .design-visual{transform:translateY(-2px)}
+.design-name{display:block;padding:10px;text-align:center;font-weight:bold;background:#fff}
 .error{color:#c62828;background:#fff1f1;border-radius:8px;padding:10px 13px;margin-top:12px;display:none}.error.show{display:block}
 .nav-buttons{text-align:center;margin:35px 0 15px}.confirm-panel{background:#FFFDF8;border:1px solid #E8D5BB;border-radius:14px;padding:22px;margin-bottom:25px}
 .confirm-row{display:grid;grid-template-columns:230px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid #eadfce}.confirm-row:last-child{border-bottom:0}.confirm-label{font-weight:bold;color:#8B5A2B}.confirm-value{white-space:pre-wrap;word-break:break-word}
 .back-button{background:#eee;color:#555;margin-right:10px}.back-button:hover{background:#e2e2e2;transform:translateY(-2px)}
 .loading{display:none;text-align:center;padding:35px}.loading.show{display:block}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:#B67832;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
-@keyframes spin{to{transform:rotate(360deg)}}.complete{display:none;text-align:center;padding:55px 25px}.complete.show{display:block;animation:sectionIn .5s ease}
-.complete-icon{width:78px;height:78px;border-radius:50%;background:#B67832;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px}.complete h2{color:#8B5A2B;margin-bottom:15px}
+@keyframes spin{to{transform:rotate(360deg)}}.complete{display:none;text-align:center;padding:50px 20px}
+.complete.show{display:block;animation:sectionIn .5s ease}
+.complete-icon{font-size:55px;margin-bottom:8px;color:#8f674f}
+.complete h2{font-size:30px;margin-bottom:10px;color:#333}
+.complete p{margin:6px 0}
+.complete-home-button{display:inline-block;margin-top:25px;min-width:210px;border:0;border-radius:999px;padding:14px 22px;background:#8f674f;color:#fff;text-decoration:none;font:inherit;font-weight:bold;cursor:pointer;transition:.2s}
+.complete-home-button:hover{transform:translateY(-2px);opacity:.92}
 .small-warning{font-size:13px;color:#777;margin-top:18px;line-height:1.7}#offlineOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:20px}#offlineOverlay.show{display:flex}.offline-card{width:min(520px,100%);background:#fff;border-radius:22px;padding:40px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}.offline-icon{font-size:58px;margin-bottom:12px}.offline-card h2{color:#8B5A2B;margin-bottom:12px}.offline-card p{line-height:1.8;margin-bottom:24px}.reload-button{border:0;border-radius:999px;background:#B67832;color:#fff;font:inherit;font-weight:bold;padding:15px 38px;cursor:pointer;box-shadow:0 8px 20px rgba(182,120,50,.25)}.reload-button:hover{transform:translateY(-2px)}
 footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-top:50px}
-.confirm-layer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:2000;overflow:auto;padding:30px 15px}.confirm-layer-inner{max-width:900px;margin:40px auto;background:#fff;border-radius:20px;padding:30px;box-shadow:0 15px 45px rgba(0,0,0,.2)}
+.confirm-layer{display:none;max-width:900px;margin:40px auto 70px;padding:38px;background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.confirm-layer-inner{max-width:100%;margin:0;padding:0}
+.confirm-layer .form-intro{text-align:center}
+.confirm-panel{border:1px solid #eaded5;border-radius:14px;overflow:hidden;background:#fff;margin:0 0 25px}
+.confirm-row{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid #eee3dc;padding:0}
+.confirm-row:last-child{border-bottom:0}
+.confirm-label{padding:13px 16px;background:#fff7f0;font-weight:bold;color:#333}
+.confirm-value{padding:13px 16px;white-space:pre-wrap;word-break:break-word}
+.confirm-layer .nav-buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.confirm-layer .nav-buttons button{min-width:210px;border:0;border-radius:999px;padding:14px 22px;font:inherit;font-weight:bold;cursor:pointer;transition:.2s}
+.confirm-layer .nav-buttons button:hover{transform:translateY(-2px)}
+.confirm-layer .back-button{background:#eee5df;color:#5f5148;margin-right:0}
+.confirm-layer #layerSubmit{background:#8f674f;color:#fff}
 @media(max-width:768px){
 .header{height:75px;padding:0 15px}.logo img{height:45px}.menu{width:260px}.page-title{font-size:30px;margin-top:105px}
 .rule-box,.form-wrap{margin:30px 15px;padding:20px}.rule-content{height:450px;padding:15px;font-size:14px}.agree-area{padding:0 15px}.agree-button{width:100%;font-size:16px}
 .question-title{font-size:19px}.question-head{padding:15px 14px 16px}.q-number{margin:-15px 0 10px -1px}.radio-list{gap:20px}.radio-item{font-size:17px}
-.design-grid{grid-template-columns:1fr;gap:20px}.confirm-row{grid-template-columns:1fr;gap:5px}.back-button,.submit-button{width:100%;margin:0 0 12px}
+.design-grid{grid-template-columns:1fr;gap:15px}
+.confirm-layer{margin:25px 15px 50px;padding:22px 15px;border-radius:16px}
+.confirm-row{grid-template-columns:1fr}
+.confirm-label{padding-bottom:5px}
+.confirm-value{padding-top:5px}
+.confirm-layer .nav-buttons{flex-direction:column-reverse}
+.confirm-layer .nav-buttons button{width:100%;min-width:0}
+.back-button,.submit-button{width:100%;margin:0 0 12px}
 }
 @media(min-width:769px) and (max-width:1050px){.design-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -216,7 +245,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 </form>
 
 <div class="loading" id="loading"><div class="spinner"></div><strong>送信しています…</strong><p>そのままお待ちください。</p></div>
-<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">この画面が表示される前にページを閉じた場合、送信が完了していない可能性があります。</p></div>
+<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">この画面が表示される前にページを閉じた場合、送信が完了していない可能性があります。</p><a class="complete-home-button" href="index.html">ホームへ戻る</a></div>
 </div></section>
 
 <div class="confirm-layer" id="confirmLayer">
@@ -239,7 +268,7 @@ emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 </script>
 <script>
 /* ===== ここだけ変更すれば選択肢・画像を変更できます ===== */
-const CLASS_OPTIONS=["１組","２組","３組","４組","５組","６組"];
+const CLASS_OPTIONS=["１組","２組","３組","４組","５組"];
 const ATTENDANCE_MAX=40;
 const DESIGNS=[
 {name:"デザイン１",file:"design1.png"},{name:"デザイン２",file:"design2.png"},
@@ -272,7 +301,7 @@ start.addEventListener("click",()=>{$("formSection").classList.add("show");setTi
 
 /* 選択肢 */
 CLASS_OPTIONS.forEach(v=>$("classNo").add(new Option(v,v)));
-for(let i=1;i<=ATTENDANCE_MAX;i++){const v=String(i).padStart(2,"０")+"番";$("attendance").add(new Option(v,v))}
+for(let i=1;i<=ATTENDANCE_MAX;i++){const v=String(i).replace(/[0-9]/g,c=>"０１２３４５６７８９"[Number(c)])+"番";$("attendance").add(new Option(v,v))}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 DESIGNS.forEach(d=>{
  const label=document.createElement("label");label.className="design-card";
@@ -332,9 +361,17 @@ $("confirmButton").addEventListener("click",()=>{
  if(active("q9"))rows.push(["発行希望日",val("issueDate")]);
  if(active("q10"))rows.push(["特注ページのデザイン",val("customDesign")]);
  panel.innerHTML=rows.map(r=>`<div class="confirm-row"><div class="confirm-label">${esc(r[0])}</div><div class="confirm-value">${esc(r[1])}</div></div>`).join("");
- layer.style.display="block";document.body.style.overflow="hidden";
+ $("formSection").style.display="none";
+layer.style.display="block";
+document.body.style.overflow="";
+window.scrollTo({top:0,behavior:"smooth"});
 });
-$("layerBack").addEventListener("click",()=>{layer.style.display="none";document.body.style.overflow=""});
+$("layerBack").addEventListener("click",()=>{
+ layer.style.display="none";
+ $("formSection").style.display="";
+ document.body.style.overflow="";
+ window.scrollTo({top:$("formSection").offsetTop-90,behavior:"smooth"});
+});
 
 /* ===== EmailJSでメール送信 =====
    EmailJSのテンプレート側で送信先を
@@ -350,6 +387,7 @@ $("layerSubmit").addEventListener("click",async()=>{
  }
  layer.style.display="none";
  document.body.style.overflow="";
+ $("formSection").style.display="";
  form.style.display="none";
  $("loading").classList.add("show");
  submitButton.disabled=true;
