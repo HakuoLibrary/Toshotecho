@@ -195,7 +195,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 <div class="question" id="q4"><div class="question-head"><div class="question-title">あなたの出席番号を選択してください。<span class="required">*</span></div><div class="question-desc">間違えないでください！</div></div>
 <div class="question-body"><select id="attendance" name="質問４_出席番号"><option value="">答えの選択</option></select></div></div>
 
-<div class="question"><div class="question-head"><div class="question-title">図書手帳の種類を選んでください。<span class="required">*</span></div>
+<div class="question" id="q5"><div class="question-head"><div class="question-title">図書手帳の種類を選んでください。<span class="required">*</span></div>
 <div class="question-desc">・「１年度のみ有効」は、従来通り学籍番号（４桁）がバーコードになっています。
 メリット：バーコードが小さい
 デメリット：進級・年度が変わると使えなくなる
@@ -248,6 +248,8 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
            rel="noopener noreferrer">こちらのフォーム</a>から送信してください。
 ・名前などの個人情報の掲載はおやめください。</div></div>
 <div class="question-body"><textarea id="customDesign" name="質問１０_特注ページのデザイン" placeholder="回答を入力してください。できるだけ詳しく書いてください。"></textarea></div></div>
+
+<div class="question" id="qPromo"><div class="question-head"><div class="question-title">プロモーションコードがあれば入力してください。</div><div class="question-desc">数字４桁のみ入力できます。入力しない場合は空欄のままで構いません。</div></div><div class="question-body"><input type="text" id="promoCode" name="プロモーションコード" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="４桁の数字を入力してください"><div class="field-note">半角数字４桁のみ入力できます。</div></div></div>
 
 <div class="nav-buttons"><button type="button" class="submit-button" id="confirmButton">入力内容を確認する</button></div>
 <div class="error" id="formError"></div>
@@ -326,12 +328,16 @@ function show(id,on){$(id).style.display=on?"block":"none";$(id).dataset.active=
 function updateBranches(){
  const g=$("grade").value,teacher=g==="教職員";
  show("q2",teacher);show("q3",!!g&&!teacher);show("q4",!!g&&!teacher);
+ show("q5",!!g&&!teacher);
  const t=checked("質問５_図書手帳の種類");
  show("q6",teacher||t.includes("白鷗在籍中はずっと有効"));
  const d=checked("質問８_お渡し方法");
- show("q9",d==="Ｂ棟図書室のカウンター");show("q10",!!d);
+ show("q9",d==="Ｂ棟図書室のカウンター");show("q10",!!d);show("qPromo",!!d);
 }
-$("grade").addEventListener("change",updateBranches);
+$("grade").addEventListener("change",()=>{
+ if($("grade").value==="教職員")document.querySelectorAll('input[name="質問５_図書手帳の種類"]').forEach(x=>x.checked=false);
+ updateBranches();
+});
 document.querySelectorAll('input[name="質問５_図書手帳の種類"],input[name="質問８_お渡し方法"]').forEach(x=>x.addEventListener("change",updateBranches));
 updateBranches();
 
@@ -347,28 +353,33 @@ function validate(){
  if(!val("grade")){error("学年を選択してください。");return false}
  if(val("grade")==="教職員"){if(!val("name")){error("お名前を入力してください。");return false}}
  else{if(!val("classNo")){error("組を選択してください。");return false}if(!val("attendance")){error("出席番号を選択してください。");return false}}
- const t=checked("質問５_図書手帳の種類");if(!t){error("図書手帳の種類を選択してください。");return false}
+ const t=checked("質問５_図書手帳の種類");if(val("grade")!=="教職員"&&!t){error("図書手帳の種類を選択してください。");return false}
  if(active("q6")&&(!val("coverText")||$("coverText").value.length>13)){error("表紙に入れる文言は１３文字以内で入力してください。文言が無い場合は「（スペース）」と入力してください。");return false}
  if(!checked("質問７_色とデザイン")){error("色とデザインを選択してください。");return false}
  const d=checked("質問８_お渡し方法");if(!d){error("お渡し方法を選択してください。");return false}
  if(active("q9")&&!val("issueDate")){error("発行希望日を入力してください。");return false}
  if(active("q10")&&!val("customDesign")){error("特注ページのデザインを入力してください。");return false}
+ if(val("promoCode")&&!/^\d{4}$/.test(val("promoCode"))){error("プロモーションコードは数字４桁で入力してください。");return false}
  return true
 }
 
 /* 確認画面 */
 const form=$("applicationForm"),layer=$("confirmLayer"),panel=$("confirmPanel");
+$("promoCode").addEventListener("input",()=>{
+ $("promoCode").value=$("promoCode").value.replace(/[^0-9]/g,"").slice(0,4);
+});
 $("confirmButton").addEventListener("click",()=>{
  if(!validate())return;
  const rows=[["利用規約への同意","同意済み"],["学年",val("grade")]];
  if(active("q2"))rows.push(["名前",val("name")]);
  if(active("q3"))rows.push(["組",val("classNo")]);
  if(active("q4"))rows.push(["出席番号",val("attendance")]);
- rows.push(["図書手帳の種類",checked("質問５_図書手帳の種類")]);
+ if(active("q5"))rows.push(["図書手帳の種類",checked("質問５_図書手帳の種類")]);
  if(active("q6"))rows.push(["表紙に入れる文言",val("coverText")]);
  rows.push(["色とデザイン",checked("質問７_色とデザイン")],["お渡し方法",checked("質問８_お渡し方法")]);
  if(active("q9"))rows.push(["発行希望日",val("issueDate")]);
  if(active("q10"))rows.push(["特注ページのデザイン",val("customDesign")]);
+ if(val("promoCode"))rows.push(["プロモーションコード",val("promoCode")]);
  panel.innerHTML=rows.map(r=>`<div class="confirm-row"><div class="confirm-label">${esc(r[0])}</div><div class="confirm-value">${esc(r[1])}</div></div>`).join("");
  $("formSection").style.display="none";
 layer.style.display="block";
