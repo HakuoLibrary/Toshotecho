@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>プロモーションコード｜図書手帳公式ホームページ</title>
+
+
+<style>
+
+/* =====================================================
+   基本
+===================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+
+  margin: 0;
+
+  padding:
+    0
+    14px
+    60px;
+
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8f9fb 0%,
+      #f1f3f6 100%
+    );
+
+  color: #292929;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    "Meiryo",
+    sans-serif;
+
+}
+
+
+/* =====================================================
+   ページ全体
+===================================================== */
+
+.page {
+
+  width: 100%;
+
+  max-width: 520px;
+
+  margin: 0 auto;
+
+}
+
+
+/* =====================================================
+   ヘッダー
+===================================================== */
+
+.header {
+
+  position: relative;
+
+  padding:
+    22px
+    4px
+    20px;
+
+}
+
+
+/* ホームボタン */
+
+.home-button {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding:
+    9px
+    14px;
+
+  border:
+    1px solid
+    rgba(0,0,0,.08);
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.88);
+
+  color: #444;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  text-decoration: none;
+
+  box-shadow:
+    0 3px 12px
+    rgba(0,0,0,.06);
+
+  transition:
+    transform .15s,
+    box-shadow .15s,
+    background .15s;
+
+}
+
+.home-button:hover {
+
+  background: #fff;
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 5px 16px
+    rgba(0,0,0,.10);
+
+}
+
+.home-button:active {
+
+  transform:
+    scale(.97);
+
+}
+
+
+/* 矢印 */
+
+.home-arrow {
+
+  font-size: 16px;
+
+  line-height: 1;
+
+}
+
+
+/* タイトル */
+
+.page-heading {
+
+  margin:
+    20px
+    0
+    5px;
+
+  font-size: 28px;
+
+  font-weight: 900;
+
+  letter-spacing:
+    -.5px;
+
+  color: #202020;
+
+}
+
+.page-subtitle {
+
+  margin: 0;
+
+  color: #888;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+}
+
+
+/* =====================================================
+   クーポン一覧
+===================================================== */
+
+#couponList {
+
+  width: 100%;
+
+}
+
+
+/* =====================================================
+   読み込み
+===================================================== */
+
+.loading {
+
+  padding:
+    60px
+    20px;
+
+  text-align: center;
+
+  color: #888;
+
+  font-size: 14px;
+
+}
+
+.loading-spinner {
+
+  width: 38px;
+
+  height: 38px;
+
+  margin:
+    0
+    auto
+    16px;
+
+  border:
+    3px solid
+    #e3e5e8;
+
+  border-top-color:
+    #e53935;
+
+  border-radius: 50%;
+
+  animation:
+    spin .8s linear infinite;
+
+}
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =====================================================
+   エラー
+===================================================== */
+
+.error {
+
+  padding:
+    28px
+    20px;
+
+  background: #fff;
+
+  border-radius: 18px;
+
+  text-align: center;
+
+  color: #c62828;
+
+  line-height: 1.8;
+
+  box-shadow:
+    0 8px 28px
+    rgba(0,0,0,.08);
+
+}
+
+.error-title {
+
+  margin-bottom: 8px;
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+}
+
+.error-detail {
+
+  margin-top: 12px;
+
+  color: #888;
+
+  font-size: 12px;
+
+}
+
+
+/* =====================================================
+   クーポンカード
+===================================================== */
+
+.coupon-card {
+
+  position: relative;
+
+  overflow: hidden;
+
+  margin-bottom: 14px;
+
+  background: #fff;
+
+  border:
+    1px solid
+    rgba(0,0,0,.045);
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(30,40,60,.09);
+
+}
+
+
+/* 使用可能カード */
+
+.coupon-card.active {
+
+  cursor: pointer;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+
+}
+
+.coupon-card.active:hover {
+
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 14px 34px
+    rgba(30,40,60,.14);
+
+}
+
+.coupon-card.active:active {
+
+  transform:
+    scale(.985);
+
+}
+
+
+/* 使用済み・期限切れ */
+
+.coupon-card.used,
+.coupon-card.expired {
+
+  opacity: .62;
+
+}
+
+
+/* =====================================================
+   画像
+===================================================== */
+
+.coupon-image {
+
+  position: relative;
+
+  width: 100%;
+
+  height: 205px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eeeeee,
+      #dddddd
+    );
+
+}
+
+.coupon-image::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.02),
+      rgba(0,0,0,.16)
+    );
+
+}
+
+.coupon-image img {
+
+  display: block;
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform .35s ease;
+
+}
+
+.coupon-card.active:hover
+.coupon-image img {
+
+  transform:
+    scale(1.035);
+
+}
+
+.coupon-card.used img,
+.coupon-card.expired img {
+
+  filter:
+    grayscale(100%);
+
+}
+
+.no-image {
+
+  display: flex;
+
+  width: 100%;
+
+  height: 100%;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #999;
+
+}
+
+
+/* =====================================================
+   ステータス
+===================================================== */
+
+.status {
+
+  position: absolute;
+
+  top: 13px;
+
+  right: 13px;
+
+  z-index: 2;
+
+  padding:
+    7px
+    13px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(25,25,25,.76);
+
+  backdrop-filter:
+    blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
+
+  color: #fff;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: .3px;
+
+}
+
+
+/* =====================================================
+   本文
+===================================================== */
+
+.coupon-body {
+
+  padding:
+    20px
+    20px
+    18px;
+
+}
+
+.coupon-title {
+
+  margin:
+    0
+    0
+    7px;
+
+  color: #222;
+
+  font-size: 22px;
+
+  font-weight: 900;
+
+  line-height: 1.4;
+
+  letter-spacing:
+    -.3px;
+
+}
+
+.coupon-description {
+
+  margin:
+    0
+    0
+    14px;
+
+  color: #666;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+}
+
+
+/* =====================================================
+   有効期限
+===================================================== */
+
+.coupon-info {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color: #999;
+
+  font-size: 12px;
+
+}
+
+.coupon-info strong {
+
+  color: #444;
+
+}
+
+
+/* =====================================================
+   利用条件
+===================================================== */
+
+.terms {
+
+  margin-top: 13px;
+
+  padding:
+    12px
+    14px;
+
+  background:
+    #f7f8fa;
+
+  border-radius: 10px;
+
+  color: #666;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+}
+
+.terms strong {
+
+  color: #444;
+
+}
+
+
+/* =====================================================
+   アクション
+===================================================== */
+
+.coupon-action {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-top: 17px;
+
+  padding-top: 15px;
+
+  border-top:
+    1px solid
+    #eeeeee;
+
+  color: #e53935;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  letter-spacing: .2px;
+
+}
+
+
+/* =====================================================
+   コード表示
+===================================================== */
+
+.code-area {
+
+  display: none;
+
+  margin:
+    -3px
+    0
+    16px;
+
+  padding:
+    27px
+    18px
+    25px;
+
+  background: #fff;
+
+  border-radius:
+    0
+    0
+    20px
+    20px;
+
+  text-align: center;
+
+  box-shadow:
+    0 8px 25px
+    rgba(30,40,60,.09);
+
+}
+
+.code-area.show {
+
+  display: block;
+
+  animation:
+    codeIn .22s ease-out;
+
+}
+
+@keyframes codeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(-7px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+.code-label {
+
+  margin-bottom: 11px;
+
+  color: #999;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: .5px;
+
+}
+
+.code {
+
+  display: inline-block;
+
+  min-width: 170px;
+
+  padding:
+    11px
+    20px;
+
+  border:
+    2px dashed;
+
+  border-radius: 10px;
+
+  background:
+    #fffafa;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 32px;
+
+  font-weight: 900;
+
+  letter-spacing: 7px;
+
+  line-height: 1.2;
+
+}
+
+.code-note {
+
+  margin:
+    14px
+    0
+    0;
+
+  color: #999;
+
+  font-size: 11px;
+
+  line-height: 1.6;
+
+}
+
+
+/* =====================================================
+   ダイアログ背景
+===================================================== */
+
+.overlay {
+
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  padding: 20px;
+
+  background:
+    rgba(15,18,25,.62);
+
+  backdrop-filter:
+    blur(5px);
+
+  -webkit-backdrop-filter:
+    blur(5px);
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+.overlay.show {
+
+  display: flex;
+
+}
+
+
+/* =====================================================
+   ダイアログ
+===================================================== */
+
+.dialog {
+
+  width:
+    min(100%, 380px);
+
+  padding:
+    30px
+    22px
+    21px;
+
+  background: #fff;
+
+  border-radius: 22px;
+
+  text-align: center;
+
+  box-shadow:
+    0 25px 70px
+    rgba(0,0,0,.28);
+
+  animation:
+    dialogIn .2s ease-out;
+
+}
+
+@keyframes dialogIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      scale(.94)
+      translateY(5px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      scale(1)
+      translateY(0);
+
+  }
+
+}
+
+
+/* ダイアログアイコン */
+
+.dialog-icon {
+
+  display: flex;
+
+  width: 52px;
+
+  height: 52px;
+
+  margin:
+    0
+    auto
+    15px;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff5b57,
+      #e53935
+    );
+
+  color: #fff;
+
+  font-size: 23px;
+
+  box-shadow:
+    0 7px 18px
+    rgba(229,57,53,.25);
+
+}
+
+.dialog h2 {
+
+  margin:
+    0
+    0
+    10px;
+
+  color: #222;
+
+  font-size: 20px;
+
+  font-weight: 900;
+
+  line-height: 1.5;
+
+}
+
+.dialog p {
+
+  margin:
+    0
+    0
+    25px;
+
+  color: #777;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+/* =====================================================
+   ボタン
+===================================================== */
+
+.buttons {
+
+  display: flex;
+
+  gap: 10px;
+
+}
+
+.buttons button {
+
+  flex: 1;
+
+  border: 0;
+
+  border-radius: 11px;
+
+  padding:
+    14px
+    10px;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .12s,
+    opacity .12s;
+
+}
+
+.buttons button:active {
+
+  transform:
+    scale(.97);
+
+}
+
+.btn-no {
+
+  background: #f0f1f3;
+
+  color: #555;
+
+}
+
+.btn-yes {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff5551,
+      #e53935
+    );
+
+  color: #fff;
+
+  box-shadow:
+    0 6px 15px
+    rgba(229,57,53,.22);
+
+}
+
+
+/* =====================================================
+   スマホ
+===================================================== */
+
+@media (max-width: 400px) {
+
+  body {
+
+    padding:
+      0
+      10px
+      40px;
+
+  }
+
+  .header {
+
+    padding:
+      17px
+      2px
+      17px;
+
+  }
+
+  .page-heading {
+
+    margin-top: 17px;
+
+    font-size: 25px;
+
+  }
+
+  .coupon-image {
+
+    height: 180px;
+
+  }
+
+  .coupon-body {
+
+    padding:
+      18px
+      17px
+      16px;
+
+  }
+
+  .coupon-title {
+
+    font-size: 20px;
+
+  }
+
+  .code {
+
+    min-width: 155px;
+
+    font-size: 28px;
+
+    letter-spacing: 5px;
+
+  }
+
+}
+
+
+/* =====================================================
+   小さい画面
+===================================================== */
+
+@media (max-width: 340px) {
+
+  .buttons {
+
+    gap: 7px;
+
+  }
+
+  .buttons button {
+
+    font-size: 13px;
+
+  }
+
+}
+
+
+/* =====================================================
+   図書手帳 共通デザイン追加
+   ※既存の機能・API・クーポン処理は変更しません
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+
+:root{
+  --tosho-bg:#FAEEDD;
+  --tosho-brown:#5b4636;
+  --tosho-accent:#8b6f58;
+  --tosho-white:rgba(255,255,255,.88);
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  padding:100px 20px 60px !important;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255,255,255,.72), transparent 30%),
+    linear-gradient(180deg,#FAEEDD 0%,#F7E4CF 100%) !important;
+  color:var(--tosho-brown) !important;
+  font-family:"やさしさゴシック","Kosugi Maru","Yu Gothic","Meiryo",sans-serif !important;
+}
+
+/* ヘッダー */
+.header{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  width:100% !important;
+  height:80px !important;
+  z-index:1000 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  padding:0 25px !important;
+  background:rgba(255,255,255,.72) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+  box-shadow:0 3px 18px rgba(91,70,54,.10) !important;
+}
+
+/* 左上：図書手帳アイコン */
+.header::before{
+  content:"";
+  display:block;
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+  background:url("icon.png") center/contain no-repeat;
+  cursor:pointer;
+  transition:transform .25s ease,filter .25s ease;
+}
+
+.header::before:hover{
+  transform:scale(1.07) rotate(-2deg);
+}
+
+/* 既存の「ホームへ戻る」はヘッダー上では非表示 */
+.home-button{
+  display:none !important;
+}
+
+/* 右上：三本線メニュー */
+.header::after{
+  content:"☰";
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  color:var(--tosho-brown);
+  font-size:31px;
+  line-height:1;
+  cursor:pointer;
+  border-radius:14px;
+  transition:transform .25s ease,background .25s ease;
+}
+
+.header::after:hover{
+  transform:scale(1.08);
+  background:rgba(139,111,88,.10);
+}
+
+/* タイトル部分 */
+.page-heading{
+  margin:25px 0 7px !important;
+  color:var(--tosho-brown) !important;
+  font-size:30px !important;
+  letter-spacing:.02em !important;
+  animation:toshoFadeUp .65s ease both;
+}
+
+.page-subtitle{
+  color:#8a7768 !important;
+  animation:toshoFadeUp .75s .05s ease both;
+}
+
+/* クーポン一覧 */
+#couponList{
+  animation:toshoFadeUp .8s .1s ease both;
+}
+
+/* カードを図書手帳らしく */
+.coupon-card{
+  background:rgba(255,255,255,.92) !important;
+  border:1px solid rgba(139,111,88,.10) !important;
+  border-radius:20px !important;
+  box-shadow:0 8px 25px rgba(91,70,54,.10) !important;
+  animation:toshoCardIn .55s ease both;
+  transition:transform .25s ease,box-shadow .25s ease !important;
+}
+
+.coupon-card.active:hover{
+  transform:translateY(-5px) !important;
+  box-shadow:0 16px 34px rgba(91,70,54,.16) !important;
+}
+
+.coupon-card.active:active{
+  transform:scale(.985) !important;
+}
+
+/* 画像 */
+.coupon-image{
+  background:linear-gradient(135deg,#f4e8dc,#ead8c6) !important;
+}
+
+.coupon-image img{
+  transition:transform .5s cubic-bezier(.2,.7,.2,1) !important;
+}
+
+.coupon-card.active:hover .coupon-image img{
+  transform:scale(1.045) !important;
+}
+
+/* 本文 */
+.coupon-title{
+  color:var(--tosho-brown) !important;
+}
+
+.coupon-description{
+  color:#75685e !important;
+}
+
+.coupon-info{
+  color:#9a8a7c !important;
+}
+
+.coupon-info strong{
+  color:#665447 !important;
+}
+
+.terms{
+  background:#fbf2e8 !important;
+  color:#76685e !important;
+}
+
+.terms strong{
+  color:#665447 !important;
+}
+
+.coupon-action{
+  color:#8b6f58 !important;
+  transition:letter-spacing .25s ease,transform .25s ease;
+}
+
+.coupon-card.active:hover .coupon-action{
+  letter-spacing:.5px;
+  transform:translateX(2px);
+}
+
+/* 読み込み */
+.loading{
+  color:#8a7768 !important;
+}
+
+.loading-spinner{
+  border-color:#ead8c6 !important;
+  border-top-color:#8b6f58 !important;
+}
+
+/* エラー */
+.error{
+  color:#795548 !important;
+  background:rgba(255,255,255,.92) !important;
+  box-shadow:0 8px 28px rgba(91,70,54,.10) !important;
+}
+
+.error-title{
+  color:#6d5140 !important;
+}
+
+/* コード表示 */
+.code-area{
+  background:rgba(255,255,255,.94) !important;
+  box-shadow:0 8px 25px rgba(91,70,54,.10) !important;
+}
+
+.code{
+  background:#fffaf4 !important;
+}
+
+/* ダイアログ */
+.overlay{
+  background:rgba(74,57,44,.55) !important;
+  backdrop-filter:blur(7px) !important;
+  -webkit-backdrop-filter:blur(7px) !important;
+}
+
+.dialog{
+  border:1px solid rgba(139,111,88,.10);
+  box-shadow:0 25px 70px rgba(74,57,44,.25) !important;
+  animation:toshoDialogIn .3s cubic-bezier(.2,.8,.2,1) both !important;
+}
+
+.dialog-icon{
+  background:linear-gradient(135deg,#a58a70,#80654f) !important;
+  box-shadow:0 7px 18px rgba(91,70,54,.20) !important;
+}
+
+.btn-no{
+  background:#f2e8df !important;
+  color:#6d5a4b !important;
+}
+
+.btn-yes{
+  background:linear-gradient(135deg,#a58a70,#80654f) !important;
+  box-shadow:0 6px 15px rgba(91,70,54,.20) !important;
+}
+
+/* 登場アニメーション */
+@keyframes toshoFadeUp{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes toshoCardIn{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes toshoDialogIn{
+  from{opacity:0;transform:scale(.94) translateY(10px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+
+/* スマホ */
+@media (max-width:400px){
+  body{
+    padding:92px 12px 40px !important;
+  }
+
+  .header{
+    height:72px !important;
+    padding:0 16px !important;
+  }
+
+  .header::before{
+    width:46px;
+    height:46px;
+    flex-basis:46px;
+  }
+
+  .header::after{
+    width:44px;
+    height:44px;
+    font-size:29px;
+  }
+
+  .page-heading{
+    font-size:26px !important;
+  }
+}
+
+</style>
+
+
+<style id="tosho-menu-style">
+#toshoMenuOverlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1998;
+  background:rgba(60,45,35,.28);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  opacity:0;
+  transition:opacity .25s ease;
+}
+#toshoMenu{
+  position:fixed;
+  top:0;
+  right:0;
+  z-index:1999;
+  width:min(330px,88vw);
+  min-height:100vh;
+  padding:95px 25px 35px;
+  background:rgba(255,250,244,.97);
+  box-shadow:-10px 0 35px rgba(70,52,40,.18);
+  transform:translateX(105%);
+  transition:transform .32s cubic-bezier(.2,.8,.2,1);
+}
+#toshoMenu.open{
+  transform:translateX(0);
+}
+#toshoMenuOverlay.open{
+  display:block;
+  opacity:1;
+}
+#toshoMenu a{
+  display:block;
+  padding:17px 10px;
+  border-bottom:1px solid rgba(139,111,88,.14);
+  color:#5b4636;
+  text-decoration:none;
+  font-weight:700;
+  font-size:15px;
+  transition:padding-left .2s ease,background .2s ease;
+}
+#toshoMenu a:hover{
+  padding-left:18px;
+  background:rgba(139,111,88,.07);
+}
+#toshoMenuClose{
+  position:absolute;
+  top:20px;
+  right:20px;
+  width:48px;
+  height:48px;
+  border:0;
+  background:transparent;
+  color:#5b4636;
+  font-size:38px;
+  line-height:1;
+  cursor:pointer;
+  transition:transform .25s ease;
+}
+#toshoMenuClose:hover{
+  transform:rotate(90deg);
+}
+</style>
+
+</head>
+
+
+<body>
+
+<div id="toshoMenuOverlay" aria-hidden="true"></div>
+<nav id="toshoMenu" aria-label="メニュー">
+  <button type="button" id="toshoMenuClose" aria-label="メニューを閉じる">×</button>
+  <a href="index.html">HOME</a>
+  <a href="application.html">申し込み</a>
+  <a href="features.html">特徴</a>
+  <a href="mutter.html">かもめんのつぶやき</a>
+  <a href="tool.html">お役立ちツール</a>
+  <a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener">蔵書検索（Ａ・Ｂ棟共通）</a>
+</nav>
+
+
+
+<div class="page">
+
+
+  <!-- =================================================
+       ヘッダー
+  ================================================== -->
+
+  <header class="header">
+
+
+    <!-- ★ 同じフォルダのindex.htmlへ戻る -->
+
+    <a
+      href="./index.html"
+      class="home-button"
+    >
+
+      <span class="home-arrow">
+        ←
+      </span>
+
+      ホームへ戻る
+
+    </a>
+
+
+    <h1 class="page-heading">
+      クーポン
+    </h1>
+
+    <p class="page-subtitle">
+      プロモーションコードを発行申し込みフォームに入力してご利用ください
+    </p>
+
+
+  </header>
+
+
+  <!-- =================================================
+       クーポン一覧
+  ================================================== -->
+
+  <div id="couponList">
+
+    <div class="loading">
+
+      <div class="loading-spinner"></div>
+
+      プロモーションコードを読み込んでいます…
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     開封確認ダイアログ
+===================================================== -->
+
+<div
+  id="overlay"
+  class="overlay"
+>
+
+
+  <div class="dialog">
+
+
+    <div class="dialog-icon">
+      %
+    </div>
+
+
+    <h2>
+      プロモーションコードを<br>
+      開封しますか？
+    </h2>
+
+
+    <p>
+      「はい」を押すと<br>
+      プロモーションコードが表示されます。
+    </p>
+
+
+    <div class="buttons">
+
+
+      <button
+        type="button"
+        class="btn-no"
+        onclick="closeDialog()"
+      >
+        いいえ
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-yes"
+        onclick="showCode()"
+      >
+        はい
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   ★ Apps Script API
+===================================================== */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbzg87Ue0-61IiRgYOUOaZo5fn1zYhSBBoBEbNLEVQX8MxMUaVBCoFNaUVSkiMHSuaqDEQ/exec";
+
+
+/* =====================================================
+   変数
+===================================================== */
+
+let coupons = [];
+
+let selectedCoupon = null;
+
+
+/* =====================================================
+   クーポン読み込み
+===================================================== */
+
+async function loadCoupons() {
+
+  const container =
+    document.getElementById(
+      "couponList"
+    );
+
+
+  try {
+
+
+    const response =
+      await fetch(
+        API_URL +
+        "?t=" +
+        Date.now(),
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.error ||
+        "Apps Script側でエラーが発生しました。"
+      );
+
+    }
+
+
+    coupons =
+      Array.isArray(
+        data.coupons
+      )
+        ? data.coupons
+        : [];
+
+
+    createCoupons();
+
+
+  }
+
+  catch (error) {
+
+
+    console.error(
+      "クーポン取得エラー:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div class="error">
+
+        <div class="error-title">
+          プロモーションコードを読み込めませんでした
+        </div>
+
+        <div>
+          プロモーションコードデータを取得できませんでした。
+        </div>
+
+        <div class="error-detail">
+          ページを再読み込みしてください。
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =====================================================
+   クーポンカード生成
+===================================================== */
+
+function createCoupons() {
+
+  const container =
+    document.getElementById(
+      "couponList"
+    );
+
+
+  container.innerHTML = "";
+
+
+  if (
+    coupons.length === 0
+  ) {
+
+    container.innerHTML = `
+
+      <div class="error">
+
+        <div class="error-title">
+          現在、プロモーションコードはありません
+        </div>
+
+        <div class="error-detail">
+          新しいプロモーションコードをお待ちください。
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  coupons.forEach(
+    function(coupon) {
+
+
+      /* -------------------------
+         状態
+      ------------------------- */
+
+      const used =
+        isUsed(
+          coupon.used
+        );
+
+
+      const expired =
+        isExpired(
+          coupon.expires
+        );
+
+
+      let state = "";
+
+
+      if (used) {
+
+        state = "used";
+
+      }
+
+      else if (expired) {
+
+        state = "expired";
+
+      }
+
+
+      /* -------------------------
+         カード
+      ------------------------- */
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "coupon-card " +
+        state;
+
+
+      /* -------------------------
+         ステータス
+      ------------------------- */
+
+      let statusHTML = "";
+
+
+      if (used) {
+
+        statusHTML = `
+
+          <div class="status">
+            使用済み
+          </div>
+
+        `;
+
+      }
+
+      else if (expired) {
+
+        statusHTML = `
+
+          <div class="status">
+            期限切れ
+          </div>
+
+        `;
+
+      }
+
+
+      /* -------------------------
+         画像
+      ------------------------- */
+
+      let imageHTML = "";
+
+
+      if (
+        coupon.image
+      ) {
+
+        imageHTML = `
+
+          <img
+            src="${escapeHTML(
+              coupon.image
+            )}"
+            alt="${escapeHTML(
+              coupon.title
+            )}"
+            loading="lazy"
+
+            onerror="
+              this.style.display='none';
+              this.nextElementSibling.style.display='flex';
+            "
+          >
+
+          <div
+            class="no-image"
+            style="display:none;"
+          >
+            画像を表示できません
+          </div>
+
+        `;
+
+      }
+
+      else {
+
+        imageHTML = `
+
+          <div class="no-image">
+            クーポン画像
+          </div>
+
+        `;
+
+      }
+
+
+      /* -------------------------
+         説明文
+      ------------------------- */
+
+      let descriptionHTML = "";
+
+
+      if (
+        coupon.description
+      ) {
+
+        descriptionHTML = `
+
+          <p class="coupon-description">
+
+            ${escapeHTML(
+              coupon.description
+            )}
+
+          </p>
+
+        `;
+
+      }
+
+
+      /* -------------------------
+         利用条件
+      ------------------------- */
+
+      let termsHTML = "";
+
+
+      if (
+        coupon.terms
+      ) {
+
+        termsHTML = `
+
+          <div class="terms">
+
+            <strong>
+              利用条件
+            </strong>
+
+            <br>
+
+            ${escapeHTML(
+              coupon.terms
+            )}
+
+          </div>
+
+        `;
+
+      }
+
+
+      /* -------------------------
+         カードHTML
+      ------------------------- */
+
+      card.innerHTML = `
+
+        <div class="coupon-image">
+
+          ${imageHTML}
+
+          ${statusHTML}
+
+        </div>
+
+
+        <div class="coupon-body">
+
+
+          <h2 class="coupon-title">
+
+            ${escapeHTML(
+              coupon.title
+            )}
+
+          </h2>
+
+
+          ${descriptionHTML}
+
+
+          <div class="coupon-info">
+
+            <span>
+              有効期限：
+            </span>
+
+            <strong>
+
+              ${escapeHTML(
+                formatDate(
+                  coupon.expires
+                )
+              )}
+
+            </strong>
+
+          </div>
+
+
+          ${termsHTML}
+
+
+          <div class="coupon-action">
+
+            ${
+              used
+
+              ? "このクーポンは使用済みです"
+
+              : expired
+
+              ? "このクーポンは期限切れです"
+
+              : "タップしてコードを開封  ›"
+            }
+
+          </div>
+
+
+        </div>
+
+      `;
+
+
+      /* -------------------------
+         コードエリア
+      ------------------------- */
+
+      const codeArea =
+        document.createElement(
+          "div"
+        );
+
+
+      codeArea.className =
+        "code-area";
+
+
+      const color =
+        isValidColor(
+          coupon.color
+        )
+          ? coupon.color
+          : "#e53935";
+
+
+      codeArea.innerHTML = `
+
+        <div class="code-label">
+          PROMOTION CODE
+        </div>
+
+
+        <div
+          class="code"
+
+          style="
+            color:${escapeHTML(
+              color
+            )};
+
+            border-color:${escapeHTML(
+              color
+            )};
+          "
+        >
+
+          ${escapeHTML(
+            coupon.code
+          )}
+
+        </div>
+
+
+        <p class="code-note">
+
+          こちらのコードを発行申し込みフォームに入力してご利用ください。
+
+        </p>
+
+      `;
+
+
+      /* -------------------------
+         クリック処理
+      ------------------------- */
+
+      if (
+        !used &&
+        !expired
+      ) {
+
+
+        card.classList.add(
+          "active"
+        );
+
+
+        card.addEventListener(
+          "click",
+          function() {
+
+
+            selectedCoupon = {
+
+              coupon:
+                coupon,
+
+              codeArea:
+                codeArea
+
+            };
+
+
+            openDialog();
+
+
+          }
+        );
+
+      }
+
+
+      /* -------------------------
+         追加
+      ------------------------- */
+
+      container.appendChild(
+        card
+      );
+
+
+      container.appendChild(
+        codeArea
+      );
+
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   使用済み判定
+===================================================== */
+
+function isUsed(value) {
+
+  const text =
+    String(
+      value ?? ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  return (
+
+    text === "true" ||
+
+    text === "1" ||
+
+    text === "yes" ||
+
+    text === "used" ||
+
+    text === "使用済み"
+
+  );
+
+}
+
+
+/* =====================================================
+   有効期限
+===================================================== */
+
+function isExpired(value) {
+
+  if (!value) {
+
+    return true;
+
+  }
+
+
+  const text =
+    String(
+      value
+    ).trim();
+
+
+  const match =
+    text.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+    );
+
+
+  if (match) {
+
+
+    const expiration =
+      new Date(
+
+        Number(match[1]),
+
+        Number(match[2]) - 1,
+
+        Number(match[3]),
+
+        23,
+        59,
+        59,
+        999
+
+      );
+
+
+    return (
+      new Date() >
+      expiration
+    );
+
+  }
+
+
+  const date =
+    new Date(
+      text
+    );
+
+
+  if (
+    isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return true;
+
+  }
+
+
+  date.setHours(
+    23,
+    59,
+    59,
+    999
+  );
+
+
+  return (
+    new Date() >
+    date
+  );
+
+}
+
+
+/* =====================================================
+   日付表示
+===================================================== */
+
+function formatDate(value) {
+
+  if (!value) {
+
+    return "未設定";
+
+  }
+
+
+  const text =
+    String(
+      value
+    ).trim();
+
+
+  const match =
+    text.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+    );
+
+
+  if (match) {
+
+    return (
+
+      Number(match[1]) +
+      "年" +
+
+      Number(match[2]) +
+      "月" +
+
+      Number(match[3]) +
+      "日"
+
+    );
+
+  }
+
+
+  const date =
+    new Date(
+      text
+    );
+
+
+  if (
+    isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return text;
+
+  }
+
+
+  return (
+
+    date.getFullYear() +
+    "年" +
+
+    (
+      date.getMonth() + 1
+    ) +
+    "月" +
+
+    date.getDate() +
+    "日"
+
+  );
+
+}
+
+
+/* =====================================================
+   ダイアログ
+===================================================== */
+
+function openDialog() {
+
+  document
+    .getElementById(
+      "overlay"
+    )
+    .classList.add(
+      "show"
+    );
+
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeDialog() {
+
+  document
+    .getElementById(
+      "overlay"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  document.body.style.overflow =
+    "";
+
+
+  selectedCoupon =
+    null;
+
+}
+
+
+function showCode() {
+
+  if (
+    !selectedCoupon
+  ) {
+
+    return;
+
+  }
+
+
+  const codeArea =
+    selectedCoupon.codeArea;
+
+
+  codeArea.classList.add(
+    "show"
+  );
+
+
+  document
+    .getElementById(
+      "overlay"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  document.body.style.overflow =
+    "";
+
+
+  setTimeout(
+    function() {
+
+      codeArea.scrollIntoView({
+
+        behavior:
+          "smooth",
+
+        block:
+          "center"
+
+      });
+
+    },
+    100
+  );
+
+
+  selectedCoupon =
+    null;
+
+}
+
+
+/* =====================================================
+   背景クリック
+===================================================== */
+
+document
+  .getElementById(
+    "overlay"
+  )
+  .addEventListener(
+    "click",
+    function(event) {
+
+      if (
+        event.target === this
+      ) {
+
+        closeDialog();
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   ESCキー
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Escape"
+    ) {
+
+      closeDialog();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   色チェック
+===================================================== */
+
+function isValidColor(value) {
+
+  if (!value) {
+
+    return false;
+
+  }
+
+
+  const color =
+    String(
+      value
+    ).trim();
+
+
+  return (
+
+    /^#[0-9a-fA-F]{3,8}$/
+      .test(color)
+
+    ||
+
+    /^rgba?\(/i
+      .test(color)
+
+  );
+
+}
+
+
+/* =====================================================
+   HTMLエスケープ
+===================================================== */
+
+function escapeHTML(value) {
+
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =====================================================
+   開始
+===================================================== */
+
+loadCoupons();
+
+
+/* =====================================================
+   図書手帳 共通メニュー
+   ===================================================== */
+(function(){
+  const header = document.querySelector(".header");
+  const menu = document.getElementById("toshoMenu");
+  const overlay = document.getElementById("toshoMenuOverlay");
+  const close = document.getElementById("toshoMenuClose");
+
+  if(!header || !menu || !overlay || !close) return;
+
+  const openMenu = () => {
+    menu.classList.add("open");
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeMenu = () => {
+    menu.classList.remove("open");
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  };
+
+  header.addEventListener("click", function(e){
+    const rect = header.getBoundingClientRect();
+    if(e.clientX >= rect.right - 90){
+      openMenu();
+    }
+  });
+
+  close.addEventListener("click", closeMenu);
+  overlay.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") closeMenu();
+  });
+})();
+
+</script>
+
+
+</body>
+</html>
