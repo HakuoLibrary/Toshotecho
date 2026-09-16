@@ -11,6 +11,8 @@
 
 <title>プロモーションコード｜図書手帳公式ホームページ</title>
 
+<!-- タブアイコン -->
+<link rel="icon" type="image/png" href="./favicon.png">
 
 <style>
 
@@ -1085,6 +1087,7 @@ body {
 
   }
 
+
 }
 
 
@@ -1115,7 +1118,11 @@ body{
   font-family:"やさしさゴシック","Kosugi Maru","Yu Gothic","Meiryo",sans-serif !important;
 }
 
-/* ヘッダー */
+
+/* =====================================================
+   ヘッダー
+===================================================== */
+
 .header{
   position:fixed !important;
   top:0 !important;
@@ -1133,14 +1140,19 @@ body{
   box-shadow:0 3px 18px rgba(91,70,54,.10) !important;
 }
 
-/* 左上：図書手帳アイコン */
+
+/* =====================================================
+   左上：図書手帳アイコン
+   ★ 52px → 64px に拡大
+===================================================== */
+
 .header::before{
   content:"";
   display:block;
-  width:52px;
-  height:52px;
-  flex:0 0 52px;
-  background:url("icon.png") center/contain no-repeat;
+  width:64px;
+  height:64px;
+  flex:0 0 64px;
+  background:url("./icon.png") center/contain no-repeat;
   cursor:pointer;
   transition:transform .25s ease,filter .25s ease;
 }
@@ -1149,12 +1161,18 @@ body{
   transform:scale(1.07) rotate(-2deg);
 }
 
+
 /* 既存の「ホームへ戻る」はヘッダー上では非表示 */
+
 .home-button{
   display:none !important;
 }
 
-/* 右上：三本線メニュー */
+
+/* =====================================================
+   右上：三本線メニュー
+===================================================== */
+
 .header::after{
   content:"☰";
   display:flex;
@@ -1175,7 +1193,11 @@ body{
   background:rgba(139,111,88,.10);
 }
 
-/* タイトル部分 */
+
+/* =====================================================
+   タイトル部分
+===================================================== */
+
 .page-heading{
   margin:25px 0 7px !important;
   color:var(--tosho-brown) !important;
@@ -1189,12 +1211,20 @@ body{
   animation:toshoFadeUp .75s .05s ease both;
 }
 
-/* クーポン一覧 */
+
+/* =====================================================
+   クーポン一覧
+===================================================== */
+
 #couponList{
   animation:toshoFadeUp .8s .1s ease both;
 }
 
-/* カードを図書手帳らしく */
+
+/* =====================================================
+   カードを図書手帳らしく
+===================================================== */
+
 .coupon-card{
   background:rgba(255,255,255,.92) !important;
   border:1px solid rgba(139,111,88,.10) !important;
@@ -1213,7 +1243,11 @@ body{
   transform:scale(.985) !important;
 }
 
-/* 画像 */
+
+/* =====================================================
+   画像
+===================================================== */
+
 .coupon-image{
   background:linear-gradient(135deg,#f4e8dc,#ead8c6) !important;
 }
@@ -1226,7 +1260,11 @@ body{
   transform:scale(1.045) !important;
 }
 
-/* 本文 */
+
+/* =====================================================
+   本文
+===================================================== */
+
 .coupon-title{
   color:var(--tosho-brown) !important;
 }
@@ -1262,7 +1300,11 @@ body{
   transform:translateX(2px);
 }
 
-/* 読み込み */
+
+/* =====================================================
+   読み込み
+===================================================== */
+
 .loading{
   color:#8a7768 !important;
 }
@@ -1272,7 +1314,11 @@ body{
   border-top-color:#8b6f58 !important;
 }
 
-/* エラー */
+
+/* =====================================================
+   エラー
+===================================================== */
+
 .error{
   color:#795548 !important;
   background:rgba(255,255,255,.92) !important;
@@ -1283,7 +1329,11 @@ body{
   color:#6d5140 !important;
 }
 
-/* コード表示 */
+
+/* =====================================================
+   コード表示
+===================================================== */
+
 .code-area{
   background:rgba(255,255,255,.94) !important;
   box-shadow:0 8px 25px rgba(91,70,54,.10) !important;
@@ -1293,7 +1343,11 @@ body{
   background:#fffaf4 !important;
 }
 
-/* ダイアログ */
+
+/* =====================================================
+   ダイアログ
+===================================================== */
+
 .overlay{
   background:rgba(74,57,44,.55) !important;
   backdrop-filter:blur(7px) !important;
@@ -1321,24 +1375,52 @@ body{
   box-shadow:0 6px 15px rgba(91,70,54,.20) !important;
 }
 
-/* 登場アニメーション */
+
+/* =====================================================
+   登場アニメーション
+===================================================== */
+
 @keyframes toshoFadeUp{
-  from{opacity:0;transform:translateY(16px);}
-  to{opacity:1;transform:translateY(0);}
+  from{
+    opacity:0;
+    transform:translateY(16px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 @keyframes toshoCardIn{
-  from{opacity:0;transform:translateY(18px);}
-  to{opacity:1;transform:translateY(0);}
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 @keyframes toshoDialogIn{
-  from{opacity:0;transform:scale(.94) translateY(10px);}
-  to{opacity:1;transform:scale(1) translateY(0);}
+  from{
+    opacity:0;
+    transform:scale(.94) translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
 }
 
-/* スマホ */
+
+/* =====================================================
+   スマホ
+   ★ 46px → 56px に拡大
+===================================================== */
+
 @media (max-width:400px){
+
   body{
     padding:92px 12px 40px !important;
   }
@@ -1349,9 +1431,9 @@ body{
   }
 
   .header::before{
-    width:46px;
-    height:46px;
-    flex-basis:46px;
+    width:56px;
+    height:56px;
+    flex-basis:56px;
   }
 
   .header::after{
@@ -1363,12 +1445,14 @@ body{
   .page-heading{
     font-size:26px !important;
   }
+
 }
 
-</style>
 
+/* =====================================================
+   メニュー
+===================================================== */
 
-<style id="tosho-menu-style">
 #toshoMenuOverlay{
   display:none;
   position:fixed;
@@ -1380,6 +1464,7 @@ body{
   opacity:0;
   transition:opacity .25s ease;
 }
+
 #toshoMenu{
   position:fixed;
   top:0;
@@ -1393,13 +1478,16 @@ body{
   transform:translateX(105%);
   transition:transform .32s cubic-bezier(.2,.8,.2,1);
 }
+
 #toshoMenu.open{
   transform:translateX(0);
 }
+
 #toshoMenuOverlay.open{
   display:block;
   opacity:1;
 }
+
 #toshoMenu a{
   display:block;
   padding:17px 10px;
@@ -1410,10 +1498,12 @@ body{
   font-size:15px;
   transition:padding-left .2s ease,background .2s ease;
 }
+
 #toshoMenu a:hover{
   padding-left:18px;
   background:rgba(139,111,88,.07);
 }
+
 #toshoMenuClose{
   position:absolute;
   top:20px;
@@ -1428,9 +1518,11 @@ body{
   cursor:pointer;
   transition:transform .25s ease;
 }
+
 #toshoMenuClose:hover{
   transform:rotate(90deg);
 }
+
 </style>
 
 </head>
@@ -1439,16 +1531,46 @@ body{
 <body>
 
 <div id="toshoMenuOverlay" aria-hidden="true"></div>
-<nav id="toshoMenu" aria-label="メニュー">
-  <button type="button" id="toshoMenuClose" aria-label="メニューを閉じる">×</button>
-  <a href="index.html">HOME</a>
-  <a href="application.html">申し込み</a>
-  <a href="features.html">特徴</a>
-  <a href="mutter.html">かもめんのつぶやき</a>
-  <a href="tool.html">お役立ちツール</a>
-  <a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener">蔵書検索（Ａ・Ｂ棟共通）</a>
-</nav>
 
+<nav id="toshoMenu" aria-label="メニュー">
+
+  <button
+    type="button"
+    id="toshoMenuClose"
+    aria-label="メニューを閉じる"
+  >
+    ×
+  </button>
+
+  <a href="index.html">
+    HOME
+  </a>
+
+  <a href="application.html">
+    申し込み
+  </a>
+
+  <a href="features.html">
+    特徴
+  </a>
+
+  <a href="mutter.html">
+    かもめんのつぶやき
+  </a>
+
+  <a href="tool.html">
+    お役立ちツール
+  </a>
+
+  <a
+    href="https://lib-finder.net/hakuo/"
+    target="_blank"
+    rel="noopener"
+  >
+    蔵書検索（Ａ・Ｂ棟共通）
+  </a>
+
+</nav>
 
 
 <div class="page">
@@ -1518,7 +1640,6 @@ body{
   class="overlay"
 >
 
-
   <div class="dialog">
 
 
@@ -1564,7 +1685,6 @@ body{
 
 
   </div>
-
 
 </div>
 
@@ -2532,42 +2652,133 @@ loadCoupons();
 
 /* =====================================================
    図書手帳 共通メニュー
-   ===================================================== */
-(function(){
-  const header = document.querySelector(".header");
-  const menu = document.getElementById("toshoMenu");
-  const overlay = document.getElementById("toshoMenuOverlay");
-  const close = document.getElementById("toshoMenuClose");
+===================================================== */
 
-  if(!header || !menu || !overlay || !close) return;
+(function(){
+
+  const header =
+    document.querySelector(
+      ".header"
+    );
+
+  const menu =
+    document.getElementById(
+      "toshoMenu"
+    );
+
+  const overlay =
+    document.getElementById(
+      "toshoMenuOverlay"
+    );
+
+  const close =
+    document.getElementById(
+      "toshoMenuClose"
+    );
+
+
+  if(
+    !header ||
+    !menu ||
+    !overlay ||
+    !close
+  ){
+
+    return;
+
+  }
+
 
   const openMenu = () => {
-    menu.classList.add("open");
-    overlay.classList.add("open");
-    overlay.setAttribute("aria-hidden","false");
-    document.body.style.overflow = "hidden";
+
+    menu.classList.add(
+      "open"
+    );
+
+    overlay.classList.add(
+      "open"
+    );
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    document.body.style.overflow =
+      "hidden";
+
   };
+
 
   const closeMenu = () => {
-    menu.classList.remove("open");
-    overlay.classList.remove("open");
-    overlay.setAttribute("aria-hidden","true");
-    document.body.style.overflow = "";
+
+    menu.classList.remove(
+      "open"
+    );
+
+    overlay.classList.remove(
+      "open"
+    );
+
+    overlay.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    document.body.style.overflow =
+      "";
+
   };
 
-  header.addEventListener("click", function(e){
-    const rect = header.getBoundingClientRect();
-    if(e.clientX >= rect.right - 90){
-      openMenu();
+
+  header.addEventListener(
+    "click",
+    function(e){
+
+      const rect =
+        header.getBoundingClientRect();
+
+
+      if(
+        e.clientX >=
+        rect.right - 90
+      ){
+
+        openMenu();
+
+      }
+
     }
-  });
+  );
 
-  close.addEventListener("click", closeMenu);
-  overlay.addEventListener("click", closeMenu);
 
-  document.addEventListener("keydown", function(e){
-    if(e.key === "Escape") closeMenu();
-  });
+  close.addEventListener(
+    "click",
+    closeMenu
+  );
+
+
+  overlay.addEventListener(
+    "click",
+    closeMenu
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    function(e){
+
+      if(
+        e.key === "Escape"
+      ){
+
+        closeMenu();
+
+      }
+
+    }
+  );
+
 })();
 
 </script>
