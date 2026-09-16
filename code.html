@@ -114,9 +114,11 @@ body {
   position: fixed;
 
   top: 0;
+
   left: 0;
 
   width: 100%;
+
   height: 80px;
 
   z-index: 1000;
@@ -127,7 +129,9 @@ body {
 
   justify-content: space-between;
 
-  padding: 0 25px;
+  padding:
+    0
+    25px;
 
   background:
     rgba(255,255,255,.72);
@@ -145,40 +149,9 @@ body {
 }
 
 
-
 /* =====================================================
    左上：図書手帳アイコン
    index.htmlへのリンク
-===================================================== */
-
-
-/* =====================================================
-   ヘッダー中央タイトル
-===================================================== */
-
-.header-title {
-
-  position: absolute;
-
-  top: 50%;
-
-  left: 50%;
-
-  width: max-content;
-
-  max-width: calc(100% - 460px);
-
-  transform:
-    translate(-50%, -50%);
-
-  text-align: center;
-
-}
-
-
-  
-/* =====================================================
-   左上：図書手帳ロゴ
 ===================================================== */
 
 .header-icon {
@@ -187,13 +160,13 @@ body {
 
   align-items: center;
 
-  justify-content: flex-start;
+  justify-content: center;
 
-  width: 195px;
+  width: 164px;
 
-  height: 72px;
+  height: 60px;
 
-  flex: 0 0 195px;
+  flex: 0 0 164px;
 
   text-decoration: none;
 
@@ -205,74 +178,15 @@ body {
 }
 
 
-/* ロゴ画像 */
-
-.header-icon img {
-
-  display: block;
-
-  width: 195px;
-
-  height: 72px;
-
-  object-fit: contain;
-
-  object-position: left center;
-
-  transform-origin: left center;
-
-  transition:
-    transform .25s cubic-bezier(.2,.8,.2,1),
-    filter .25s ease;
-
-}
-
-
-/* PC：カーソルを合わせると少し大きくなる */
-
-.header-icon:hover img {
-
-  transform:
-    scale(1.04);
-
-}
-
-
-/* クリック時 */
-
-.header-icon:active img {
-
-  transform:
-    scale(.97);
-
-}
-
-
-/* キーボード操作時 */
-
-.header-icon:focus-visible {
-
-  outline:
-    3px solid
-    rgba(139,111,88,.35);
-
-  outline-offset: 4px;
-
-  border-radius: 12px;
-
-}
-
-
-
 /* アイコン画像 */
 
 .header-icon img {
 
   display: block;
 
-  width: 72px;
+  width: 164px;
 
-  height: 72px;
+  height: 60px;
 
   object-fit: contain;
 
@@ -290,8 +204,7 @@ body {
 .header-icon:hover img {
 
   transform:
-    scale(1.10)
-    rotate(-2deg);
+    scale(1.08);
 
 }
 
@@ -1556,158 +1469,26 @@ body {
   }
 
 
-/* =====================================================
-   スマホ
-===================================================== */
-
-@media (max-width: 600px) {
-
-  body {
-
-    padding:
-      88px
-      12px
-      40px;
-
-  }
-
-
-  .header {
-
-    height: 72px;
-
-    padding:
-      0
-      14px;
-
-  }
-
-
-  /* ---------------------------------
-     スマホ用ロゴ
-  --------------------------------- */
+  /* スマホ用アイコン */
 
   .header-icon {
 
-    width: 155px;
+    width: 140px;
 
-    height: 62px;
+    height: 54px;
 
-    flex: 0 0 155px;
+    flex-basis: 140px;
 
   }
 
 
   .header-icon img {
 
-    width: 155px;
+    width: 140px;
 
-    height: 62px;
-
-  }
-
-
-  /* ---------------------------------
-     スマホ用タイトル
-  --------------------------------- */
-
-  .header-title {
-
-    max-width:
-      calc(100% - 245px);
+    height: 54px;
 
   }
-
-
-  .page-heading {
-
-    margin:
-      0 0 3px;
-
-    font-size:
-      19px;
-
-    white-space:
-      nowrap;
-
-  }
-
-
-  .page-subtitle {
-
-    font-size:
-      9px;
-
-    line-height:
-      1.4;
-
-    white-space:
-      nowrap;
-
-  }
-
-
-  /* ---------------------------------
-     メニューボタン
-  --------------------------------- */
-
-  .header::after {
-
-    width:
-      42px;
-
-    height:
-      42px;
-
-    font-size:
-      28px;
-
-  }
-
-
-  .coupon-image {
-
-    height:
-      180px;
-
-  }
-
-
-  .coupon-body {
-
-    padding:
-      18px
-      17px
-      16px;
-
-  }
-
-
-  .coupon-title {
-
-    font-size:
-      20px;
-
-  }
-
-
-  .code {
-
-    min-width:
-      155px;
-
-    font-size:
-      28px;
-
-    letter-spacing:
-      5px;
-
-  }
-
-}
-
-
-
 
 
   /* スマホでもタップ時に少し縮む */
@@ -1777,7 +1558,6 @@ body {
 }
 
 
-
 /* =====================================================
    小さいスマホ
 ===================================================== */
@@ -1788,91 +1568,45 @@ body {
 
     padding:
       0
-      10px;
+      12px;
 
   }
 
 
   .header-icon {
 
-    width:
-      125px;
+    width: 128px;
 
-    height:
-      58px;
+    height: 50px;
 
-    flex-basis:
-      125px;
+    flex-basis: 128px;
 
   }
 
 
   .header-icon img {
 
-    width:
-      125px;
+    width: 128px;
 
-    height:
-      58px;
-
-  }
-
-
-  .header-title {
-
-    max-width:
-      calc(100% - 205px);
-
-  }
-
-
-  .page-heading {
-
-    font-size:
-      16px;
-
-  }
-
-
-  .page-subtitle {
-
-    display:
-      none;
-
-  }
-
-
-  .header::after {
-
-    width:
-      40px;
-
-    height:
-      40px;
-
-    font-size:
-      27px;
+    height: 50px;
 
   }
 
 
   .buttons {
 
-    gap:
-      7px;
+    gap: 7px;
 
   }
 
 
   .buttons button {
 
-    font-size:
-      13px;
+    font-size: 13px;
 
   }
 
 }
-
 
 
 /* =====================================================
@@ -2001,39 +1735,59 @@ body {
        ヘッダー
   ================================================== -->
 
-<header class="header">
+  <header class="header">
 
-  <!-- 左上：図書手帳ロゴ -->
-  <a
-    href="./index.html"
-    class="header-icon"
-    aria-label="HOME"
-  >
 
-    <img
-      src="./icon.png"
-      alt="図書手帳 HOME"
+    <!--
+      左上アイコン
+      同一フォルダのindex.htmlへ移動
+    -->
+
+    <a
+      href="./index.html"
+      class="header-icon"
+      aria-label="HOME"
     >
 
-  </a>
+      <img
+        src="./icon.png"
+        alt="図書手帳 HOME"
+      >
+
+    </a>
 
 
-  <!-- 中央：ページタイトル -->
-  <div class="header-title">
+    <!-- 旧ホームボタン
+         CSSで非表示 -->
 
-    <h1 class="page-heading">
-      プロモーションコード
-    </h1>
+    <a
+      href="./index.html"
+      class="home-button"
+    >
 
-    <p class="page-subtitle">
-      プロモーションコードを発行申し込みフォームに入力してご利用ください
-    </p>
+      <span class="home-arrow">
+        ←
+      </span>
 
-  </div>
+      ホームへ戻る
+
+    </a>
 
 
-</header>
+    <div>
 
+      <h1 class="page-heading">
+        プロモーションコード
+      </h1>
+
+      <p class="page-subtitle">
+        プロモーションコードを発行申し込みフォームに入力してご利用ください
+      </p>
+
+    </div>
+
+
+  </header>
 
 
   <!-- =================================================
