@@ -11,7 +11,6 @@
 
 <title>プロモーションコード｜図書手帳公式ホームページ</title>
 
-<!-- タブアイコン -->
 <link rel="icon" type="image/png" href="./favicon.png">
 
 <style>
@@ -34,29 +33,59 @@ body {
   margin: 0;
 
   padding:
-    0
-    14px
+    100px
+    20px
     60px;
 
   min-height: 100vh;
 
   background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(255,255,255,.72),
+      transparent 30%
+    ),
     linear-gradient(
       180deg,
-      #f8f9fb 0%,
-      #f1f3f6 100%
+      #FAEEDD 0%,
+      #F7E4CF 100%
     );
 
-  color: #292929;
+  color: #5b4636;
 
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Hiragino Kaku Gothic ProN",
+    "やさしさゴシック",
+    "Kosugi Maru",
     "Yu Gothic",
     "Meiryo",
     sans-serif;
+
+}
+
+
+/* =====================================================
+   Google Fonts
+===================================================== */
+
+@import url(
+  'https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap'
+);
+
+
+/* =====================================================
+   共通変数
+===================================================== */
+
+:root {
+
+  --tosho-bg: #FAEEDD;
+
+  --tosho-brown: #5b4636;
+
+  --tosho-accent: #8b6f58;
+
+  --tosho-white:
+    rgba(255,255,255,.88);
 
 }
 
@@ -82,119 +111,234 @@ body {
 
 .header {
 
-  position: relative;
+  position: fixed;
 
-  padding:
-    22px
-    4px
-    20px;
+  top: 0;
 
-}
+  left: 0;
 
+  width: 100%;
 
-/* ホームボタン */
+  height: 80px;
 
-.home-button {
+  z-index: 1000;
 
-  display: inline-flex;
+  display: flex;
 
   align-items: center;
 
-  gap: 7px;
+  justify-content: space-between;
 
   padding:
-    9px
-    14px;
-
-  border:
-    1px solid
-    rgba(0,0,0,.08);
-
-  border-radius: 999px;
+    0
+    25px;
 
   background:
-    rgba(255,255,255,.88);
+    rgba(255,255,255,.72);
 
-  color: #444;
+  backdrop-filter:
+    blur(12px);
 
-  font-size: 13px;
+  -webkit-backdrop-filter:
+    blur(12px);
 
-  font-weight: 700;
+  box-shadow:
+    0 3px 18px
+    rgba(91,70,54,.10);
+
+}
+
+
+/* =====================================================
+   左上：図書手帳アイコン
+   index.htmlへのリンク
+===================================================== */
+
+.header-icon {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 72px;
+
+  height: 72px;
+
+  flex: 0 0 72px;
 
   text-decoration: none;
 
-  box-shadow:
-    0 3px 12px
-    rgba(0,0,0,.06);
+  cursor: pointer;
 
   transition:
-    transform .15s,
-    box-shadow .15s,
-    background .15s;
+    transform .25s ease;
 
 }
 
-.home-button:hover {
 
-  background: #fff;
+/* アイコン画像 */
+
+.header-icon img {
+
+  display: block;
+
+  width: 72px;
+
+  height: 72px;
+
+  object-fit: contain;
+
+  transform-origin: center center;
+
+  transition:
+    transform .25s cubic-bezier(.2,.8,.2,1),
+    filter .25s ease;
+
+}
+
+
+/* PC：カーソルを合わせると少し大きくなる */
+
+.header-icon:hover img {
 
   transform:
-    translateY(-1px);
-
-  box-shadow:
-    0 5px 16px
-    rgba(0,0,0,.10);
+    scale(1.10)
+    rotate(-2deg);
 
 }
 
-.home-button:active {
+
+/* クリック時 */
+
+.header-icon:active img {
 
   transform:
-    scale(.97);
+    scale(.95);
 
 }
 
 
-/* 矢印 */
+/* キーボード操作時 */
 
-.home-arrow {
+.header-icon:focus-visible {
 
-  font-size: 16px;
+  outline:
+    3px solid
+    rgba(139,111,88,.35);
+
+  outline-offset: 4px;
+
+  border-radius: 12px;
+
+}
+
+
+/* =====================================================
+   既存ホームボタン
+   ヘッダー上では非表示
+===================================================== */
+
+.home-button {
+
+  display: none !important;
+
+}
+
+
+/* =====================================================
+   右上：三本線メニュー
+===================================================== */
+
+.header::after {
+
+  content: "☰";
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 48px;
+
+  height: 48px;
+
+  color:
+    var(--tosho-brown);
+
+  font-size: 31px;
 
   line-height: 1;
 
+  cursor: pointer;
+
+  border-radius: 14px;
+
+  transition:
+    transform .25s ease,
+    background .25s ease;
+
 }
 
 
-/* タイトル */
+.header::after:hover {
+
+  transform:
+    scale(1.08);
+
+  background:
+    rgba(139,111,88,.10);
+
+}
+
+
+/* =====================================================
+   タイトル
+===================================================== */
 
 .page-heading {
 
   margin:
-    20px
+    25px
     0
-    5px;
+    7px;
 
-  font-size: 28px;
+  color:
+    var(--tosho-brown);
+
+  font-size: 30px;
 
   font-weight: 900;
 
-  letter-spacing:
-    -.5px;
+  letter-spacing: .02em;
 
-  color: #202020;
+  animation:
+    toshoFadeUp
+    .65s
+    ease
+    both;
 
 }
+
 
 .page-subtitle {
 
   margin: 0;
 
-  color: #888;
+  color: #8a7768;
 
   font-size: 13px;
 
   line-height: 1.6;
+
+  animation:
+    toshoFadeUp
+    .75s
+    .05s
+    ease
+    both;
 
 }
 
@@ -206,6 +350,13 @@ body {
 #couponList {
 
   width: 100%;
+
+  animation:
+    toshoFadeUp
+    .8s
+    .1s
+    ease
+    both;
 
 }
 
@@ -222,11 +373,12 @@ body {
 
   text-align: center;
 
-  color: #888;
+  color: #8a7768;
 
   font-size: 14px;
 
 }
+
 
 .loading-spinner {
 
@@ -241,22 +393,29 @@ body {
 
   border:
     3px solid
-    #e3e5e8;
+    #ead8c6;
 
   border-top-color:
-    #e53935;
+    #8b6f58;
 
   border-radius: 50%;
 
   animation:
-    spin .8s linear infinite;
+    spin
+    .8s
+    linear
+    infinite;
 
 }
+
 
 @keyframes spin {
 
   to {
-    transform: rotate(360deg);
+
+    transform:
+      rotate(360deg);
+
   }
 
 }
@@ -272,31 +431,40 @@ body {
     28px
     20px;
 
-  background: #fff;
+  background:
+    rgba(255,255,255,.92);
+
+  border:
+    1px solid
+    rgba(139,111,88,.10);
 
   border-radius: 18px;
 
   text-align: center;
 
-  color: #c62828;
+  color: #795548;
 
   line-height: 1.8;
 
   box-shadow:
     0 8px 28px
-    rgba(0,0,0,.08);
+    rgba(91,70,54,.10);
 
 }
+
 
 .error-title {
 
   margin-bottom: 8px;
+
+  color: #6d5140;
 
   font-size: 17px;
 
   font-weight: 800;
 
 }
+
 
 .error-detail {
 
@@ -321,43 +489,52 @@ body {
 
   margin-bottom: 14px;
 
-  background: #fff;
+  background:
+    rgba(255,255,255,.92);
 
   border:
     1px solid
-    rgba(0,0,0,.045);
+    rgba(139,111,88,.10);
 
   border-radius: 20px;
 
   box-shadow:
     0 8px 25px
-    rgba(30,40,60,.09);
+    rgba(91,70,54,.10);
+
+  animation:
+    toshoCardIn
+    .55s
+    ease
+    both;
+
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
 
 }
 
 
-/* 使用可能カード */
+/* 使用可能 */
 
 .coupon-card.active {
 
   cursor: pointer;
 
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease;
-
 }
+
 
 .coupon-card.active:hover {
 
   transform:
-    translateY(-3px);
+    translateY(-5px);
 
   box-shadow:
-    0 14px 34px
-    rgba(30,40,60,.14);
+    0 16px 34px
+    rgba(91,70,54,.16);
 
 }
+
 
 .coupon-card.active:active {
 
@@ -378,7 +555,7 @@ body {
 
 
 /* =====================================================
-   画像
+   クーポン画像
 ===================================================== */
 
 .coupon-image {
@@ -394,11 +571,12 @@ body {
   background:
     linear-gradient(
       135deg,
-      #eeeeee,
-      #dddddd
+      #f4e8dc,
+      #ead8c6
     );
 
 }
+
 
 .coupon-image::after {
 
@@ -419,6 +597,7 @@ body {
 
 }
 
+
 .coupon-image img {
 
   display: block;
@@ -430,17 +609,20 @@ body {
   object-fit: cover;
 
   transition:
-    transform .35s ease;
+    transform .5s
+    cubic-bezier(.2,.7,.2,1);
 
 }
+
 
 .coupon-card.active:hover
 .coupon-image img {
 
   transform:
-    scale(1.035);
+    scale(1.045);
 
 }
+
 
 .coupon-card.used img,
 .coupon-card.expired img {
@@ -449,6 +631,7 @@ body {
     grayscale(100%);
 
 }
+
 
 .no-image {
 
@@ -520,6 +703,7 @@ body {
 
 }
 
+
 .coupon-title {
 
   margin:
@@ -527,7 +711,8 @@ body {
     0
     7px;
 
-  color: #222;
+  color:
+    var(--tosho-brown);
 
   font-size: 22px;
 
@@ -540,6 +725,7 @@ body {
 
 }
 
+
 .coupon-description {
 
   margin:
@@ -547,7 +733,7 @@ body {
     0
     14px;
 
-  color: #666;
+  color: #75685e;
 
   font-size: 14px;
 
@@ -568,15 +754,16 @@ body {
 
   gap: 5px;
 
-  color: #999;
+  color: #9a8a7c;
 
   font-size: 12px;
 
 }
 
+
 .coupon-info strong {
 
-  color: #444;
+  color: #665447;
 
 }
 
@@ -594,11 +781,11 @@ body {
     14px;
 
   background:
-    #f7f8fa;
+    #fbf2e8;
 
   border-radius: 10px;
 
-  color: #666;
+  color: #76685e;
 
   font-size: 12px;
 
@@ -606,9 +793,10 @@ body {
 
 }
 
+
 .terms strong {
 
-  color: #444;
+  color: #665447;
 
 }
 
@@ -633,13 +821,28 @@ body {
     1px solid
     #eeeeee;
 
-  color: #e53935;
+  color: #8b6f58;
 
   font-size: 13px;
 
   font-weight: 800;
 
   letter-spacing: .2px;
+
+  transition:
+    letter-spacing .25s ease,
+    transform .25s ease;
+
+}
+
+
+.coupon-card.active:hover
+.coupon-action {
+
+  letter-spacing: .5px;
+
+  transform:
+    translateX(2px);
 
 }
 
@@ -662,7 +865,8 @@ body {
     18px
     25px;
 
-  background: #fff;
+  background:
+    rgba(255,255,255,.94);
 
   border-radius:
     0
@@ -674,18 +878,22 @@ body {
 
   box-shadow:
     0 8px 25px
-    rgba(30,40,60,.09);
+    rgba(91,70,54,.10);
 
 }
+
 
 .code-area.show {
 
   display: block;
 
   animation:
-    codeIn .22s ease-out;
+    codeIn
+    .22s
+    ease-out;
 
 }
+
 
 @keyframes codeIn {
 
@@ -709,6 +917,7 @@ body {
 
 }
 
+
 .code-label {
 
   margin-bottom: 11px;
@@ -722,6 +931,7 @@ body {
   letter-spacing: .5px;
 
 }
+
 
 .code {
 
@@ -739,7 +949,7 @@ body {
   border-radius: 10px;
 
   background:
-    #fffafa;
+    #fffaf4;
 
   font-family:
     "Courier New",
@@ -754,6 +964,7 @@ body {
   line-height: 1.2;
 
 }
+
 
 .code-note {
 
@@ -788,19 +999,20 @@ body {
   padding: 20px;
 
   background:
-    rgba(15,18,25,.62);
+    rgba(74,57,44,.55);
 
   backdrop-filter:
-    blur(5px);
+    blur(7px);
 
   -webkit-backdrop-filter:
-    blur(5px);
+    blur(7px);
 
   align-items: center;
 
   justify-content: center;
 
 }
+
 
 .overlay.show {
 
@@ -825,45 +1037,26 @@ body {
 
   background: #fff;
 
+  border:
+    1px solid
+    rgba(139,111,88,.10);
+
   border-radius: 22px;
 
   text-align: center;
 
   box-shadow:
     0 25px 70px
-    rgba(0,0,0,.28);
+    rgba(74,57,44,.25);
 
   animation:
-    dialogIn .2s ease-out;
+    toshoDialogIn
+    .3s
+    cubic-bezier(.2,.8,.2,1)
+    both;
 
 }
 
-@keyframes dialogIn {
-
-  from {
-
-    opacity: 0;
-
-    transform:
-      scale(.94)
-      translateY(5px);
-
-  }
-
-  to {
-
-    opacity: 1;
-
-    transform:
-      scale(1)
-      translateY(0);
-
-  }
-
-}
-
-
-/* ダイアログアイコン */
 
 .dialog-icon {
 
@@ -887,8 +1080,8 @@ body {
   background:
     linear-gradient(
       135deg,
-      #ff5b57,
-      #e53935
+      #a58a70,
+      #80654f
     );
 
   color: #fff;
@@ -897,9 +1090,10 @@ body {
 
   box-shadow:
     0 7px 18px
-    rgba(229,57,53,.25);
+    rgba(91,70,54,.20);
 
 }
+
 
 .dialog h2 {
 
@@ -917,6 +1111,7 @@ body {
   line-height: 1.5;
 
 }
+
 
 .dialog p {
 
@@ -946,6 +1141,7 @@ body {
 
 }
 
+
 .buttons button {
 
   flex: 1;
@@ -970,6 +1166,7 @@ body {
 
 }
 
+
 .buttons button:active {
 
   transform:
@@ -977,28 +1174,271 @@ body {
 
 }
 
+
 .btn-no {
 
-  background: #f0f1f3;
+  background:
+    #f2e8df;
 
-  color: #555;
+  color:
+    #6d5a4b;
 
 }
+
 
 .btn-yes {
 
   background:
     linear-gradient(
       135deg,
-      #ff5551,
-      #e53935
+      #a58a70,
+      #80654f
     );
 
   color: #fff;
 
   box-shadow:
     0 6px 15px
-    rgba(229,57,53,.22);
+    rgba(91,70,54,.20);
+
+}
+
+
+/* =====================================================
+   メニュー
+===================================================== */
+
+#toshoMenuOverlay {
+
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1998;
+
+  background:
+    rgba(60,45,35,.28);
+
+  backdrop-filter:
+    blur(3px);
+
+  -webkit-backdrop-filter:
+    blur(3px);
+
+  opacity: 0;
+
+  transition:
+    opacity .25s ease;
+
+}
+
+
+#toshoMenuOverlay.open {
+
+  display: block;
+
+  opacity: 1;
+
+}
+
+
+#toshoMenu {
+
+  position: fixed;
+
+  top: 0;
+
+  right: 0;
+
+  z-index: 1999;
+
+  width:
+    min(330px,88vw);
+
+  min-height: 100vh;
+
+  padding:
+    95px
+    25px
+    35px;
+
+  background:
+    rgba(255,250,244,.97);
+
+  box-shadow:
+    -10px
+    0
+    35px
+    rgba(70,52,40,.18);
+
+  transform:
+    translateX(105%);
+
+  transition:
+    transform .32s
+    cubic-bezier(.2,.8,.2,1);
+
+}
+
+
+#toshoMenu.open {
+
+  transform:
+    translateX(0);
+
+}
+
+
+#toshoMenu a {
+
+  display: block;
+
+  padding:
+    17px
+    10px;
+
+  border-bottom:
+    1px solid
+    rgba(139,111,88,.14);
+
+  color:
+    #5b4636;
+
+  text-decoration: none;
+
+  font-weight: 700;
+
+  font-size: 15px;
+
+  transition:
+    padding-left .2s ease,
+    background .2s ease;
+
+}
+
+
+#toshoMenu a:hover {
+
+  padding-left: 18px;
+
+  background:
+    rgba(139,111,88,.07);
+
+}
+
+
+#toshoMenuClose {
+
+  position: absolute;
+
+  top: 20px;
+
+  right: 20px;
+
+  width: 48px;
+
+  height: 48px;
+
+  border: 0;
+
+  background: transparent;
+
+  color:
+    #5b4636;
+
+  font-size: 38px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    transform .25s ease;
+
+}
+
+
+#toshoMenuClose:hover {
+
+  transform:
+    rotate(90deg);
+
+}
+
+
+/* =====================================================
+   アニメーション
+===================================================== */
+
+@keyframes toshoFadeUp {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(16px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+@keyframes toshoCardIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(18px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+@keyframes toshoDialogIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      scale(.94)
+      translateY(10px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      scale(1)
+      translateY(0);
+
+  }
 
 }
 
@@ -1012,34 +1452,82 @@ body {
   body {
 
     padding:
-      0
-      10px
+      92px
+      12px
       40px;
 
   }
 
+
   .header {
 
+    height: 72px;
+
     padding:
-      17px
-      2px
-      17px;
+      0
+      16px;
 
   }
+
+
+  /* スマホ用アイコン */
+
+  .header-icon {
+
+    width: 62px;
+
+    height: 62px;
+
+    flex-basis: 62px;
+
+  }
+
+
+  .header-icon img {
+
+    width: 62px;
+
+    height: 62px;
+
+  }
+
+
+  /* スマホでもタップ時に少し縮む */
+
+  .header-icon:active img {
+
+    transform:
+      scale(.94);
+
+  }
+
+
+  .header::after {
+
+    width: 44px;
+
+    height: 44px;
+
+    font-size: 29px;
+
+  }
+
 
   .page-heading {
 
     margin-top: 17px;
 
-    font-size: 25px;
+    font-size: 26px;
 
   }
+
 
   .coupon-image {
 
     height: 180px;
 
   }
+
 
   .coupon-body {
 
@@ -1050,11 +1538,13 @@ body {
 
   }
 
+
   .coupon-title {
 
     font-size: 20px;
 
   }
+
 
   .code {
 
@@ -1070,10 +1560,39 @@ body {
 
 
 /* =====================================================
-   小さい画面
+   小さいスマホ
 ===================================================== */
 
 @media (max-width: 340px) {
+
+  .header {
+
+    padding:
+      0
+      12px;
+
+  }
+
+
+  .header-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    flex-basis: 58px;
+
+  }
+
+
+  .header-icon img {
+
+    width: 58px;
+
+    height: 58px;
+
+  }
+
 
   .buttons {
 
@@ -1081,447 +1600,42 @@ body {
 
   }
 
+
   .buttons button {
 
     font-size: 13px;
 
   }
 
-
 }
 
 
 /* =====================================================
-   図書手帳 共通デザイン追加
-   ※既存の機能・API・クーポン処理は変更しません
-   ===================================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
-
-:root{
-  --tosho-bg:#FAEEDD;
-  --tosho-brown:#5b4636;
-  --tosho-accent:#8b6f58;
-  --tosho-white:rgba(255,255,255,.88);
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  padding:100px 20px 60px !important;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(255,255,255,.72), transparent 30%),
-    linear-gradient(180deg,#FAEEDD 0%,#F7E4CF 100%) !important;
-  color:var(--tosho-brown) !important;
-  font-family:"やさしさゴシック","Kosugi Maru","Yu Gothic","Meiryo",sans-serif !important;
-}
-
-
-/* =====================================================
-   ヘッダー
+   動きを減らす設定に対応
 ===================================================== */
 
-.header{
-  position:fixed !important;
-  top:0 !important;
-  left:0 !important;
-  width:100% !important;
-  height:80px !important;
-  z-index:1000 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  padding:0 25px !important;
-  background:rgba(255,255,255,.72) !important;
-  backdrop-filter:blur(12px) !important;
-  -webkit-backdrop-filter:blur(12px) !important;
-  box-shadow:0 3px 18px rgba(91,70,54,.10) !important;
-}
+@media (prefers-reduced-motion: reduce) {
 
+  *,
+  *::before,
+  *::after {
 
-/* =====================================================
-   左上：図書手帳アイコン
-   ★ 52px → 64px に拡大
-===================================================== */
+    animation-duration: .01ms !important;
 
-.header::before{
-  content:"";
-  display:block;
-  width:64px;
-  height:64px;
-  flex:0 0 64px;
-  background:url("./icon.png") center/contain no-repeat;
-  cursor:pointer;
-  transition:transform .25s ease,filter .25s ease;
-}
+    animation-iteration-count: 1 !important;
 
-.header::before:hover{
-  transform:scale(1.07) rotate(-2deg);
-}
+    transition-duration: .01ms !important;
 
+    scroll-behavior: auto !important;
 
-/* 既存の「ホームへ戻る」はヘッダー上では非表示 */
-
-.home-button{
-  display:none !important;
-}
-
-
-/* =====================================================
-   右上：三本線メニュー
-===================================================== */
-
-.header::after{
-  content:"☰";
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:48px;
-  height:48px;
-  color:var(--tosho-brown);
-  font-size:31px;
-  line-height:1;
-  cursor:pointer;
-  border-radius:14px;
-  transition:transform .25s ease,background .25s ease;
-}
-
-.header::after:hover{
-  transform:scale(1.08);
-  background:rgba(139,111,88,.10);
-}
-
-
-/* =====================================================
-   タイトル部分
-===================================================== */
-
-.page-heading{
-  margin:25px 0 7px !important;
-  color:var(--tosho-brown) !important;
-  font-size:30px !important;
-  letter-spacing:.02em !important;
-  animation:toshoFadeUp .65s ease both;
-}
-
-.page-subtitle{
-  color:#8a7768 !important;
-  animation:toshoFadeUp .75s .05s ease both;
-}
-
-
-/* =====================================================
-   クーポン一覧
-===================================================== */
-
-#couponList{
-  animation:toshoFadeUp .8s .1s ease both;
-}
-
-
-/* =====================================================
-   カードを図書手帳らしく
-===================================================== */
-
-.coupon-card{
-  background:rgba(255,255,255,.92) !important;
-  border:1px solid rgba(139,111,88,.10) !important;
-  border-radius:20px !important;
-  box-shadow:0 8px 25px rgba(91,70,54,.10) !important;
-  animation:toshoCardIn .55s ease both;
-  transition:transform .25s ease,box-shadow .25s ease !important;
-}
-
-.coupon-card.active:hover{
-  transform:translateY(-5px) !important;
-  box-shadow:0 16px 34px rgba(91,70,54,.16) !important;
-}
-
-.coupon-card.active:active{
-  transform:scale(.985) !important;
-}
-
-
-/* =====================================================
-   画像
-===================================================== */
-
-.coupon-image{
-  background:linear-gradient(135deg,#f4e8dc,#ead8c6) !important;
-}
-
-.coupon-image img{
-  transition:transform .5s cubic-bezier(.2,.7,.2,1) !important;
-}
-
-.coupon-card.active:hover .coupon-image img{
-  transform:scale(1.045) !important;
-}
-
-
-/* =====================================================
-   本文
-===================================================== */
-
-.coupon-title{
-  color:var(--tosho-brown) !important;
-}
-
-.coupon-description{
-  color:#75685e !important;
-}
-
-.coupon-info{
-  color:#9a8a7c !important;
-}
-
-.coupon-info strong{
-  color:#665447 !important;
-}
-
-.terms{
-  background:#fbf2e8 !important;
-  color:#76685e !important;
-}
-
-.terms strong{
-  color:#665447 !important;
-}
-
-.coupon-action{
-  color:#8b6f58 !important;
-  transition:letter-spacing .25s ease,transform .25s ease;
-}
-
-.coupon-card.active:hover .coupon-action{
-  letter-spacing:.5px;
-  transform:translateX(2px);
-}
-
-
-/* =====================================================
-   読み込み
-===================================================== */
-
-.loading{
-  color:#8a7768 !important;
-}
-
-.loading-spinner{
-  border-color:#ead8c6 !important;
-  border-top-color:#8b6f58 !important;
-}
-
-
-/* =====================================================
-   エラー
-===================================================== */
-
-.error{
-  color:#795548 !important;
-  background:rgba(255,255,255,.92) !important;
-  box-shadow:0 8px 28px rgba(91,70,54,.10) !important;
-}
-
-.error-title{
-  color:#6d5140 !important;
-}
-
-
-/* =====================================================
-   コード表示
-===================================================== */
-
-.code-area{
-  background:rgba(255,255,255,.94) !important;
-  box-shadow:0 8px 25px rgba(91,70,54,.10) !important;
-}
-
-.code{
-  background:#fffaf4 !important;
-}
-
-
-/* =====================================================
-   ダイアログ
-===================================================== */
-
-.overlay{
-  background:rgba(74,57,44,.55) !important;
-  backdrop-filter:blur(7px) !important;
-  -webkit-backdrop-filter:blur(7px) !important;
-}
-
-.dialog{
-  border:1px solid rgba(139,111,88,.10);
-  box-shadow:0 25px 70px rgba(74,57,44,.25) !important;
-  animation:toshoDialogIn .3s cubic-bezier(.2,.8,.2,1) both !important;
-}
-
-.dialog-icon{
-  background:linear-gradient(135deg,#a58a70,#80654f) !important;
-  box-shadow:0 7px 18px rgba(91,70,54,.20) !important;
-}
-
-.btn-no{
-  background:#f2e8df !important;
-  color:#6d5a4b !important;
-}
-
-.btn-yes{
-  background:linear-gradient(135deg,#a58a70,#80654f) !important;
-  box-shadow:0 6px 15px rgba(91,70,54,.20) !important;
-}
-
-
-/* =====================================================
-   登場アニメーション
-===================================================== */
-
-@keyframes toshoFadeUp{
-  from{
-    opacity:0;
-    transform:translateY(16px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes toshoCardIn{
-  from{
-    opacity:0;
-    transform:translateY(18px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes toshoDialogIn{
-  from{
-    opacity:0;
-    transform:scale(.94) translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:scale(1) translateY(0);
-  }
-}
-
-
-/* =====================================================
-   スマホ
-   ★ 46px → 56px に拡大
-===================================================== */
-
-@media (max-width:400px){
-
-  body{
-    padding:92px 12px 40px !important;
-  }
-
-  .header{
-    height:72px !important;
-    padding:0 16px !important;
-  }
-
-  .header::before{
-    width:56px;
-    height:56px;
-    flex-basis:56px;
-  }
-
-  .header::after{
-    width:44px;
-    height:44px;
-    font-size:29px;
-  }
-
-  .page-heading{
-    font-size:26px !important;
   }
 
 }
 
 
 /* =====================================================
-   メニュー
+   JavaScript
 ===================================================== */
-
-#toshoMenuOverlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:1998;
-  background:rgba(60,45,35,.28);
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
-  opacity:0;
-  transition:opacity .25s ease;
-}
-
-#toshoMenu{
-  position:fixed;
-  top:0;
-  right:0;
-  z-index:1999;
-  width:min(330px,88vw);
-  min-height:100vh;
-  padding:95px 25px 35px;
-  background:rgba(255,250,244,.97);
-  box-shadow:-10px 0 35px rgba(70,52,40,.18);
-  transform:translateX(105%);
-  transition:transform .32s cubic-bezier(.2,.8,.2,1);
-}
-
-#toshoMenu.open{
-  transform:translateX(0);
-}
-
-#toshoMenuOverlay.open{
-  display:block;
-  opacity:1;
-}
-
-#toshoMenu a{
-  display:block;
-  padding:17px 10px;
-  border-bottom:1px solid rgba(139,111,88,.14);
-  color:#5b4636;
-  text-decoration:none;
-  font-weight:700;
-  font-size:15px;
-  transition:padding-left .2s ease,background .2s ease;
-}
-
-#toshoMenu a:hover{
-  padding-left:18px;
-  background:rgba(139,111,88,.07);
-}
-
-#toshoMenuClose{
-  position:absolute;
-  top:20px;
-  right:20px;
-  width:48px;
-  height:48px;
-  border:0;
-  background:transparent;
-  color:#5b4636;
-  font-size:38px;
-  line-height:1;
-  cursor:pointer;
-  transition:transform .25s ease;
-}
-
-#toshoMenuClose:hover{
-  transform:rotate(90deg);
-}
 
 </style>
 
@@ -1530,9 +1644,25 @@ body{
 
 <body>
 
-<div id="toshoMenuOverlay" aria-hidden="true"></div>
 
-<nav id="toshoMenu" aria-label="メニュー">
+<!-- =====================================================
+     メニュー背景
+===================================================== -->
+
+<div
+  id="toshoMenuOverlay"
+  aria-hidden="true"
+></div>
+
+
+<!-- =====================================================
+     メニュー
+===================================================== -->
+
+<nav
+  id="toshoMenu"
+  aria-label="メニュー"
+>
 
   <button
     type="button"
@@ -1542,25 +1672,31 @@ body{
     ×
   </button>
 
-  <a href="index.html">
+
+  <a href="./index.html">
     HOME
   </a>
 
-  <a href="application.html">
+
+  <a href="./application.html">
     申し込み
   </a>
 
-  <a href="features.html">
+
+  <a href="./features.html">
     特徴
   </a>
 
-  <a href="mutter.html">
+
+  <a href="./mutter.html">
     かもめんのつぶやき
   </a>
 
-  <a href="tool.html">
+
+  <a href="./tool.html">
     お役立ちツール
   </a>
+
 
   <a
     href="https://lib-finder.net/hakuo/"
@@ -1573,6 +1709,10 @@ body{
 </nav>
 
 
+<!-- =====================================================
+     ページ
+===================================================== -->
+
 <div class="page">
 
 
@@ -1583,7 +1723,27 @@ body{
   <header class="header">
 
 
-    <!-- ★ 同じフォルダのindex.htmlへ戻る -->
+    <!--
+      左上アイコン
+      同一フォルダのindex.htmlへ移動
+    -->
+
+    <a
+      href="./index.html"
+      class="header-icon"
+      aria-label="HOME"
+    >
+
+      <img
+        src="./icon.png"
+        alt="図書手帳 HOME"
+      >
+
+    </a>
+
+
+    <!-- 旧ホームボタン
+         CSSで非表示 -->
 
     <a
       href="./index.html"
@@ -1599,13 +1759,17 @@ body{
     </a>
 
 
-    <h1 class="page-heading">
-      クーポン
-    </h1>
+    <div>
 
-    <p class="page-subtitle">
-      プロモーションコードを発行申し込みフォームに入力してご利用ください
-    </p>
+      <h1 class="page-heading">
+        クーポン
+      </h1>
+
+      <p class="page-subtitle">
+        プロモーションコードを発行申し込みフォームに入力してご利用ください
+      </p>
+
+    </div>
 
 
   </header>
@@ -1691,9 +1855,8 @@ body{
 
 <script>
 
-
 /* =====================================================
-   ★ Apps Script API
+   Apps Script API
 ===================================================== */
 
 const API_URL =
@@ -1722,7 +1885,6 @@ async function loadCoupons() {
 
 
   try {
-
 
     const response =
       await fetch(
@@ -1770,11 +1932,10 @@ async function loadCoupons() {
 
     createCoupons();
 
-
   }
 
-  catch (error) {
 
+  catch (error) {
 
     console.error(
       "クーポン取得エラー:",
@@ -1851,9 +2012,9 @@ function createCoupons() {
     function(coupon) {
 
 
-      /* -------------------------
+      /* =========================
          状態
-      ------------------------- */
+      ========================= */
 
       const used =
         isUsed(
@@ -1883,9 +2044,9 @@ function createCoupons() {
       }
 
 
-      /* -------------------------
+      /* =========================
          カード
-      ------------------------- */
+      ========================= */
 
       const card =
         document.createElement(
@@ -1898,9 +2059,9 @@ function createCoupons() {
         state;
 
 
-      /* -------------------------
+      /* =========================
          ステータス
-      ------------------------- */
+      ========================= */
 
       let statusHTML = "";
 
@@ -1930,9 +2091,9 @@ function createCoupons() {
       }
 
 
-      /* -------------------------
+      /* =========================
          画像
-      ------------------------- */
+      ========================= */
 
       let imageHTML = "";
 
@@ -1969,6 +2130,7 @@ function createCoupons() {
 
       }
 
+
       else {
 
         imageHTML = `
@@ -1982,9 +2144,9 @@ function createCoupons() {
       }
 
 
-      /* -------------------------
+      /* =========================
          説明文
-      ------------------------- */
+      ========================= */
 
       let descriptionHTML = "";
 
@@ -2008,9 +2170,9 @@ function createCoupons() {
       }
 
 
-      /* -------------------------
+      /* =========================
          利用条件
-      ------------------------- */
+      ========================= */
 
       let termsHTML = "";
 
@@ -2040,9 +2202,9 @@ function createCoupons() {
       }
 
 
-      /* -------------------------
+      /* =========================
          カードHTML
-      ------------------------- */
+      ========================= */
 
       card.innerHTML = `
 
@@ -2114,9 +2276,9 @@ function createCoupons() {
       `;
 
 
-      /* -------------------------
+      /* =========================
          コードエリア
-      ------------------------- */
+      ========================= */
 
       const codeArea =
         document.createElement(
@@ -2133,7 +2295,7 @@ function createCoupons() {
           coupon.color
         )
           ? coupon.color
-          : "#e53935";
+          : "#8b6f58";
 
 
       codeArea.innerHTML = `
@@ -2173,15 +2335,14 @@ function createCoupons() {
       `;
 
 
-      /* -------------------------
+      /* =========================
          クリック処理
-      ------------------------- */
+      ========================= */
 
       if (
         !used &&
         !expired
       ) {
-
 
         card.classList.add(
           "active"
@@ -2191,7 +2352,6 @@ function createCoupons() {
         card.addEventListener(
           "click",
           function() {
-
 
             selectedCoupon = {
 
@@ -2206,16 +2366,15 @@ function createCoupons() {
 
             openDialog();
 
-
           }
         );
 
       }
 
 
-      /* -------------------------
+      /* =========================
          追加
-      ------------------------- */
+      ========================= */
 
       container.appendChild(
         card
@@ -2225,7 +2384,6 @@ function createCoupons() {
       container.appendChild(
         codeArea
       );
-
 
     }
   );
@@ -2290,7 +2448,6 @@ function isExpired(value) {
 
 
   if (match) {
-
 
     const expiration =
       new Date(
@@ -2644,7 +2801,7 @@ function escapeHTML(value) {
 
 
 /* =====================================================
-   開始
+   クーポン読み込み開始
 ===================================================== */
 
 loadCoupons();
@@ -2654,22 +2811,26 @@ loadCoupons();
    図書手帳 共通メニュー
 ===================================================== */
 
-(function(){
+(function() {
+
 
   const header =
     document.querySelector(
       ".header"
     );
 
+
   const menu =
     document.getElementById(
       "toshoMenu"
     );
 
+
   const overlay =
     document.getElementById(
       "toshoMenuOverlay"
     );
+
 
   const close =
     document.getElementById(
@@ -2677,17 +2838,21 @@ loadCoupons();
     );
 
 
-  if(
+  if (
     !header ||
     !menu ||
     !overlay ||
     !close
-  ){
+  ) {
 
     return;
 
   }
 
+
+  /* =========================
+     メニューを開く
+  ========================= */
 
   const openMenu = () => {
 
@@ -2710,6 +2875,10 @@ loadCoupons();
   };
 
 
+  /* =========================
+     メニューを閉じる
+  ========================= */
+
   const closeMenu = () => {
 
     menu.classList.remove(
@@ -2731,18 +2900,43 @@ loadCoupons();
   };
 
 
+  /* =========================
+     ヘッダークリック
+  ========================= */
+
   header.addEventListener(
     "click",
-    function(e){
+    function(e) {
+
+
+      /*
+       * アイコンをクリックした場合は
+       * index.htmlへのリンクを優先する
+       */
+
+      if (
+        e.target.closest(
+          ".header-icon"
+        )
+      ) {
+
+        return;
+
+      }
+
 
       const rect =
         header.getBoundingClientRect();
 
 
-      if(
+      /*
+       * 右側約90pxをメニューボタンとして扱う
+       */
+
+      if (
         e.clientX >=
         rect.right - 90
-      ){
+      ) {
 
         openMenu();
 
@@ -2752,11 +2946,19 @@ loadCoupons();
   );
 
 
+  /* =========================
+     閉じるボタン
+  ========================= */
+
   close.addEventListener(
     "click",
     closeMenu
   );
 
+
+  /* =========================
+     背景クリック
+  ========================= */
 
   overlay.addEventListener(
     "click",
@@ -2764,13 +2966,17 @@ loadCoupons();
   );
 
 
+  /* =========================
+     ESCキー
+  ========================= */
+
   document.addEventListener(
     "keydown",
-    function(e){
+    function(e) {
 
-      if(
+      if (
         e.key === "Escape"
-      ){
+      ) {
 
         closeMenu();
 
@@ -2778,6 +2984,7 @@ loadCoupons();
 
     }
   );
+
 
 })();
 
