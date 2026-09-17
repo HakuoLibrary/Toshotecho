@@ -21,12 +21,20 @@ padding:0;
 box-sizing:border-box;
 }
 
-body{
-font-family:"Yu Gothic","Meiryo",sans-serif;
-background:#FAEEDD;
-color:#444;
-overflow-x:hidden;
+@font-face{
+    font-family:"やさしさゴシック";
+    src:url("やさしさゴシック.otf") format("opentype");
+    font-weight:normal;
+    font-style:normal;
 }
+
+body{
+    font-family:"やさしさゴシック","Yu Gothic","Meiryo",sans-serif;
+    background:#FAEEDD;
+    color:#444;
+    overflow-x:hidden;
+}
+
 
 html{
 scroll-behavior:smooth;

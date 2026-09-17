@@ -34,21 +34,44 @@ scroll-behavior:smooth;
 }
 
 
-body{
-
-font-family:
-"Yu Gothic UI",
-"Yu Gothic",
-Meiryo,
-sans-serif;
-
-background:#FAEEDD;
-
-color:#444;
-
-overflow-x:hidden;
-
+@font-face {
+    font-family: "やさしさゴシック";
+    src: url("やさしさゴシック.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
 }
+
+
+/* ==================================================
+   RESET
+================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "やさしさゴシック", sans-serif;
+}
+
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    font-family:
+        "やさしさゴシック",
+        sans-serif;
+
+    background: #FAEEDD;
+
+    color: #444;
+
+    overflow-x: hidden;
+}
+
 
 
 
