@@ -1963,7 +1963,7 @@ async function loadCoupons() {
   catch (error) {
 
     console.error(
-      "クーポン取得エラー:",
+      "プロモーションコード取得エラー:",
       error
     );
 
@@ -2284,11 +2284,11 @@ function createCoupons() {
             ${
               used
 
-              ? "このクーポンは使用済みです"
+              ? "このプロモーションコードは使用済みです"
 
               : expired
 
-              ? "このクーポンは期限切れです"
+              ? "このプロモーションコードは期限切れです"
 
               : "タップしてコードを開封  ›"
             }
