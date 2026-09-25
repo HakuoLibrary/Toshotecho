@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問い合わせ｜図書手帳公式ホームページ</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+@font-face{
+  font-family:"やさしさゴシック";
+  src:url("やさしさゴシック.ttf") format("opentype");
+  font-weight:normal;
+  font-style:normal;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"やさしさゴシック","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;
+background:#FAEEDD;color:#444;overflow-x:hidden}
+.header{position:fixed;top:0;left:0;width:100%;height:80px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;background:rgba(255,255,255,.72);backdrop-filter:blur(12px);box-shadow:0 5px 20px rgba(0,0,0,.08);z-index:1000}
+.logo img{height:52px;width:auto;display:block;transition:.25s}.logo img:hover{transform:scale(1.05)}
+.menu-btn{width:56px;height:56px;border:0;border-radius:50%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.15);transition:.3s}
+.menu-btn:hover{transform:scale(1.05)}.menu-btn span{width:26px;height:3px;background:#444;border-radius:20px;transition:.35s}
+.menu-btn.active span:nth-child(1){transform:translateY(9px) rotate(45deg)}.menu-btn.active span:nth-child(2){opacity:0}.menu-btn.active span:nth-child(3){transform:translateY(-9px) rotate(-45deg)}
+.menu{position:fixed;top:0;right:-320px;width:300px;height:100vh;background:#fff;padding-top:90px;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.12);transition:.35s;z-index:999}.menu.open{right:0}
+.menu a{padding:18px 24px;text-decoration:none;font-weight:bold;color:#444;transition:.25s}.menu a:hover{background:#FAEEDD;padding-left:36px;color:#B67832}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.3s;z-index:998}.overlay.show{opacity:1;pointer-events:auto}
+.page-title{margin-top:120px;text-align:center;color:#8B5A2B;font-size:38px;animation:fadeIn 1s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rule-box,.form-wrap{max-width:1000px;margin:40px auto;padding:30px;background:#fff;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+.rule-content{height:500px;overflow-y:auto;padding:25px;line-height:2;border:1px solid #E8D5BB;border-radius:12px;background:#FFFDF8}
+.terms h2,.terms h3{color:#5c4937}.terms p{margin:12px 0}
+.agree-area{max-width:1000px;margin:30px auto 60px;padding:0 30px;text-align:center}
+.agree-label{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:22px;font-weight:bold;font-size:17px}.agree-label input{width:20px;height:20px;accent-color:#B67832}
+.agree-button,.submit-button,.back-button{display:inline-block;padding:16px 38px;border:0;border-radius:999px;font-size:17px;font-weight:bold;font-family:"やさしさゴシック";cursor:pointer;transition:.3s}
+.agree-button,.submit-button{background:#B67832;color:#fff;box-shadow:0 10px 20px rgba(182,120,50,.25)}.agree-button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.agree-button:not(:disabled):hover,.submit-button:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 15px 30px rgba(182,120,50,.35)}
+.form-section{display:none}.form-section.show{display:block;animation:sectionIn .45s ease}
+@keyframes sectionIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.form-intro{text-align:center;margin-bottom:30px}.form-intro h2{color:#8B5A2B;margin-bottom:10px}
+.notice{background:#FFF8ED;border-left:5px solid #B67832;padding:14px 16px;border-radius:10px;margin-bottom:25px;line-height:1.8}
+.question{margin:0 0 34px}.question-head{background:#EAF4F7;border-radius:8px;padding:16px 20px 18px}
+.q-number{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:46px;padding:0 10px;background:#B07A00;color:#fff;border-radius:0 0 5px 5px;font-weight:bold;font-size:19px;margin:-16px 0 13px 0}
+.question-title{font-size:22px;line-height:1.6}.required{color:#d22;font-size:.75em;margin-left:7px}.question-desc{margin-top:8px;line-height:1.65;white-space:pre-line}.question-desc.red{color:#e33}
+.question-body{padding:18px 0 0}
+input[type=text],input[type=date],select,textarea{width:100%;border:0;border-radius:8px;background:#F7F7F7;padding:15px 16px;font:inherit;font-size:18px;color:#555;outline:0;transition:.25s}
+textarea{min-height:180px;resize:vertical;line-height:1.7}
+input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(182,120,50,.18);background:#fff}
+.field-note{font-size:13px;color:#777;margin-top:7px}.radio-list{display:flex;flex-direction:column;gap:24px}
+.radio-item{display:flex;align-items:flex-start;gap:13px;cursor:pointer;font-size:18px;line-height:1.5}.radio-item input{margin-top:4px;width:22px;height:22px;accent-color:#B67832;flex:none}
+.design-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.design-card{position:relative;cursor:pointer}
+.design-card input{position:absolute;opacity:0;pointer-events:none}
+.design-visual{display:block;cursor:pointer;border:3px solid transparent;border-radius:15px;overflow:hidden;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.06);transition:.2s;text-align:center}
+.design-card:hover .design-visual{transform:translateY(-2px);box-shadow:0 7px 18px rgba(0,0,0,.10)}
+.design-card input:checked+.design-visual{border-color:#9a6b4f;box-shadow:0 0 0 3px rgba(154,107,79,.18)}
+.design-visual img{
+    display:block;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    background:#eee;
+}
+.design-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:#999;font-weight:bold;background:#eee;line-height:1.6}
+.design-name{display:block;padding:10px;text-align:center;font-weight:bold;background:#fff}
+.error{color:#c62828;background:#fff1f1;border-radius:8px;padding:10px 13px;margin-top:12px;display:none}.error.show{display:block}
+.nav-buttons{text-align:center;margin:35px 0 15px}.confirm-panel{background:#FFFDF8;border:1px solid #E8D5BB;border-radius:14px;padding:22px;margin-bottom:25px}
+.confirm-row{display:grid;grid-template-columns:230px 1fr;gap:18px;padding:13px 0;border-bottom:1px solid #eadfce}.confirm-row:last-child{border-bottom:0}.confirm-label{font-weight:bold;color:#8B5A2B}.confirm-value{white-space:pre-wrap;word-break:break-word}
+.back-button{background:#eee;color:#555;margin-right:10px}.back-button:hover{background:#e2e2e2;transform:translateY(-2px)}
+.loading{display:none;text-align:center;padding:35px}.loading.show{display:block}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:#B67832;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
+@keyframes spin{to{transform:rotate(360deg)}}.complete{display:none;text-align:center;padding:50px 20px}
+.complete.show{display:block;animation:sectionIn .5s ease}
+.complete-icon{font-size:55px;margin-bottom:8px;color:#8f674f}
+.complete h2{font-size:30px;margin-bottom:10px;color:#333}
+.complete p{margin:6px 0}
+.complete-home-button{display:inline-block;margin-top:25px;min-width:210px;border:0;border-radius:999px;padding:14px 22px;background:#8f674f;color:#fff;text-decoration:none;font:inherit;font-weight:bold;cursor:pointer;transition:.2s}
+.complete-home-button:hover{transform:translateY(-2px);opacity:.92}
+.small-warning{font-size:13px;color:#777;margin-top:18px;line-height:1.7}#offlineOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:20px}#offlineOverlay.show{display:flex}.offline-card{width:min(520px,100%);background:#fff;border-radius:22px;padding:40px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}.offline-icon{font-size:58px;margin-bottom:12px}.offline-card h2{color:#8B5A2B;margin-bottom:12px}.offline-card p{line-height:1.8;margin-bottom:24px}.reload-button{border:0;border-radius:999px;background:#B67832;color:#fff;font:inherit;font-weight:bold;padding:15px 38px;cursor:pointer;box-shadow:0 8px 20px rgba(182,120,50,.25)}.reload-button:hover{transform:translateY(-2px)}
+footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-top:50px}
+.confirm-layer{display:none;max-width:900px;margin:40px auto 70px;padding:38px;background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.confirm-layer-inner{max-width:100%;margin:0;padding:0}
+.confirm-layer .form-intro{text-align:center}
+.confirm-panel{border:1px solid #eaded5;border-radius:14px;overflow:hidden;background:#fff;margin:0 0 25px}
+.confirm-row{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid #eee3dc;padding:0}
+.confirm-row:last-child{border-bottom:0}
+.confirm-label{padding:13px 16px;background:#fff7f0;font-weight:bold;color:#333}
+.confirm-value{padding:13px 16px;white-space:pre-wrap;word-break:break-word}
+.confirm-layer .nav-buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.confirm-layer .nav-buttons button{min-width:210px;border:0;border-radius:999px;padding:14px 22px;font:inherit;font-weight:bold;cursor:pointer;transition:.2s}
+.confirm-layer .nav-buttons button:hover{transform:translateY(-2px)}
+.confirm-layer .back-button{background:#eee5df;color:#5f5148;margin-right:0}
+.confirm-layer #layerSubmit{background:#8f674f;color:#fff}
+
+.inquiry-wrap{max-width:900px}
+.inquiry-wrap .form-intro h2{font-size:28px}
+.inquiry-wrap .question{margin-bottom:28px}
+input[type=email]{width:100%;border:0;border-radius:8px;background:#F7F7F7;padding:15px 16px;font:inherit;font-size:18px;color:#555;outline:0;transition:.25s}
+input[type=email]:focus{box-shadow:0 0 0 3px rgba(182,120,50,.18);background:#fff}
+
+@media(max-width:768px){
+.header{height:75px;padding:0 15px}.logo img{height:45px}.menu{width:260px}.page-title{font-size:30px;margin-top:105px}
+.rule-box,.form-wrap{margin:30px 15px;padding:20px}.rule-content{height:450px;padding:15px;font-size:14px}.agree-area{padding:0 15px}.agree-button{width:100%;font-size:16px}
+.question-title{font-size:19px}.question-head{padding:15px 14px 16px}.q-number{margin:-15px 0 10px -1px}.radio-list{gap:20px}.radio-item{font-size:17px}
+.design-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+.confirm-layer{margin:25px 15px 50px;padding:22px 15px;border-radius:16px}
+.confirm-row{grid-template-columns:1fr}
+.confirm-label{padding-bottom:5px}
+.confirm-value{padding-top:5px}
+.confirm-layer .nav-buttons{flex-direction:column-reverse}
+.confirm-layer .nav-buttons button{width:100%;min-width:0}
+.back-button,.submit-button{width:100%;margin:0 0 12px}
+}
+@media(min-width:769px) and (max-width:1050px){.design-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div id="offlineOverlay" aria-live="assertive"><div class="offline-card"><div class="offline-icon">📡</div><h2>Wi-Fiに接続していません</h2><p>インターネット接続を確認してください。<br>接続したあと、「再読み込み」を押してください。</p><button class="reload-button" id="reloadButton">再読み込み</button></div></div>
+
+<header class="header">
+<a href="index.html" class="logo"><img src="icon.png" alt="図書手帳"></a>
+<button class="menu-btn" id="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
+</header>
+<nav class="menu" id="menu">
+<a href="index.html">HOME</a><a href="application.html">申し込み</a><a href="code.html">プロモーションコード</a><a href="features.html">特徴</a><a href="movie.html">紹介動画</a><a href="mutter.html">かもめんのつぶやき</a>
+<a href="https://lib-finder.net/hakuo/" target="_blank" rel="noopener noreferrer">蔵書検索（Ａ・Ｂ棟共通）</a><a href="character.html">キャラクター紹介</a><a href="tool.html">お役立ちツール</a>
+</nav>
+<div class="overlay" id="overlay"></div>
+
+<h1 class="page-title">お問い合わせ</h1>
+
+<section class="form-wrap inquiry-wrap">
+  <div class="form-intro">
+    <h2>お問い合わせフォーム</h2>
+    <p>図書手帳についてのお問い合わせはこちらから送信してください。<span class="required">*</span> は必須項目です。</p>
+  </div>
+
+  <div class="notice">
+    入力内容は、送信前に確認画面で確認できます。<br>
+    「この内容で送信する」を押すまで送信されません。
+  </div>
+
+  <form id="inquiryForm" method="post">
+    <input type="hidden" name="お問い合わせフォーム" value="図書手帳公式ホームページ">
+
+    <div class="question">
+      <div class="question-head">
+        <div class="question-title">お名前<span class="required">*</span></div>
+      </div>
+      <div class="question-body">
+        <input type="text" id="name" name="お名前" placeholder="お名前を入力してください" maxlength="100">
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head">
+        <div class="question-title">メールアドレス<span class="required">*</span></div>
+        <div class="question-desc">返信が必要な場合は、受信できるメールアドレスを入力してください。</div>
+      </div>
+      <div class="question-body">
+        <input type="email" id="email" name="メールアドレス" placeholder="example@example.com" maxlength="254" autocomplete="email">
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head">
+        <div class="question-title">お問い合わせの種類<span class="required">*</span></div>
+      </div>
+      <div class="question-body">
+        <select id="category" name="お問い合わせの種類">
+          <option value="">答えの選択</option>
+          <option>図書手帳について</option>
+          <option>申し込みについて</option>
+          <option>発行・受け取りについて</option>
+          <option>プロモーションコードについて</option>
+          <option>ホームページについて</option>
+          <option>その他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head">
+        <div class="question-title">お問い合わせ内容<span class="required">*</span></div>
+        <div class="question-desc">できるだけ詳しく入力してください。</div>
+      </div>
+      <div class="question-body">
+        <textarea id="message" name="お問い合わせ内容" placeholder="お問い合わせ内容を入力してください。"></textarea>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button type="button" class="submit-button" id="confirmButton">入力内容を確認する</button>
+    </div>
+    <div class="error" id="formError"></div>
+  </form>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <strong>送信しています…</strong>
+    <p>そのままお待ちください。</p>
+  </div>
+
+  <div class="complete" id="complete">
+    <div class="complete-icon">✓</div>
+    <h2>お問い合わせを受け付けました</h2>
+    <p>お問い合わせ内容が送信されました。<br>ありがとうございました。</p>
+    <p class="small-warning">このページは閉じて構いません。</p>
+    <a class="complete-home-button" href="index.html">ホームへ戻る</a>
+  </div>
+</section>
+
+<div class="confirm-layer" id="confirmLayer">
+  <div class="confirm-layer-inner">
+    <div class="form-intro">
+      <h2>入力内容の確認</h2>
+      <p>以下の内容で間違いがないか確認してください。</p>
+    </div>
+    <div class="confirm-panel" id="confirmPanel"></div>
+    <div class="nav-buttons">
+      <button type="button" class="back-button" id="layerBack">入力画面に戻る</button>
+      <button type="button" class="submit-button" id="layerSubmit">この内容で送信する</button>
+    </div>
+    <p class="small-warning">「この内容で送信する」を押すと、入力内容が送信されます。</p>
+  </div>
+</div>
+
+<footer>© ２０２６ 図書手帳公式ホームページ</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+/* ===== EmailJS設定 =====
+   application.html と同じ設定を使用しています。
+   EmailJSのテンプレート側で送信先を設定してください。
+*/
+const EMAILJS_PUBLIC_KEY = "aZpA2sQwoAVmga5wa";
+const EMAILJS_SERVICE_ID = "service_ezbs7ob";
+const EMAILJS_TEMPLATE_ID = "template_r1yghje";
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+const $ = id => document.getElementById(id);
+
+/* ===== メニュー ===== */
+const menuBtn=$("menuBtn"), menu=$("menu"), overlay=$("overlay");
+function closeMenu(){
+  menu.classList.remove("open");
+  overlay.classList.remove("show");
+  menuBtn.classList.remove("active");
+}
+menuBtn.addEventListener("click",()=>{
+  const x=menu.classList.toggle("open");
+  overlay.classList.toggle("show",x);
+  menuBtn.classList.toggle("active",x);
+});
+overlay.addEventListener("click",closeMenu);
+
+/* ===== オフライン表示 ===== */
+const offlineOverlay=$("offlineOverlay");
+const updateNetworkState=()=>offlineOverlay.classList.toggle("show",!navigator.onLine);
+window.addEventListener("online",updateNetworkState);
+window.addEventListener("offline",updateNetworkState);
+$("reloadButton").addEventListener("click",()=>location.reload());
+updateNetworkState();
+
+/* ===== 入力・確認 ===== */
+const form=$("inquiryForm");
+const layer=$("confirmLayer");
+const panel=$("confirmPanel");
+
+const val=id=>$(id).value.trim();
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function error(msg){
+  const e=$("formError");
+  e.textContent=msg;
+  e.classList.add("show");
+  e.scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function validate(){
+  $("formError").classList.remove("show");
+
+  if(!val("name")){
+    error("お名前を入力してください。");
+    return false;
+  }
+
+  const email=val("email");
+  if(!email){
+    error("メールアドレスを入力してください。");
+    return false;
+  }
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    error("メールアドレスの形式を確認してください。");
+    return false;
+  }
+
+  if(!val("category")){
+    error("お問い合わせの種類を選択してください。");
+    return false;
+  }
+
+  if(!val("message")){
+    error("お問い合わせ内容を入力してください。");
+    return false;
+  }
+
+  return true;
+}
+
+$("confirmButton").addEventListener("click",()=>{
+  if(!validate()) return;
+
+  const rows=[
+    ["お名前",val("name")],
+    ["メールアドレス",val("email")],
+    ["お問い合わせの種類",val("category")],
+    ["お問い合わせ内容",val("message")]
+  ];
+
+  panel.innerHTML=rows.map(r=>
+    `<div class="confirm-row"><div class="confirm-label">${esc(r[0])}</div><div class="confirm-value">${esc(r[1])}</div></div>`
+  ).join("");
+
+  $("inquiryForm").style.display="none";
+  layer.style.display="block";
+  window.scrollTo({
+    top:Math.max(0,layer.getBoundingClientRect().top+window.scrollY-90),
+    behavior:"smooth"
+  });
+});
+
+$("layerBack").addEventListener("click",()=>{
+  layer.style.display="none";
+  $("inquiryForm").style.display="";
+  window.scrollTo({
+    top:$("inquiryForm").closest(".form-wrap").offsetTop-90,
+    behavior:"smooth"
+  });
+});
+
+/* ===== EmailJSで送信 ===== */
+$("layerSubmit").addEventListener("click",async()=>{
+  const submitButton=$("layerSubmit");
+
+  if(
+    EMAILJS_PUBLIC_KEY.includes("YOUR_") ||
+    EMAILJS_SERVICE_ID.includes("YOUR_") ||
+    EMAILJS_TEMPLATE_ID.includes("YOUR_")
+  ){
+    alert("EmailJSの設定がまだ完了していません。");
+    return;
+  }
+
+  layer.style.display="none";
+  $("loading").classList.add("show");
+  submitButton.disabled=true;
+
+  try{
+
+    const templateParams={
+      name: $("name").value.trim(),
+      email: $("email").value.trim(),
+      inquiry_type: $("category").value,
+      message: $("message").value.trim(),
+      reply_to: $("email").value.trim(),
+      subject: "【図書手帳】お問い合わせ",
+      from_name: $("name").value.trim()
+    };
+
+    console.log("EmailJS送信データ:",templateParams);
+
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams
+    );
+
+    $("loading").classList.remove("show");
+    $("complete").classList.add("show");
+
+    window.scrollTo({
+      top:$("complete").closest(".form-wrap").offsetTop-90,
+      behavior:"smooth"
+    });
+
+  }catch(e){
+
+    console.error("EmailJS送信エラー:",e);
+
+    $("loading").classList.remove("show");
+    $("inquiryForm").style.display="";
+    submitButton.disabled=false;
+    layer.style.display="block";
+
+    alert(
+      "送信に失敗しました。\n" +
+      "インターネット接続を確認して、もう一度お試しください。"
+    );
+
+  }
+});
+</script>
+</body>
+</html>
