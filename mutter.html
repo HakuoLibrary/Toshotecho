@@ -462,5 +462,70 @@ span.textContent = num + 1;
 
 </script>
 
+<!-- ページ先頭へ戻るボタン -->
+<button id="backToTop" aria-label="ページ先頭へ戻る">
+  <img src="image8.png" alt="ページ先頭へ戻る">
+</button>
+
+<style>
+  #backToTop {
+    position: fixed;
+    right: 25px;
+    bottom: 10px;
+    width: 180px;
+    height: 180px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    /* 最初は非表示 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  #backToTop img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* スクロール後に表示 */
+  #backToTop.show {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+  const backToTop = document.getElementById("backToTop");
+
+  // スクロールしたらボタンを表示
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 200) {
+      backToTop.classList.add("show");
+    } else {
+      backToTop.classList.remove("show");
+    }
+  });
+
+  // クリックでページ先頭へ滑らかに移動
+  backToTop.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+
+  // ページ先頭まで戻ったらフェードアウト
+  window.addEventListener("scroll", () => {
+    if (window.scrollY === 0) {
+      backToTop.classList.remove("show");
+    }
+  });
+</script>
+
+   
 </body>
 </html>
