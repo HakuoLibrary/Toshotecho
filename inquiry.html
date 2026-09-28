@@ -1959,6 +1959,65 @@ footer{
     </div>
 
 
+    <!-- 返信希望 -->
+
+    <div class="question">
+
+      <div class="question-head">
+
+        <div class="question-title">
+
+          返信を希望しますか？
+
+          <span class="required">
+            *
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="question-body">
+
+        <div class="radio-list">
+
+          <label class="radio-item">
+
+            <input
+              type="radio"
+              name="返信希望"
+              value="希望する"
+            >
+
+            <span>
+              希望する
+            </span>
+
+          </label>
+
+
+          <label class="radio-item">
+
+            <input
+              type="radio"
+              name="返信希望"
+              value="希望しない"
+            >
+
+            <span>
+              希望しない
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
     <!-- 種類 -->
 
     <div class="question">
@@ -2464,6 +2523,25 @@ function validate(){
   }
 
 
+  /* 返信希望 */
+
+  const reply =
+    document.querySelector(
+      'input[name="返信希望"]:checked'
+    );
+
+
+  if(!reply){
+
+    error(
+      "返信希望の有無を選択してください。"
+    );
+
+    return false;
+
+  }
+
+
   if(!val("category")){
 
     error(
@@ -2512,6 +2590,13 @@ $("confirmButton").addEventListener(
       [
         "メールアドレス",
         val("email")
+      ],
+
+      [
+        "返信希望",
+        document.querySelector(
+          'input[name="返信希望"]:checked'
+        ).value
       ],
 
       [
@@ -2669,6 +2754,11 @@ $("layerSubmit").addEventListener(
           $("email")
           .value
           .trim(),
+
+        reply:
+          document.querySelector(
+            'input[name="返信希望"]:checked'
+          ).value,
 
         inquiry_type:
           $("category")
