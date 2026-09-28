@@ -2227,6 +2227,7 @@ function(element){
 <!-- ページ先頭へ戻るボタン -->
 <button id="backToTop" aria-label="ページ先頭へ戻る">
   <img src="image7.png" alt="ページ先頭へ戻る">
+  <span id="closeBackToTop" aria-label="閉じる">×</span>
 </button>
 
 <style>
@@ -2258,10 +2259,37 @@ function(element){
     opacity: 1;
     visibility: visible;
   }
+
+  /* ×ボタン */
+  #closeBackToTop {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 30px;
+    height: 30px;
+    line-height: 27px;
+
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-radius: 50%;
+
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  #closeBackToTop:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
 </style>
 
 <script>
   const backToTop = document.getElementById("backToTop");
+  const closeBackToTop = document.getElementById("closeBackToTop");
 
   // スクロールしたらボタンを表示
   window.addEventListener("scroll", () => {
@@ -2272,12 +2300,24 @@ function(element){
     }
   });
 
-  // クリックでページ先頭へ滑らかに移動
-  backToTop.addEventListener("click", () => {
+  // 画像部分をクリックしたらページ先頭へ
+  backToTop.addEventListener("click", (event) => {
+    // ×ボタンをクリックした場合はここでは処理しない
+    if (event.target === closeBackToTop) {
+      return;
+    }
+
     window.scrollTo({
       top: 0,
       behavior: "smooth"
     });
+  });
+
+  // ×をクリックしたら画像を消す
+  closeBackToTop.addEventListener("click", (event) => {
+    event.stopPropagation();
+    backToTop.classList.remove("show");
+    backToTop.style.display = "none";
   });
 
   // ページ先頭まで戻ったらフェードアウト
