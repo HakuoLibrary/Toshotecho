@@ -2016,6 +2016,47 @@ footer{
 
     </div>
 
+<!-- メールアドレス（確認） -->
+
+<div class="question">
+
+  <div class="question-head">
+
+    <div class="question-title">
+
+      メールアドレス（確認）
+
+      <span class="required">
+        *
+      </span>
+
+    </div>
+
+    <div class="question-desc">
+
+      確認のため、もう一度メールアドレスを入力してください。
+
+    </div>
+
+  </div>
+
+
+  <div class="question-body">
+
+    <input
+      type="email"
+      id="emailConfirm"
+      name="メールアドレス（確認）"
+      placeholder="例：2020123456@metro.ed.jp"
+      maxlength="254"
+      autocomplete="email"
+    >
+
+  </div>
+
+</div>
+
+     
 
     <!-- 返信希望 -->
 
@@ -2561,28 +2602,57 @@ function validate(){
 
   if(!email){
 
-    error(
-      "メールアドレスを入力してください。"
-    );
+  error(
+    "メールアドレスを入力してください。"
+  );
 
-    return false;
+  return false;
 
-  }
+}
 
 
-  if(
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      email
-    )
-  ){
+if(
+  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    email
+  )
+){
 
-    error(
-      "メールアドレスの形式を確認してください。"
-    );
+  error(
+    "メールアドレスの形式を確認してください。"
+  );
 
-    return false;
+  return false;
 
-  }
+}
+
+
+/* メールアドレス（確認） */
+
+const emailConfirm =
+  val("emailConfirm");
+
+
+if(!emailConfirm){
+
+  error(
+    "確認用のメールアドレスを入力してください。"
+  );
+
+  return false;
+
+}
+
+
+if(email !== emailConfirm){
+
+  error(
+    "メールアドレスが一致していません。もう一度確認してください。"
+  );
+
+  return false;
+
+}
+
 
 
   /* 返信希望 */
