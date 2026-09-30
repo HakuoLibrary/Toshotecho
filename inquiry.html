@@ -981,17 +981,50 @@ select option{
 }
 
 .confirm-row{
-
   display:grid;
 
+  /* 左側を文字の幅に合わせ、残りを右側に使う */
   grid-template-columns:
-    220px 1fr;
+    max-content minmax(0, 1fr);
 
   border-bottom:
     1px dashed #d9e4e1;
 
   padding:0;
 }
+
+.confirm-row:last-child{
+  border-bottom:0;
+}
+
+.confirm-label{
+  padding:
+    14px 16px;
+
+  background:#edf8f7;
+
+  font-weight:bold;
+
+  color:#397f82;
+
+  /* 項目名が勝手に改行されないようにする */
+  white-space:nowrap;
+}
+
+.confirm-value{
+  padding:
+    14px 16px;
+
+  white-space:pre-wrap;
+
+  word-break:break-word;
+
+  /* 長文でもグリッドからはみ出さない */
+  min-width:0;
+
+  color:#555f5f;
+}
+
 
 .confirm-row:last-child{
   border-bottom:0;
