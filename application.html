@@ -125,6 +125,10 @@ input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{box-sh
 .complete p{margin:6px 0}
 .complete-home-button{display:inline-block;margin-top:25px;min-width:210px;border:0;border-radius:999px;padding:14px 22px;background:#8f674f;color:#fff;text-decoration:none;font:inherit;font-weight:bold;cursor:pointer;transition:.2s}
 .complete-home-button:hover{transform:translateY(-2px);opacity:.92}
+.reception-number-box{margin:28px auto 10px;max-width:430px;padding:22px 20px;background:#FFF8ED;border:2px solid #E8D5BB;border-radius:18px}
+.reception-number-label{font-size:16px;font-weight:bold;color:#8B5A2B;margin-bottom:8px}
+.reception-number{font-family:Arial,sans-serif;font-size:34px;letter-spacing:5px;font-weight:bold;color:#8f674f;margin:5px 0 12px}
+.reception-number-box p{font-size:13px;line-height:1.7;color:#777;margin:0}
 .small-warning{font-size:13px;color:#777;margin-top:18px;line-height:1.7}#offlineOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:20px}#offlineOverlay.show{display:flex}.offline-card{width:min(520px,100%);background:#fff;border-radius:22px;padding:40px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}.offline-icon{font-size:58px;margin-bottom:12px}.offline-card h2{color:#8B5A2B;margin-bottom:12px}.offline-card p{line-height:1.8;margin-bottom:24px}.reload-button{border:0;border-radius:999px;background:#B67832;color:#fff;font:inherit;font-weight:bold;padding:15px 38px;cursor:pointer;box-shadow:0 8px 20px rgba(182,120,50,.25)}.reload-button:hover{transform:translateY(-2px)}
 footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-top:50px}
 .confirm-layer{display:none;max-width:900px;margin:40px auto 70px;padding:38px;background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.08)}
@@ -152,6 +156,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 .confirm-layer .nav-buttons{flex-direction:column-reverse}
 .confirm-layer .nav-buttons button{width:100%;min-width:0}
 .back-button,.submit-button{width:100%;margin:0 0 12px}
+.reception-number{font-size:29px;letter-spacing:4px}
 }
 @media(min-width:769px) and (max-width:1050px){.design-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -314,7 +319,7 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 </form>
 
 <div class="loading" id="loading"><div class="spinner"></div><strong>送信しています…</strong><p>そのままお待ちください。</p></div>
-<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><p class="small-warning">このページは閉じて構いません。</p><a class="complete-home-button" href="index.html">ホームへ戻る</a></div>
+<div class="complete" id="complete"><div class="complete-icon">✓</div><h2>お申し込みを受け付けました</h2><p>図書手帳の発行申込が送信されました。<br>ありがとうございました。</p><div class="reception-number-box"><div class="reception-number-label">受付番号</div><div class="reception-number" id="receptionNumber">------</div><p>この受付番号は、申し込みを確認する際に使用する場合があります。<br>念のため控えておいてください。</p></div><p class="small-warning">このページは閉じて構いません。</p><a class="complete-home-button" href="index.html">ホームへ戻る</a></div>
 </div></section>
 
 <div class="confirm-layer" id="confirmLayer">
@@ -349,6 +354,18 @@ const DESIGNS=[
 
 const $=id=>document.getElementById(id);
 const menuBtn=$("menuBtn"),menu=$("menu"),overlay=$("overlay");
+
+/* ===== 受付番号 =====
+   英大文字・数字からランダムに６桁を生成します。
+   同じ申し込みの送信リトライでは同じ番号を使用します。
+*/
+const receptionChars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+let receptionNumber="";
+function generateReceptionNumber(){
+  const values=new Uint32Array(6);
+  crypto.getRandomValues(values);
+  return Array.from(values,v=>receptionChars[v%receptionChars.length]).join("");
+}
 function closeMenu(){menu.classList.remove("open");overlay.classList.remove("show");menuBtn.classList.remove("active")}
 menuBtn.addEventListener("click",()=>{const x=menu.classList.toggle("open");overlay.classList.toggle("show",x);menuBtn.classList.toggle("active",x)});
 overlay.addEventListener("click",closeMenu);
@@ -478,10 +495,14 @@ $("layerSubmit").addEventListener("click",async()=>{
    const value=row.querySelector(".confirm-value")?.textContent||"";
    applicationData.push(label+"："+value);
   });
-  const templateParams={
-   application_data:applicationData.join("\n\n"),
-   subject:"【図書手帳】発行申込"
-  };
+  /* 受付番号をこの申し込み専用に発行 */
+   if(!receptionNumber)receptionNumber=generateReceptionNumber();
+
+   const templateParams={
+    application_data:"受付番号："+receptionNumber+"\n\n"+applicationData.join("\n\n"),
+    reception_number:receptionNumber,
+    subject:"【図書手帳】発行申込"
+   };
   await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,templateParams);
   $("loading").classList.remove("show");
   $("complete").classList.add("show");
