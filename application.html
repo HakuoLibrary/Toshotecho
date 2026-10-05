@@ -507,7 +507,13 @@ $("layerSubmit").addEventListener("click",async()=>{
   $("loading").classList.remove("show");
   $("receptionNumber").textContent=receptionNumber;
   $("complete").classList.add("show");
-  window.scrollTo({top:$("formSection").offsetTop-90,behavior:"smooth"});
+
+  setTimeout(()=>{
+    $("receptionNumber").scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+  },100);
  }catch(e){
   console.error(e);
   $("loading").classList.remove("show");
