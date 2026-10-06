@@ -636,7 +636,10 @@ input[type="range"]::-moz-range-thumb {
 
   transform-origin:
     center center;
+}
 
+/* 画像アップロード後だけ、元の影を表示 */
+.canvas-stage.has-image {
   box-shadow:
     0 24px 60px
     rgba(30,35,55,.22);
@@ -1599,6 +1602,8 @@ function loadImage(file) {
         () => {
 
           image = img;
+
+          canvasStage.classList.add("has-image");
 
           canvas.width =
             img.naturalWidth;
