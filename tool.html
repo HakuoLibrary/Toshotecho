@@ -348,6 +348,7 @@ background:transparent;
 
 }
 
+
 </style>
 
 </head>
@@ -385,7 +386,7 @@ background:transparent;
 <a href="tool.html">お役立ちツール</a>
 <a href="inquiry.html">お問い合わせ</a>
 
-<div id="secretArea"></div>
+
 
 </nav>
 
@@ -481,9 +482,12 @@ background:transparent;
 
 </div>
 
-<footer>
+
+<footer id="footerSecret">
 © ２０２６ 図書手帳公式ホームページ
 </footer>
+
+
 
 <script>
 
@@ -515,36 +519,37 @@ function openTool(page){
 window.open(page, "_blank", "noopener,noreferrer");
 }
 
-/* ===========================
-   SECRET
-=========================== */
+/* =========================
+   FOOTER SECRET COMMAND
+========================= */
 
-const secretArea =
-document.getElementById("secretArea");
+const footerSecret = document.getElementById("footerSecret");
 
-let clickCount = 0;
-let firstClick = 0;
+let footerClickCount = 0;
+let footerFirstClickTime = 0;
 
-secretArea.addEventListener("click",()=>{
+footerSecret.addEventListener("click", () => {
 
-const now = Date.now();
+    const now = Date.now();
 
-if(now - firstClick > 3000){
+    if (
+        footerClickCount === 0 ||
+        now - footerFirstClickTime > 3000
+    ) {
+        footerClickCount = 1;
+        footerFirstClickTime = now;
+        return;
+    }
 
-clickCount = 0;
-firstClick = now;
+    footerClickCount++;
 
-}
-
-clickCount++;
-
-if(clickCount >= 5){
-
-window.location.href = "kaigaivideo.html";
-
-}
+    if (footerClickCount >= 5) {
+        window.location.href = "kaigaivideo.html";
+    }
 
 });
+
+
 
 
 </script>
