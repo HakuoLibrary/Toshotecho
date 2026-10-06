@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velvet Light — 画像編集サイト</title>
+
+<style>
+:root {
+  --bg: #f4f6fb;
+  --bg2: #eef0f7;
+  --panel: rgba(255,255,255,.92);
+  --panel-solid: #ffffff;
+  --border: #e3e6ef;
+  --border-dark: #d5d9e5;
+
+  --text: #202333;
+  --text-soft: #555c70;
+  --muted: #858c9f;
+
+  --accent: #7164e8;
+  --accent-light: #eeebff;
+  --accent-hover: #6255d8;
+
+  --danger: #e45770;
+
+  --shadow:
+    0 20px 50px rgba(48, 55, 85, .10),
+    0 3px 12px rgba(48, 55, 85, .06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at 10% 5%,
+      rgba(126, 112, 235, .12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(112, 190, 255, .10),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      var(--bg),
+      var(--bg2)
+    );
+
+  color: var(--text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* =========================================
+   APP
+========================================= */
+
+.app {
+  max-width: 1500px;
+  min-height: calc(100vh - 48px);
+
+  margin: auto;
+
+  display: grid;
+
+  grid-template-columns:
+    330px
+    minmax(0, 1fr);
+
+  grid-template-rows:
+    auto
+    1fr;
+
+  gap: 16px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+  grid-column: 1 / -1;
+
+  min-height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 15px 20px;
+
+  background: var(--panel);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 20px;
+
+  box-shadow: var(--shadow);
+
+  backdrop-filter: blur(20px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.logo {
+  width: 43px;
+  height: 43px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 13px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7b6ff0,
+      #9c80ed
+    );
+
+  box-shadow:
+    0 8px 22px
+    rgba(113,100,232,.24);
+
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.brand-title {
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -.035em;
+}
+
+.brand-sub {
+  margin-top: 3px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn {
+  padding: 10px 13px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 10px;
+
+  background: #fff;
+
+  color: var(--text);
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 750;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+
+  border-color:
+    var(--border-dark);
+
+  background: #fafbfe;
+
+  box-shadow:
+    0 5px 14px
+    rgba(40,45,70,.07);
+}
+
+.btn.primary {
+  color: white;
+
+  border-color: transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent),
+      #9682ed
+    );
+
+  box-shadow:
+    0 7px 18px
+    rgba(113,100,232,.22);
+}
+
+.btn.primary:hover {
+  background:
+    linear-gradient(
+      135deg,
+      var(--accent-hover),
+      #8973e5
+    );
+}
+
+.btn.danger:hover {
+  color: var(--danger);
+
+  border-color:
+    rgba(228,87,112,.25);
+
+  background:
+    rgba(228,87,112,.05);
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar {
+  min-width: 0;
+
+  overflow: auto;
+
+  padding: 18px;
+
+  background: var(--panel);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 20px;
+
+  box-shadow: var(--shadow);
+
+  backdrop-filter: blur(20px);
+}
+
+.section {
+  padding-bottom: 18px;
+
+  margin-bottom: 17px;
+
+  border-bottom:
+    1px solid
+    #edf0f5;
+}
+
+.section:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 13px;
+
+  color: #50566a;
+
+  font-size: 11px;
+  font-weight: 850;
+
+  letter-spacing: .1em;
+
+  text-transform: uppercase;
+}
+
+.control {
+  margin-bottom: 15px;
+}
+
+.control:last-child {
+  margin-bottom: 0;
+}
+
+.control-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+
+  color: var(--text-soft);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.value {
+  color: var(--accent);
+
+  font-size: 11px;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* =========================================
+   DROPZONE
+========================================= */
+
+.dropzone {
+  padding: 20px 12px;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  border:
+    1.5px dashed
+    #ccd1df;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fafbff,
+      #f7f8fc
+    );
+
+  transition:
+    .2s ease;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color:
+    var(--accent);
+
+  background:
+    var(--accent-light);
+
+  transform:
+    translateY(-1px);
+}
+
+.drop-icon {
+  width: 42px;
+  height: 42px;
+
+  margin:
+    0 auto 9px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  color: var(--accent);
+
+  background:
+    #eeebff;
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.drop-title {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.drop-sub {
+  margin-top: 5px;
+
+  color: var(--muted);
+
+  font-size: 10px;
+}
+
+/* =========================================
+   RANGE
+========================================= */
+
+input[type="range"] {
+  width: 100%;
+  height: 5px;
+
+  appearance: none;
+
+  background:
+    #e5e7ef;
+
+  border-radius: 999px;
+
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  border:
+    3px solid
+    var(--accent);
+
+  box-shadow:
+    0 1px 5px
+    rgba(60,60,90,.18);
+
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  border:
+    3px solid
+    var(--accent);
+
+  cursor: pointer;
+}
+
+/* =========================================
+   TOOLS
+========================================= */
+
+.toggle-row {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 8px;
+}
+
+.tool-btn {
+  padding: 10px 8px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 10px;
+
+  background:
+    #fafbfe;
+
+  color: var(--text-soft);
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  transition: .18s ease;
+}
+
+.tool-btn:hover {
+  border-color:
+    #cdd1df;
+
+  background:
+    #f4f2ff;
+}
+
+.tool-btn.active {
+  color: var(--accent);
+
+  border-color:
+    #c9c3fb;
+
+  background:
+    var(--accent-light);
+}
+
+/* =========================================
+   SELECT
+========================================= */
+
+.select {
+  width: 100%;
+
+  padding: 10px 11px;
+
+  color: var(--text);
+
+  background: white;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 10px;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+.select:focus {
+  border-color:
+    var(--accent);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(113,100,232,.10);
+}
+
+.reset-btn {
+  width: 100%;
+}
+
+/* =========================================
+   WORKSPACE
+========================================= */
+
+.workspace {
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 20px;
+
+  background:
+    #f9fafc;
+
+  box-shadow: var(--shadow);
+}
+
+/*
+  Photoshop風の透明チェッカー
+*/
+
+.canvas-wrap {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  padding: 40px;
+
+  overflow: auto;
+
+  background-color: #f1f3f8;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      #e7e9ef 25%,
+      transparent 25%
+    ),
+    linear-gradient(
+      -45deg,
+      #e7e9ef 25%,
+      transparent 25%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 75%,
+      #e7e9ef 75%
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 75%,
+      #e7e9ef 75%
+    );
+
+  background-size: 28px 28px;
+
+  background-position:
+    0 0,
+    0 14px,
+    14px -14px,
+    -14px 0;
+}
+
+.canvas-stage {
+  position: relative;
+
+  transform-origin:
+    center center;
+
+  box-shadow:
+    0 24px 60px
+    rgba(30,35,55,.22);
+}
+
+#canvas {
+  display: block;
+
+  max-width:
+    min(100%, 1000px);
+
+  max-height:
+    calc(100vh - 180px);
+
+  width: auto;
+  height: auto;
+}
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.empty {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  pointer-events: none;
+}
+
+.empty-card {
+  max-width: 380px;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+.empty-symbol {
+  width: 78px;
+  height: 78px;
+
+  margin:
+    0 auto 18px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 23px;
+
+  color: var(--accent);
+
+  background:
+    linear-gradient(
+      135deg,
+      #eeebff,
+      #f5f0ff
+    );
+
+  border:
+    1px solid
+    #ddd7ff;
+
+  font-size: 30px;
+}
+
+.empty h2 {
+  margin: 0 0 9px;
+
+  color: var(--text);
+
+  font-size: 20px;
+
+  letter-spacing:
+    -.04em;
+}
+
+.empty p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+
+  line-height: 1.8;
+}
+
+/* =========================================
+   STATUS
+========================================= */
+
+.statusbar {
+  position: absolute;
+
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  pointer-events: none;
+}
+
+.status {
+  padding: 8px 11px;
+
+  color: var(--text-soft);
+
+  background:
+    rgba(255,255,255,.88);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 9px;
+
+  box-shadow:
+    0 4px 15px
+    rgba(30,35,55,.06);
+
+  backdrop-filter:
+    blur(12px);
+
+  font-size: 10px;
+}
+
+.zoom {
+  display: flex;
+  gap: 5px;
+
+  pointer-events: auto;
+}
+
+.zoom button {
+  width: 32px;
+  height: 32px;
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 9px;
+
+  color: var(--text);
+
+  background:
+    rgba(255,255,255,.9);
+
+  box-shadow:
+    0 3px 10px
+    rgba(30,35,55,.05);
+
+  cursor: pointer;
+
+  font-weight: 750;
+}
+
+.zoom button:hover {
+  border-color:
+    #cdd1df;
+
+  background: white;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.sidebar::-webkit-scrollbar,
+.canvas-wrap::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.canvas-wrap::-webkit-scrollbar-thumb {
+  background: #d4d8e3;
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.canvas-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 950px) {
+
+  body {
+    padding: 12px;
+  }
+
+  .app {
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+      auto
+      auto
+      minmax(550px, 1fr);
+
+    min-height:
+      calc(100vh - 24px);
+  }
+
+  .header {
+    grid-column: auto;
+  }
+
+  .sidebar {
+    max-height: 420px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .header {
+    padding: 12px 13px;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .header-actions .btn:not(.primary) {
+    display: none;
+  }
+
+  .canvas-wrap {
+    padding: 20px;
+  }
+
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+  <!-- =====================================
+       HEADER
+  ====================================== -->
+
+  <header class="header">
+
+    <div class="brand">
+
+      <div class="logo">
+        ✦
+      </div>
+
+      <div>
+
+        <div class="brand-title">
+          VELVET EDITOR by Toshotecho
+        </div>
+
+        <div class="brand-sub">
+          Simple • Powerful • Private • Useful
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+      <button
+        class="btn"
+        id="undoBtn"
+      >
+        ↶ 元に戻す
+      </button>
+
+      <button
+        class="btn"
+        id="redoBtn"
+      >
+        ↷ やり直す
+      </button>
+
+      <button
+        class="btn danger"
+        id="resetBtn"
+      >
+        リセット
+      </button>
+
+      <button
+        class="btn primary"
+        id="downloadBtn"
+      >
+        ↓ ダウンロード
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================
+       SIDEBAR
+  ====================================== -->
+
+  <aside class="sidebar">
+
+
+    <!-- Upload -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>画像</span>
+      </div>
+
+
+      <div
+        class="dropzone"
+        id="dropzone"
+      >
+
+        <div class="drop-icon">
+          ↑
+        </div>
+
+        <div class="drop-title">
+          画像をアップロード
+        </div>
+
+        <div class="drop-sub">
+          PNG / JPG / WEBP
+        </div>
+
+        <input
+          id="fileInput"
+          type="file"
+          accept="image/*"
+          hidden
+        >
+
+      </div>
+
+    </section>
+
+
+    <!-- Transform -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>変形</span>
+      </div>
+
+
+      <div class="toggle-row">
+
+        <button
+          class="tool-btn"
+          id="flipH"
+        >
+          ↔ 左右反転
+        </button>
+
+        <button
+          class="tool-btn"
+          id="flipV"
+        >
+          ↕ 上下反転
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Adjust -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>調整</span>
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            透明度
+          </span>
+
+          <span
+            class="value"
+            id="opacityValue"
+          >
+            100%
+          </span>
+
+        </div>
+
+        <input
+          id="opacity"
+          type="range"
+          min="0"
+          max="100"
+          value="100"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            明るさ
+          </span>
+
+          <span
+            class="value"
+            id="brightnessValue"
+          >
+            100%
+          </span>
+
+        </div>
+
+        <input
+          id="brightness"
+          type="range"
+          min="0"
+          max="200"
+          value="100"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            コントラスト
+          </span>
+
+          <span
+            class="value"
+            id="contrastValue"
+          >
+            100%
+          </span>
+
+        </div>
+
+        <input
+          id="contrast"
+          type="range"
+          min="0"
+          max="200"
+          value="100"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            彩度
+          </span>
+
+          <span
+            class="value"
+            id="saturateValue"
+          >
+            100%
+          </span>
+
+        </div>
+
+        <input
+          id="saturate"
+          type="range"
+          min="0"
+          max="200"
+          value="100"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            色相
+          </span>
+
+          <span
+            class="value"
+            id="hueValue"
+          >
+            0°
+          </span>
+
+        </div>
+
+        <input
+          id="hue"
+          type="range"
+          min="-180"
+          max="180"
+          value="0"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            ぼかし
+          </span>
+
+          <span
+            class="value"
+            id="blurValue"
+          >
+            0px
+          </span>
+
+        </div>
+
+        <input
+          id="blur"
+          type="range"
+          min="0"
+          max="20"
+          value="0"
+        >
+
+      </div>
+
+    </section>
+
+
+    <!-- Presets -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>フィルター</span>
+      </div>
+
+
+      <select
+        class="select"
+        id="preset"
+      >
+
+        <option value="none">
+          オリジナル
+        </option>
+
+        <option value="mono">
+          モノクロ
+        </option>
+
+        <option value="vintage">
+          ヴィンテージ
+        </option>
+
+        <option value="warm">
+          ウォーム
+        </option>
+
+        <option value="cool">
+          クール
+        </option>
+
+        <option value="dramatic">
+          ドラマチック
+        </option>
+
+        <option value="dream">
+          ドリーム
+        </option>
+
+        <option value="noir">
+          ノワール
+        </option>
+
+      </select>
+
+    </section>
+
+
+    <!-- Color -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>カラー</span>
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            セピア
+          </span>
+
+          <span
+            class="value"
+            id="sepiaValue"
+          >
+            0%
+          </span>
+
+        </div>
+
+        <input
+          id="sepia"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        >
+
+      </div>
+
+
+      <div class="control">
+
+        <div class="control-head">
+
+          <span>
+            反転
+          </span>
+
+          <span
+            class="value"
+            id="invertValue"
+          >
+            0%
+          </span>
+
+        </div>
+
+        <input
+          id="invert"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+        >
+
+      </div>
+
+    </section>
+
+
+    <!-- Reset -->
+
+    <section class="section">
+
+      <button
+        class="btn reset-btn"
+        id="resetControls"
+      >
+        ↺ 調整を初期化
+      </button>
+
+    </section>
+
+  </aside>
+
+
+  <!-- =====================================
+       WORKSPACE
+  ====================================== -->
+
+  <main class="workspace">
+
+
+    <div class="canvas-wrap">
+
+      <div
+        class="canvas-stage"
+        id="canvasStage"
+      >
+
+        <canvas id="canvas"></canvas>
+
+      </div>
+
+    </div>
+
+
+    <!-- Empty -->
+
+    <div
+      class="empty"
+      id="emptyState"
+    >
+
+      <div class="empty-card">
+
+        <div class="empty-symbol">
+          ◇
+        </div>
+
+        <h2>
+          画像を編集しましょう
+        </h2>
+
+        <p>
+          左側から画像をアップロードするか、
+          ここへドラッグ＆ドロップしてください。
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- Status -->
+
+    <div class="statusbar">
+
+      <div
+        class="status"
+        id="status"
+      >
+        画像がありません
+      </div>
+
+
+      <div class="zoom">
+
+        <button id="zoomOut">
+          −
+        </button>
+
+        <button id="zoomReset">
+          100%
+        </button>
+
+        <button id="zoomIn">
+          ＋
+        </button>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const canvas =
+  document.getElementById("canvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const dropzone =
+  document.getElementById("dropzone");
+
+const emptyState =
+  document.getElementById("emptyState");
+
+const status =
+  document.getElementById("status");
+
+const canvasStage =
+  document.getElementById("canvasStage");
+
+
+/* =========================================
+   STATE
+========================================= */
+
+let image = null;
+
+let zoom = 1;
+
+let state = {
+
+  opacity: 100,
+
+  brightness: 100,
+
+  contrast: 100,
+
+  saturate: 100,
+
+  hue: 0,
+
+  blur: 0,
+
+  sepia: 0,
+
+  invert: 0,
+
+  flipH: false,
+
+  flipV: false,
+
+  preset: "none"
+
+};
+
+
+let history = [];
+
+let historyIndex = -1;
+
+
+/* =========================================
+   FILE UPLOAD
+========================================= */
+
+dropzone.addEventListener(
+  "click",
+  () => {
+
+    fileInput.click();
+
+  }
+);
+
+
+fileInput.addEventListener(
+  "change",
+  event => {
+
+    const file =
+      event.target.files[0];
+
+    if (file) {
+
+      loadImage(file);
+
+    }
+
+  }
+);
+
+
+["dragenter", "dragover"].forEach(
+  eventName => {
+
+    dropzone.addEventListener(
+      eventName,
+      event => {
+
+        event.preventDefault();
+
+        dropzone.classList.add(
+          "dragover"
+        );
+
+      }
+    );
+
+  }
+);
+
+
+["dragleave", "drop"].forEach(
+  eventName => {
+
+    dropzone.addEventListener(
+      eventName,
+      event => {
+
+        event.preventDefault();
+
+        dropzone.classList.remove(
+          "dragover"
+        );
+
+      }
+    );
+
+  }
+);
+
+
+dropzone.addEventListener(
+  "drop",
+  event => {
+
+    const file =
+      event.dataTransfer.files[0];
+
+    if (
+      file &&
+      file.type.startsWith("image/")
+    ) {
+
+      loadImage(file);
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   LOAD IMAGE
+========================================= */
+
+function loadImage(file) {
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    event => {
+
+      const img =
+        new Image();
+
+      img.onload =
+        () => {
+
+          image = img;
+
+          canvas.width =
+            img.naturalWidth;
+
+          canvas.height =
+            img.naturalHeight;
+
+          emptyState.style.display =
+            "none";
+
+          status.textContent =
+            `${img.naturalWidth} × ${img.naturalHeight}px`;
+
+          resetControls(false);
+
+          history = [];
+
+          historyIndex = -1;
+
+          saveHistory();
+
+          render();
+
+        };
+
+      img.src =
+        event.target.result;
+
+    };
+
+  reader.readAsDataURL(file);
+
+}
+
+
+/* =========================================
+   FILTER
+========================================= */
+
+function getFilter() {
+
+  let brightness =
+    state.brightness;
+
+  let contrast =
+    state.contrast;
+
+  let saturate =
+    state.saturate;
+
+  let hue =
+    state.hue;
+
+  let sepia =
+    state.sepia;
+
+  let invert =
+    state.invert;
+
+  let blur =
+    state.blur;
+
+
+  switch (state.preset) {
+
+    case "mono":
+
+      saturate = 0;
+
+      break;
+
+
+    case "vintage":
+
+      sepia = 35;
+
+      saturate = 82;
+
+      contrast = 110;
+
+      brightness = 105;
+
+      break;
+
+
+    case "warm":
+
+      sepia = 12;
+
+      saturate = 118;
+
+      brightness = 105;
+
+      hue = -8;
+
+      break;
+
+
+    case "cool":
+
+      saturate = 105;
+
+      hue = 18;
+
+      brightness = 102;
+
+      break;
+
+
+    case "dramatic":
+
+      contrast = 145;
+
+      saturate = 118;
+
+      brightness = 94;
+
+      break;
+
+
+    case "dream":
+
+      brightness = 112;
+
+      contrast = 90;
+
+      saturate = 112;
+
+      blur = 1;
+
+      break;
+
+
+    case "noir":
+
+      saturate = 0;
+
+      contrast = 145;
+
+      brightness = 96;
+
+      break;
+
+  }
+
+
+  return `
+    brightness(${brightness}%)
+    contrast(${contrast}%)
+    saturate(${saturate}%)
+    hue-rotate(${hue}deg)
+    sepia(${sepia}%)
+    invert(${invert}%)
+    blur(${blur}px)
+  `;
+
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function render() {
+
+  if (!image) return;
+
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  ctx.save();
+
+
+  ctx.globalAlpha =
+    state.opacity / 100;
+
+
+  ctx.filter =
+    getFilter();
+
+
+  ctx.translate(
+
+    state.flipH
+      ? canvas.width
+      : 0,
+
+    state.flipV
+      ? canvas.height
+      : 0
+
+  );
+
+
+  ctx.scale(
+
+    state.flipH
+      ? -1
+      : 1,
+
+    state.flipV
+      ? -1
+      : 1
+
+  );
+
+
+  ctx.drawImage(
+
+    image,
+
+    0,
+    0,
+
+    canvas.width,
+    canvas.height
+
+  );
+
+
+  ctx.restore();
+
+
+  updateStage();
+
+}
+
+
+/* =========================================
+   ZOOM
+========================================= */
+
+function updateStage() {
+
+  canvasStage.style.transform =
+    `scale(${zoom})`;
+
+}
+
+
+document
+  .getElementById("zoomIn")
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom =
+        Math.min(
+          3,
+          zoom + .1
+        );
+
+      updateStage();
+
+    }
+  );
+
+
+document
+  .getElementById("zoomOut")
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom =
+        Math.max(
+          .2,
+          zoom - .1
+        );
+
+      updateStage();
+
+    }
+  );
+
+
+document
+  .getElementById("zoomReset")
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom = 1;
+
+      updateStage();
+
+    }
+  );
+
+
+/* =========================================
+   RANGE CONTROLS
+========================================= */
+
+const ranges = {
+
+  opacity: "opacityValue",
+
+  brightness: "brightnessValue",
+
+  contrast: "contrastValue",
+
+  saturate: "saturateValue",
+
+  hue: "hueValue",
+
+  blur: "blurValue",
+
+  sepia: "sepiaValue",
+
+  invert: "invertValue"
+
+};
+
+
+Object.entries(ranges).forEach(
+  ([id, output]) => {
+
+    const input =
+      document.getElementById(id);
+
+
+    input.addEventListener(
+      "input",
+      () => {
+
+        state[id] =
+          Number(input.value);
+
+        updateLabel(
+          id,
+          output
+        );
+
+        render();
+
+      }
+    );
+
+
+    input.addEventListener(
+      "change",
+      saveHistory
+    );
+
+  }
+);
+
+
+function updateLabel(
+  id,
+  output
+) {
+
+  const value =
+    state[id];
+
+  let suffix = "%";
+
+
+  if (id === "hue") {
+
+    suffix = "°";
+
+  }
+
+
+  if (id === "blur") {
+
+    suffix = "px";
+
+  }
+
+
+  document
+    .getElementById(output)
+    .textContent =
+      value + suffix;
+
+}
+
+
+/* =========================================
+   PRESET
+========================================= */
+
+document
+  .getElementById("preset")
+  .addEventListener(
+    "change",
+    event => {
+
+      state.preset =
+        event.target.value;
+
+      saveHistory();
+
+      render();
+
+    }
+  );
+
+
+/* =========================================
+   FLIP
+========================================= */
+
+document
+  .getElementById("flipH")
+  .addEventListener(
+    "click",
+    () => {
+
+      state.flipH =
+        !state.flipH;
+
+      document
+        .getElementById("flipH")
+        .classList.toggle(
+          "active",
+          state.flipH
+        );
+
+      saveHistory();
+
+      render();
+
+    }
+  );
+
+
+document
+  .getElementById("flipV")
+  .addEventListener(
+    "click",
+    () => {
+
+      state.flipV =
+        !state.flipV;
+
+      document
+        .getElementById("flipV")
+        .classList.toggle(
+          "active",
+          state.flipV
+        );
+
+      saveHistory();
+
+      render();
+
+    }
+  );
+
+
+/* =========================================
+   RESET
+========================================= */
+
+document
+  .getElementById("resetControls")
+  .addEventListener(
+    "click",
+    () => {
+
+      resetControls();
+
+    }
+  );
+
+
+document
+  .getElementById("resetBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (!image) return;
+
+
+      const ok =
+        confirm(
+          "編集内容をすべてリセットしますか？"
+        );
+
+
+      if (ok) {
+
+        resetControls();
+
+      }
+
+    }
+  );
+
+
+function resetControls(
+  save = true
+) {
+
+  state = {
+
+    opacity: 100,
+
+    brightness: 100,
+
+    contrast: 100,
+
+    saturate: 100,
+
+    hue: 0,
+
+    blur: 0,
+
+    sepia: 0,
+
+    invert: 0,
+
+    flipH: false,
+
+    flipV: false,
+
+    preset: "none"
+
+  };
+
+
+  Object.keys(ranges)
+    .forEach(
+      id => {
+
+        const input =
+          document.getElementById(id);
+
+        input.value =
+          state[id];
+
+        updateLabel(
+          id,
+          ranges[id]
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById("preset")
+    .value = "none";
+
+
+  document
+    .getElementById("flipH")
+    .classList.remove(
+      "active"
+    );
+
+
+  document
+    .getElementById("flipV")
+    .classList.remove(
+      "active"
+    );
+
+
+  if (save) {
+
+    saveHistory();
+
+  }
+
+
+  render();
+
+}
+
+
+/* =========================================
+   HISTORY
+========================================= */
+
+function cloneState() {
+
+  return JSON.parse(
+    JSON.stringify(state)
+  );
+
+}
+
+
+function saveHistory() {
+
+  if (!image) return;
+
+
+  history =
+    history.slice(
+      0,
+      historyIndex + 1
+    );
+
+
+  history.push(
+    cloneState()
+  );
+
+
+  if (history.length > 30) {
+
+    history.shift();
+
+  }
+
+
+  historyIndex =
+    history.length - 1;
+
+}
+
+
+function restoreHistory(index) {
+
+  if (
+    index < 0 ||
+    index >= history.length
+  ) {
+
+    return;
+
+  }
+
+
+  state =
+    JSON.parse(
+      JSON.stringify(
+        history[index]
+      )
+    );
+
+
+  historyIndex =
+    index;
+
+
+  syncControls();
+
+  render();
+
+}
+
+
+document
+  .getElementById("undoBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (historyIndex > 0) {
+
+        restoreHistory(
+          historyIndex - 1
+        );
+
+      }
+
+    }
+  );
+
+
+document
+  .getElementById("redoBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (
+        historyIndex <
+        history.length - 1
+      ) {
+
+        restoreHistory(
+          historyIndex + 1
+        );
+
+      }
+
+    }
+  );
+
+
+function syncControls() {
+
+  Object.keys(ranges)
+    .forEach(
+      id => {
+
+        document
+          .getElementById(id)
+          .value =
+            state[id];
+
+        updateLabel(
+          id,
+          ranges[id]
+        );
+
+      }
+    );
+
+
+  document
+    .getElementById("preset")
+    .value =
+      state.preset;
+
+
+  document
+    .getElementById("flipH")
+    .classList.toggle(
+      "active",
+      state.flipH
+    );
+
+
+  document
+    .getElementById("flipV")
+    .classList.toggle(
+      "active",
+      state.flipV
+    );
+
+}
+
+
+/* =========================================
+   DOWNLOAD
+========================================= */
+
+document
+  .getElementById("downloadBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if (!image) {
+
+        alert(
+          "先に画像をアップロードしてください。"
+        );
+
+        return;
+
+      }
+
+
+      canvas.toBlob(
+        blob => {
+
+          const url =
+            URL.createObjectURL(
+              blob
+            );
+
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+
+          link.href = url;
+
+          link.download =
+            "velvet-edited.png";
+
+
+          document.body.appendChild(
+            link
+          );
+
+
+          link.click();
+
+
+          link.remove();
+
+
+          URL.revokeObjectURL(
+            url
+          );
+
+        },
+
+        "image/png"
+
+      );
+
+    }
+  );
+
+
+/* =========================================
+   KEYBOARD SHORTCUTS
+========================================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      (event.ctrlKey ||
+       event.metaKey) &&
+      event.key.toLowerCase() === "z"
+    ) {
+
+      event.preventDefault();
+
+
+      if (event.shiftKey) {
+
+        document
+          .getElementById("redoBtn")
+          .click();
+
+      } else {
+
+        document
+          .getElementById("undoBtn")
+          .click();
+
+      }
+
+    }
+
+
+    if (
+      (event.ctrlKey ||
+       event.metaKey) &&
+      event.key.toLowerCase() === "y"
+    ) {
+
+      event.preventDefault();
+
+
+      document
+        .getElementById("redoBtn")
+        .click();
+
+    }
+
+
+    if (
+      (event.ctrlKey ||
+       event.metaKey) &&
+      event.key.toLowerCase() === "s"
+    ) {
+
+      event.preventDefault();
+
+
+      document
+        .getElementById("downloadBtn")
+        .click();
+
+    }
+
+  }
+);
+
+
+/* =========================================
+   INIT
+========================================= */
+
+updateStage();
+
+</script>
+
+</body>
+</html>
