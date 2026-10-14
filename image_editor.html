@@ -1325,6 +1325,37 @@ input[type="range"]::-moz-range-thumb {
     </section>
 
 
+    <!-- Save Settings -->
+
+    <section class="section">
+
+      <div class="section-title">
+        <span>保存設定</span>
+      </div>
+
+      <div class="control">
+
+        <div class="control-head">
+          <span>ファイル名</span>
+        </div>
+
+        <input
+          id="saveFileName"
+          type="text"
+          value="edited image by Toshotecho"
+          placeholder="ファイル名を入力してください"
+          style="width:100%; padding:10px; border:1px solid #e3e6ef; border-radius:10px;"
+        >
+
+        <div class="drop-sub">
+          拡張子（.png）は自動で付きます
+        </div>
+
+      </div>
+
+    </section>
+
+
     <!-- Reset -->
 
     <section class="section">
@@ -2352,7 +2383,7 @@ document
   .getElementById("downloadBtn")
   .addEventListener(
     "click",
-    () => {
+    async () => {
 
       if (!image) {
 
@@ -2364,41 +2395,97 @@ document
 
       }
 
+      // 入力されたファイル名を取得
+      let fileName =
+        document
+          .getElementById("saveFileName")
+          .value
+          .trim();
 
+      // 空欄なら初期名を使用
+      if (!fileName) {
+        fileName = "edited image by Toshotecho";
+      }
+
+      // .png が二重に付かないようにする
+      fileName =
+        fileName.replace(/\.png$/i, "");
+
+      fileName += ".png";
+
+      // CanvasをPNG画像に変換
       canvas.toBlob(
-        blob => {
+        async blob => {
 
+          if (!blob) {
+            alert("画像の作成に失敗しました。");
+            return;
+          }
+
+          // フォルダ選択に対応しているブラウザ
+          if ("showSaveFilePicker" in window) {
+
+            try {
+
+              const handle =
+                await window.showSaveFilePicker({
+
+                  suggestedName: fileName,
+
+                  types: [
+                    {
+                      description: "PNG画像",
+                      accept: {
+                        "image/png": [".png"]
+                      }
+                    }
+                  ]
+
+                });
+
+              const writable =
+                await handle.createWritable();
+
+              await writable.write(blob);
+
+              await writable.close();
+
+            } catch (error) {
+
+              // ユーザーがキャンセルした場合は何もしない
+              if (error.name === "AbortError") {
+                return;
+              }
+
+              alert(
+                "保存できませんでした。ブラウザの設定を確認してください。"
+              );
+
+            }
+
+            return;
+
+          }
+
+          // 非対応ブラウザでは従来のダウンロードを使用
           const url =
-            URL.createObjectURL(
-              blob
-            );
-
+            URL.createObjectURL(blob);
 
           const link =
-            document.createElement(
-              "a"
-            );
-
+            document.createElement("a");
 
           link.href = url;
+          link.download = fileName;
 
-          link.download =
-            "velvet-edited.png";
-
-
-          document.body.appendChild(
-            link
-          );
-
+          document.body.appendChild(link);
 
           link.click();
 
-
           link.remove();
 
-
-          URL.revokeObjectURL(
-            url
+          setTimeout(
+            () => URL.revokeObjectURL(url),
+            1000
           );
 
         },
@@ -2409,6 +2496,7 @@ document
 
     }
   );
+
 
 
 /* =========================================
