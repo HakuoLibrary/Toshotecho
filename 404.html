@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>404 - ページが見つかりません | 図書手帳公式ホームページ</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+/* ==========================================================
+FONT
+========================================================== */
+
+@font-face {
+font-family: "やさしさゴシック";
+src: url("やさしさゴシック.otf") format("opentype");
+font-weight: 100 900;
+font-style: normal;
+font-display: swap;
+}
+
+/* ==========================================================
+RESET
+========================================================== */
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+html {
+scroll-behavior: smooth;
+}
+
+body {
+font-family: "やさしさゴシック", sans-serif;
+background: #FAEEDD;
+color: #444;
+overflow-x: hidden;
+min-height: 100vh;
+}
+
+/* ==========================================================
+HEADER
+========================================================== */
+
+.header {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 80px;
+
+display: flex;
+justify-content: space-between;
+align-items: center;
+
+padding: 0 24px;
+
+background: rgba(255, 255, 255, .72);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+
+box-shadow: 0 5px 20px rgba(0, 0, 0, .08);
+
+z-index: 1000;
+}
+
+/* ==========================================================
+LOGO
+========================================================== */
+
+.logo {
+display: flex;
+align-items: center;
+text-decoration: none;
+}
+
+.logo img {
+height: 60px;
+width: auto;
+display: block;
+transition: transform .25s ease;
+}
+
+.logo img:hover {
+transform: scale(1.05);
+}
+
+/* ==========================================================
+MENU BUTTON
+========================================================== */
+
+.menu-btn {
+width: 56px;
+height: 56px;
+
+border: none;
+border-radius: 50%;
+background: white;
+
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 6px;
+
+cursor: pointer;
+
+box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+
+transition:
+transform .3s ease,
+box-shadow .3s ease;
+}
+
+.menu-btn:hover {
+transform: scale(1.05);
+box-shadow: 0 8px 25px rgba(0, 0, 0, .2);
+}
+
+.menu-btn span {
+width: 26px;
+height: 3px;
+
+background: #444;
+border-radius: 20px;
+
+transition:
+transform .35s ease,
+opacity .25s ease;
+}
+
+/* ☰ → × */
+
+.menu-btn.active span:nth-child(1) {
+transform: translateY(9px) rotate(45deg);
+}
+
+.menu-btn.active span:nth-child(2) {
+opacity: 0;
+}
+
+.menu-btn.active span:nth-child(3) {
+transform: translateY(-9px) rotate(-45deg);
+}
+
+/* ==========================================================
+SIDE MENU
+========================================================== */
+
+.menu {
+position: fixed;
+top: 0;
+right: -320px;
+
+width: 300px;
+height: 100vh;
+height: 100dvh;
+
+background: white;
+padding-top: 90px;
+
+display: flex;
+flex-direction: column;
+
+overflow-y: auto;
+
+box-shadow: -10px 0 30px rgba(0, 0, 0, .12);
+
+transition: right .35s cubic-bezier(.4, 0, .2, 1);
+
+z-index: 999;
+}
+
+.menu.open {
+right: 0;
+}
+
+.menu a {
+padding: 18px 24px;
+
+text-decoration: none;
+font-weight: bold;
+color: #444;
+
+transition:
+background .25s ease,
+padding-left .25s ease,
+color .25s ease;
+}
+
+.menu a:hover {
+background: #FAEEDD;
+padding-left: 36px;
+color: #B67832;
+}
+
+/* ==========================================================
+OVERLAY
+========================================================== */
+
+.overlay {
+position: fixed;
+top: 0;
+left: 0;
+
+width: 100%;
+height: 100%;
+
+background: rgba(0, 0, 0, .25);
+
+opacity: 0;
+visibility: hidden;
+pointer-events: none;
+
+transition:
+opacity .3s ease,
+visibility .3s ease;
+
+z-index: 998;
+}
+
+.overlay.show {
+opacity: 1;
+visibility: visible;
+pointer-events: auto;
+}
+
+/* ==========================================================
+404 CONTENT
+========================================================== */
+
+.error-page {
+min-height: 100vh;
+min-height: 100dvh;
+
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+
+text-align: center;
+
+padding: 110px 24px 40px;
+
+animation: fadeIn .9s ease both;
+}
+
+.error-content {
+width: 100%;
+max-width: 700px;
+
+padding: 45px 35px;
+
+background: rgba(255, 255, 255, .78);
+border-radius: 28px;
+
+box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.error-number {
+font-size: clamp(90px, 18vw, 150px);
+line-height: 1;
+font-weight: bold;
+
+color: #B67832;
+
+letter-spacing: 5px;
+
+text-shadow: 4px 5px 0 rgba(182, 120, 50, .12);
+
+margin-bottom: 18px;
+}
+
+.error-content h1 {
+font-size: clamp(23px, 4vw, 34px);
+line-height: 1.6;
+
+color: #8B5A2B;
+
+margin-bottom: 18px;
+}
+
+.error-content p {
+font-size: 16px;
+line-height: 2;
+
+color: #555;
+
+margin-bottom: 30px;
+}
+
+/* ==========================================================
+HOME BUTTON
+========================================================== */
+
+.home-button {
+display: inline-block;
+
+background: #B67832;
+color: white;
+
+text-decoration: none;
+
+padding: 16px 36px;
+
+border-radius: 999px;
+
+font-size: 17px;
+font-weight: bold;
+
+box-shadow: 0 10px 20px rgba(182, 120, 50, .25);
+
+transition:
+transform .3s ease,
+box-shadow .3s ease,
+background .3s ease;
+}
+
+.home-button:hover {
+transform: translateY(-4px) scale(1.03);
+
+background: #A56828;
+
+box-shadow: 0 15px 30px rgba(182, 120, 50, .35);
+}
+
+.home-button:active {
+transform: translateY(0) scale(.98);
+}
+
+/* ==========================================================
+FOOTER
+========================================================== */
+
+footer {
+background: #E8D5BB;
+
+padding: 25px 20px;
+
+text-align: center;
+color: #666;
+
+font-size: 13px;
+line-height: 1.8;
+}
+
+/* ==========================================================
+ANIMATION
+========================================================== */
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(18px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+/* ==========================================================
+ACCESSIBILITY
+========================================================== */
+
+button:focus-visible,
+a:focus-visible {
+outline: 3px solid rgba(182, 120, 50, .5);
+outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+*,
+*::before,
+*::after {
+animation-duration: .01ms !important;
+transition-duration: .01ms !important;
+scroll-behavior: auto !important;
+}
+}
+
+/* ==========================================================
+MOBILE
+========================================================== */
+
+@media (max-width: 768px) {
+
+.header {
+height: 72px;
+padding: 0 16px;
+}
+
+.logo img {
+height: 56px;
+}
+
+.menu {
+width: 260px;
+}
+
+.error-page {
+padding: 100px 18px 30px;
+}
+
+.error-content {
+padding: 35px 22px;
+border-radius: 22px;
+}
+
+.error-content p {
+font-size: 15px;
+}
+
+.home-button {
+padding: 15px 30px;
+font-size: 16px;
+}
+}
+
+@media (max-width: 480px) {
+
+.logo img {
+height: 54px;
+}
+
+.menu-btn {
+width: 52px;
+height: 52px;
+}
+
+.error-content {
+padding: 30px 18px;
+}
+
+.error-content p {
+font-size: 14px;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ==========================================================
+HEADER
+========================================================== -->
+
+<header class="header">
+
+<a href="index.html" class="logo" aria-label="図書手帳トップページ">
+    <img src="icon.png" alt="図書手帳">
+</a>
+
+<button
+    class="menu-btn"
+    id="menuBtn"
+    type="button"
+    aria-label="メニューを開く"
+    aria-expanded="false"
+    aria-controls="menu">
+
+    <span></span>
+    <span></span>
+    <span></span>
+
+</button>
+
+
+</header>
+
+<!-- ==========================================================
+SIDE MENU
+========================================================== -->
+
+<nav class="menu" id="menu" aria-label="メインメニュー">
+
+<a href="index.html">HOME</a>
+
+<a href="application.html">申し込み</a>
+
+<a href="code.html">プロモーションコード</a>
+
+<a href="features.html">特徴</a>
+
+<a href="movie.html">紹介動画</a>
+
+<a href="mutter.html">かもめんのつぶやき</a>
+
+<a
+    href="https://lib-finder.net/hakuo/"
+    target="_blank"
+    rel="noopener noreferrer">
+    蔵書検索（Ａ・Ｂ棟共通）
+</a>
+
+<a href="character.html">キャラクター紹介</a>
+
+<a href="tool.html">お役立ちツール</a>
+
+<a href="inquiry.html">お問い合わせ</a>
+
+
+</nav>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- ==========================================================
+404 CONTENT
+========================================================== -->
+
+<main class="error-page">
+
+<section class="error-content">
+
+    <div class="error-number" aria-hidden="true">
+        404
+    </div>
+
+    <h1>
+        ページが見つかりません
+    </h1>
+
+    <p>
+        お探しのページは見つからなかったようです。<br>
+        URLが間違っているか、ページが移動・削除・未公開の可能性があります。<br>
+        お手数ですが、トップページからお探しください。
+    </p>
+
+    <a href="index.html" class="home-button">
+        トップページへ戻る
+    </a>
+
+</section>
+
+
+</main>
+
+<!-- ==========================================================
+FOOTER
+========================================================== -->
+
+<footer>
+© ２０２６ 図書手帳公式ホームページ
+</footer>
+
+<!-- ==========================================================
+JAVASCRIPT
+========================================================== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+const menuBtn = document.getElementById("menuBtn");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+
+function openMenu() {
+menu.classList.add("open");
+overlay.classList.add("show");
+menuBtn.classList.add("active");
+
+menuBtn.setAttribute("aria-expanded", "true");
+menuBtn.setAttribute("aria-label", "メニューを閉じる");
+
+document.body.style.overflow = "hidden";
+}
+
+function closeMenu() {
+menu.classList.remove("open");
+overlay.classList.remove("show");
+menuBtn.classList.remove("active");
+
+menuBtn.setAttribute("aria-expanded", "false");
+menuBtn.setAttribute("aria-label", "メニューを開く");
+
+document.body.style.overflow = "";
+}
+
+menuBtn.addEventListener("click", function () {
+if (menu.classList.contains("open")) {
+closeMenu();
+} else {
+openMenu();
+}
+});
+
+overlay.addEventListener("click", closeMenu);
+
+menu.querySelectorAll("a").forEach(function (link) {
+link.addEventListener("click", closeMenu);
+});
+
+document.addEventListener("keydown", function (event) {
+if (
+event.key === "Escape" &&
+menu.classList.contains("open")
+) {
+closeMenu();
+menuBtn.focus();
+}
+});
+
+});
+</script>
+
+</body>
+</html>
