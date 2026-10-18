@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#06c755">
+<title>図書手帳 グループチャット</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef1f4;color:#222;font-family:system-ui,sans-serif}
+header{background:#06c755;color:white;padding:18px;font-weight:bold;font-size:20px}
+main{max-width:720px;margin:auto;padding:14px}
+.panel{background:white;border-radius:16px;padding:16px;margin-bottom:12px}
+input,button{font:inherit}
+input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:5px 0 12px}
+button{border:0;border-radius:10px;padding:11px;cursor:pointer}
+.primary{background:#06c755;color:white;font-weight:bold;width:100%}
+#chat{display:none}
+#messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 0}
+.msg{max-width:85%;align-self:flex-start}
+.msg.mine{align-self:flex-end}
+.who,.meta{font-size:11px;color:#777;margin:4px}
+.bubble{background:white;padding:11px 13px;border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.mine .bubble{background:#b9f6ca;border-radius:15px 5px 15px 15px}
+.bubble img{max-width:100%;max-height:280px;display:block;border-radius:8px}
+.del{background:transparent;color:#777;font-size:12px;padding:3px}
+.composer{background:white;padding:12px;border-radius:14px}
+.tools{display:flex;gap:7px;align-items:center}
+.tools input{flex:1;min-width:0;margin:0}
+.tools button{background:#f0f3f5}
+#status{font-size:12px;color:#666;margin-top:9px}
+#stamps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+#stamps button{font-size:23px;background:#f2f4f5}
+.small{font-size:12px;color:#777;line-height:1.6}
+</style>
+</head>
+<body>
+<header>🍀 図書手帳 グループチャット</header>
+<main>
+<section id="entry" class="panel">
+<h2>グループに参加</h2>
+<label>グループ名</label>
+<input id="room" maxlength="40" placeholder="例：友だちグループ">
+<label>合言葉</label>
+<input id="pass" type="password" maxlength="80" placeholder="グループの合言葉">
+<label>ニックネーム</label>
+<input id="nick" maxlength="24" placeholder="表示する名前">
+<button id="join" class="primary">参加する</button>
+<p id="entryStatus" class="small">Firebaseに接続しています...</p>
+</section>
+
+<section id="chat" class="panel">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h3 id="roomTitle"></h3>
+<button id="leave">退出</button>
+</div>
+<div id="messages" aria-live="polite"></div>
+<div class="composer">
+<div id="stamps" hidden>
+<button>😀</button><button>😂</button><button>🥰</button>
+<button>👍</button><button>❤️</button><button>🎉</button>
+<button>🙏</button><button>🐱</button>
+</div>
+<div class="tools">
+<button id="emoji" aria-label="絵文字">😊</button>
+<button id="photoBtn" aria-label="画像を選択">📷</button>
+<input id="photo" type="file" accept="image/*" hidden>
+<input id="message" maxlength="1000" placeholder="メッセージを入力">
+</div>
+<p id="preview" class="small"></p>
+<button id="send" class="primary" style="margin-top:9px">送信 ➤</button>
+<div id="status">未接続</div>
+</div>
+</section>
+<p class="small">公開テスト用です。現状では合言葉による参加資格をサーバーで検証していません。機密情報を送らないでください。</p>
+</main>
+
+<script type="module">
+import {initializeApp}
+ from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import {getAuth,signInAnonymously,onAuthStateChanged}
+ from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {getDatabase,ref,push,set,onChildAdded,onChildRemoved,query,limitToLast,remove}
+ from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+/* Firebase Consoleで登録したWebアプリの設定 */
+const firebaseConfig={
+ apiKey:"AIzaSyCCX2e4Rbdi9znCrBb2q9bPH1id3TMQ7bI",
+ authDomain:"toshotecho-chat.firebaseapp.com",
+ databaseURL:"https://toshotecho-chat-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"toshotecho-chat",
+ storageBucket:"toshotecho-chat.firebasestorage.app",
+ messagingSenderId:"980404604877",
+ appId:"1:980404604877:web:d6367125b5908af828be84"
+};
+
+const $=id=>document.getElementById(id);
+let app,auth,db,user,roomId,nickname,roomName;
+let stopAdded,stopRemoved,photoData="";
+const say=t=>$("status").textContent=t;
+const sayEntry=t=>$("entryStatus").textContent=t;
+
+try{
+ app=initializeApp(firebaseConfig);
+ auth=getAuth(app);
+ db=getDatabase(app);
+ onAuthStateChanged(auth,u=>{
+  if(u){user=u;sayEntry("接続準備完了。グループ情報を入力してください。");}
+ });
+ signInAnonymously(auth).catch(e=>sayEntry("認証エラー："+e.message));
+}catch(e){sayEntry("Firebase設定を確認してください。");}
+
+async function makeRoomId(name,pass){
+ const input=name.normalize("NFKC").trim().toLowerCase()+"\0"+pass;
+ const bytes=new TextEncoder().encode(input);
+ const hash=await crypto.subtle.digest("SHA-256",bytes);
+ return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+$("join").onclick=async()=>{
+ if(!user)return sayEntry("認証中です。少し待ってください。");
+ roomName=$("room").value.trim();
+ const pass=$("pass").value;
+ nickname=$("nick").value.trim();
+ if(!roomName||!pass||!nickname)
+  return sayEntry("グループ名、合言葉、ニックネームを入力してください。");
+
+ $("join").disabled=true;
+ try{
+  roomId=await makeRoomId(roomName,pass);
+  $("roomTitle").textContent=roomName;
+  $("entry").style.display="none";
+  $("chat").style.display="block";
+  $("messages").replaceChildren();
+
+  const list=query(ref(db,`rooms/${roomId}/messages`),limitToLast(100));
+  stopAdded=onChildAdded(list,snap=>render(snap.key,snap.val()),e=>say("読み込みエラー："+e.message));
+  stopRemoved=onChildRemoved(ref(db,`rooms/${roomId}/messages`),snap=>{
+   document.getElementById("m-"+snap.key)?.remove();
+  });
+  say("接続しました");
+ }catch(e){
+  sayEntry("入室エラー："+e.message);
+  $("entry").style.display="block";
+  $("chat").style.display="none";
+ }finally{$("join").disabled=false;}
+};
+
+function render(id,m){
+ if(!m||document.getElementById("m-"+id))return;
+ const wrap=document.createElement("article");
+ wrap.id="m-"+id;
+ wrap.className="msg"+(m.uid===user?.uid?" mine":"");
+ const who=document.createElement("div");
+ who.className="who";who.textContent=m.nick||"参加者";
+ const bubble=document.createElement("div");
+ bubble.className="bubble";
+ if(m.text)bubble.textContent=m.text;
+ if(m.image){
+  const img=document.createElement("img");
+  img.src=m.image;img.alt="送信画像";img.loading="lazy";
+  bubble.append(img);
+ }
+ const meta=document.createElement("div");
+ meta.className="meta";
+ meta.textContent=new Date(m.time||Date.now()).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+ wrap.append(who,bubble,meta);
+ if(m.uid===user?.uid){
+  const del=document.createElement("button");
+  del.className="del";del.textContent="削除";
+  del.onclick=async()=>{
+   if(confirm("このメッセージを削除しますか？")){
+    try{await remove(ref(db,`rooms/${roomId}/messages/${id}`));}
+    catch(e){say("削除できません。ルールを確認してください。");}
+   }
+  };
+  wrap.append(del);
+ }
+ $("messages").append(wrap);
+ $("messages").scrollTop=$("messages").scrollHeight;
+}
+
+async function send(){
+ if(!roomId||!user)return;
+ const text=$("message").value.trim();
+ if(!text&&!photoData)return;
+ if(photoData.length>180000)return say("画像が大きすぎます。小さい画像を選んでください。");
+ say("送信中...");
+ try{
+  const item=push(ref(db,`rooms/${roomId}/messages`));
+  await set(item,{uid:user.uid,nick:nickname,text,image:photoData,time:Date.now()});
+  $("message").value="";
+  photoData="";$("photo").value="";$("preview").textContent="";
+  say("送信しました");
+ }catch(e){say("送信失敗。認証とデータベースのルールを確認してください。");}
+}
+$("send").onclick=send;
+$("message").onkeydown=e=>{
+ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}
+};
+$("emoji").onclick=()=>$("stamps").hidden=!$("stamps").hidden;
+$("stamps").querySelectorAll("button").forEach(b=>{
+ b.onclick=()=>{$("message").value+=b.textContent;$("stamps").hidden=true;};
+});
+$("photoBtn").onclick=()=>$("photo").click();
+$("photo").onchange=e=>{
+ const file=e.target.files?.[0];
+ if(!file)return;
+ if(!file.type.startsWith("image/"))return say("画像ファイルを選んでください。");
+ if(file.size>120000)return say("画像は120KB以下にしてください。");
+ const reader=new FileReader();
+ reader.onload=()=>{photoData=reader.result;$("preview").textContent="画像を選択しました。送信できます。";};
+ reader.readAsDataURL(file);
+};
+$("leave").onclick=()=>{
+ stopAdded?.();stopRemoved?.();
+ stopAdded=null;stopRemoved=null;roomId=null;photoData="";
+ $("chat").style.display="none";$("entry").style.display="block";
+ $("pass").value="";sayEntry("退出しました。");
+};
+</script>
+</body>
+</html>
