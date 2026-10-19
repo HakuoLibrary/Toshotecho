@@ -21,10 +21,26 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .primary{background:#06c755;color:white;font-weight:bold;width:100%}
 #chat{display:none}
 #messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 0;overscroll-behavior:contain}
-.msg{max-width:85%;align-self:flex-start;min-width:0}
+.msg{
+  max-width:85%;
+  align-self:flex-start;
+  min-width:0;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
 .msg.mine{align-self:flex-end}
 .who,.meta{font-size:11px;color:#777;margin:4px}
-.bubble{background:#F0F0F0;padding:11px 13px;border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.bubble{
+  background:#F0F0F0;
+  padding:11px 13px;
+  border-radius:5px 15px 15px 15px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
 .mine .bubble{background:#b9f6ca;border-radius:15px 5px 15px 15px}
 .bubble a{color:#0878c9;text-decoration:underline;overflow-wrap:anywhere}
 .bubble img{max-width:100%;max-height:280px;display:block;border-radius:8px;cursor:zoom-in;margin-top:5px}
@@ -288,12 +304,15 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 <!-- メッセージメニュー -->
+
 <div id="menu" role="menu" style="display:none;position:fixed;z-index:1000;background:white;border-radius:12px;padding:6px;box-shadow:0 5px 25px #0003;min-width:155px">
 <button data-action="reply" style="display:block;width:100%;text-align:left;background:white">↩ リプライ</button>
 <button data-action="mention" style="display:block;width:100%;text-align:left;background:white">＠ メンション</button>
+<button data-action="copy" style="display:block;width:100%;text-align:left;background:white">📋 コピー</button>
 <button data-action="edit" style="display:block;width:100%;text-align:left;background:white">✏ 編集</button>
 <button data-action="delete" class="danger" style="display:block;width:100%;text-align:left;background:white;color:#d22">🗑 削除</button>
 </div>
+
 
 <!-- 画像拡大表示 -->
 <div id="imageModal" role="dialog" aria-modal="true" aria-label="画像拡大表示">
@@ -644,8 +663,10 @@ function render(id,m){
  }
 
  wrap.addEventListener("contextmenu",e=>{
-  e.preventDefault();
-  showMenu(id,m,e.clientX,e.clientY);
+   e.preventDefault();
+   e.stopPropagation();
+   window.getSelection()?.removeAllRanges();
+   showMenu(id,m,e.clientX,e.clientY);
  });
 
  wrap.addEventListener("pointerdown",e=>{
@@ -690,7 +711,7 @@ function showMenu(id,m,x,y){
  menu.querySelector('[data-action="delete"]').style.display=
   m.uid===user?.uid?"block":"none";
 
- const width=175,height=190;
+ const width=175,height=230;
  menu.style.left=Math.max(5,Math.min(x,innerWidth-width-5))+"px";
  menu.style.top=Math.max(5,Math.min(y,innerHeight-height-5))+"px";
 }
@@ -720,6 +741,44 @@ $("menu").querySelectorAll("button").forEach(button=>{
     $("message").focus();
     break;
 
+
+    case "copy":
+     try{
+      const copyText=m.text||"";
+
+      if(copyText){
+       await navigator.clipboard.writeText(copyText);
+       say("メッセージをコピーしました");
+      }else if(m.image){
+       say("このメッセージには本文がありません。");
+      }else{
+       say("コピーする内容がありません。");
+      }
+     }catch(e){
+      // Clipboard APIが使えない環境では代替手段を使用
+      try{
+       const temp=document.createElement("textarea");
+       temp.value=m.text||"";
+       temp.style.position="fixed";
+       temp.style.opacity="0";
+       document.body.appendChild(temp);
+       temp.select();
+
+       const copied=document.execCommand("copy");
+       temp.remove();
+
+       if(copied){
+        say("メッセージをコピーしました");
+       }else{
+        say("コピーできませんでした。");
+       }
+      }catch(err){
+       say("コピーできませんでした。");
+      }
+     }
+     break;
+
+      
    case "mention":
     $("message").value+="@"+(m.nick||"参加者")+" ";
     $("message").focus();
