@@ -182,6 +182,36 @@ button:disabled{opacity:.5;cursor:not-allowed}
   .entry-heading h2{font-size:19px}
   .how-to-content{padding:20px 16px;max-height:88vh}
 }
+
+
+/* 長押しメニューの文字選択・ブラウザ標準メニューを防止 */
+#menu,
+#menu * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#menu button {
+  touch-action: manipulation;
+}
+
+/* メッセージ内でも長押しによる文字選択を防止 */
+.msg,
+.msg * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* メッセージ内のリンクや画像の操作性は維持 */
+.bubble a,
+.bubble img {
+  -webkit-user-drag: none;
+}
+
+  
 </style>
 </head>
 <body>
