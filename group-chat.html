@@ -12,77 +12,298 @@ body{margin:0;background:#eef1f4;color:#222;font-family:system-ui,sans-serif}
 header{background:#06c755;color:white;padding:18px;font-weight:bold;font-size:20px}
 main{max-width:720px;margin:auto;padding:14px}
 .panel{background:white;border-radius:16px;padding:16px;margin-bottom:12px}
-input,button{font:inherit}
-input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:5px 0 12px}
+input,button,textarea{font:inherit}
+input,textarea{padding:12px;border:1px solid #ddd;border-radius:10px}
+input{width:100%;margin:5px 0 12px}
 button{border:0;border-radius:10px;padding:11px;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
 .primary{background:#06c755;color:white;font-weight:bold;width:100%}
 #chat{display:none}
-#messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 0}
-.msg{max-width:85%;align-self:flex-start}
+#messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 0;overscroll-behavior:contain}
+.msg{max-width:85%;align-self:flex-start;min-width:0}
 .msg.mine{align-self:flex-end}
 .who,.meta{font-size:11px;color:#777;margin:4px}
-.bubble{background:white;padding:11px 13px;border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble{background:white;padding:11px 13px;border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
 .mine .bubble{background:#b9f6ca;border-radius:15px 5px 15px 15px}
-.bubble img{max-width:100%;max-height:280px;display:block;border-radius:8px}
+.bubble a{color:#0878c9;text-decoration:underline;overflow-wrap:anywhere}
+.bubble img{max-width:100%;max-height:280px;display:block;border-radius:8px;cursor:zoom-in;margin-top:5px}
+.reply-preview{border-left:3px solid #06c755;padding:5px 8px;margin-bottom:7px;background:#ffffff75;border-radius:4px;font-size:12px;color:#555;overflow-wrap:anywhere}
+.mine .reply-preview{background:#9be9b2}
+.meta{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
 .del{background:transparent;color:#777;font-size:12px;padding:3px}
 .composer{background:white;padding:12px;border-radius:14px}
 .tools{display:flex;gap:7px;align-items:center}
 .tools input{flex:1;min-width:0;margin:0}
 .tools button{background:#f0f3f5}
+#message{width:100%;min-height:43px;max-height:150px;resize:vertical}
 #status{font-size:12px;color:#666;margin-top:9px}
 #stamps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 #stamps button{font-size:23px;background:#f2f4f5}
 .small{font-size:12px;color:#777;line-height:1.6}
+.searchbar{display:flex;gap:7px;margin:12px 0}
+.searchbar input{min-width:0;flex:1;margin:0}
+#searchResults{display:none;max-height:240px;overflow:auto;margin-bottom:10px}
+.search-result{width:100%;text-align:left;background:#f3f6f4;margin-bottom:5px;overflow-wrap:anywhere}
+.search-result small{display:block;color:#777}
+#replyBar{display:none;background:#e9f8ee;padding:9px 12px;border-radius:9px;margin-bottom:8px;font-size:12px}
+#replyCancel{float:right;padding:2px 7px;background:transparent}
+#editBar{display:none;background:#fff4d8;padding:9px 12px;border-radius:9px;margin-bottom:8px}
+.notice-btn{background:#e8f7ed;color:#176e38;font-size:12px;padding:8px}
+
+/* 参加画面の見出しと使い方ボタン */
+.entry-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.entry-heading h2{
+  margin:0;
+  font-size:22px;
+}
+.how-to-btn{
+  flex-shrink:0;
+  background:#e8f7ed;
+  color:#176e38;
+  font-weight:bold;
+  padding:9px 15px;
+  border:1px solid #b9e7c8;
+}
+.how-to-btn:hover{background:#d5f2df}
+
+/* 使い方ポップアップ */
+.how-to-modal{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  background:#0008;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.how-to-modal[hidden]{display:none}
+.how-to-content{
+  position:relative;
+  width:100%;
+  max-width:540px;
+  max-height:85vh;
+  overflow-y:auto;
+  background:white;
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 10px 40px #0003;
+}
+.how-to-content h2{
+  color:#287b47;
+  font-size:21px;
+  padding-right:30px;
+  margin-top:0;
+}
+.how-to-content h3{
+  font-size:15px;
+  margin:20px 0 7px;
+  color:#333;
+}
+.how-to-text p{
+  font-size:14px;
+  line-height:1.8;
+  margin:0;
+  overflow-wrap:anywhere;
+}
+.how-to-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:#f0f3f5;
+  font-size:17px;
+  padding:7px 10px;
+}
+#howToOk{margin-top:22px}
+
+/* 画像拡大 */
+#imageModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  background:#000e;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+#imageModal.open{display:flex}
+#imageModal img{
+  max-width:100%;
+  max-height:88vh;
+  object-fit:contain;
+  border-radius:8px;
+}
+#imageClose{
+  position:absolute;
+  top:12px;
+  right:12px;
+  background:white;
+  font-size:20px;
+}
+#modalContent{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+}
+@media(max-width:480px){
+  header{font-size:18px;padding:15px 12px}
+  main{padding:9px}
+  .panel{padding:12px}
+  #messages{height:55vh}
+  .msg{max-width:92%}
+  .tools{gap:5px}
+  .tools button{padding:9px}
+  .entry-heading h2{font-size:19px}
+  .how-to-content{padding:20px 16px;max-height:88vh}
+}
 </style>
 </head>
 <body>
 <header>🍀 図書手帳 グループチャット</header>
+
 <main>
 <section id="entry" class="panel">
-<h2>グループに参加</h2>
-<label>グループ名</label>
+
+<div class="entry-heading">
+  <h2>グループに参加</h2>
+  <button type="button" id="howToBtn" class="how-to-btn">使い方</button>
+</div>
+
+<label for="room">グループ名</label>
 <input id="room" maxlength="40" placeholder="例：友だちグループ">
-<label>合言葉</label>
+
+<label for="pass">合言葉</label>
 <input id="pass" type="password" maxlength="80" placeholder="グループの合言葉">
-<label>ニックネーム</label>
+
+<label for="nick">ニックネーム</label>
 <input id="nick" maxlength="24" placeholder="表示する名前">
+
 <button id="join" class="primary">参加する</button>
 <p id="entryStatus" class="small">Firebaseに接続しています...</p>
 </section>
 
 <section id="chat" class="panel">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<h3 id="roomTitle"></h3>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+<h3 id="roomTitle" style="overflow-wrap:anywhere"></h3>
+<div style="display:flex;gap:6px">
+<button id="notifyBtn" class="notice-btn">🔔 通知を有効にする</button>
 <button id="leave">退出</button>
 </div>
+</div>
+
+<div class="searchbar">
+<input id="search" type="search" placeholder="🔍 過去のメッセージを検索">
+<button id="clearSearch">クリア</button>
+</div>
+<div id="searchResults"></div>
 <div id="messages" aria-live="polite"></div>
+
 <div class="composer">
+<div id="replyBar">
+<button id="replyCancel">✕</button>
+<strong>返信先：</strong><span id="replyText"></span>
+</div>
+
+<div id="editBar">
+編集中です。
+<button id="editCancel" style="float:right;padding:2px 7px">キャンセル</button>
+</div>
+
 <div id="stamps" hidden>
 <button>😀</button><button>😂</button><button>🥰</button>
 <button>👍</button><button>❤️</button><button>🎉</button>
 <button>🙏</button><button>🐱</button>
 </div>
+
 <div class="tools">
 <button id="emoji" aria-label="絵文字">😊</button>
 <button id="photoBtn" aria-label="画像を選択">📷</button>
 <input id="photo" type="file" accept="image/*" hidden>
-<input id="message" maxlength="1000" placeholder="メッセージを入力">
 </div>
+
+<textarea id="message" maxlength="1000" rows="2"
+ placeholder="メッセージを入力（Enterで送信・Shift+Enterで改行）"></textarea>
+
 <p id="preview" class="small"></p>
 <button id="send" class="primary" style="margin-top:9px">送信 ➤</button>
 <div id="status">未接続</div>
 </div>
 </section>
-<p class="small">公開テスト用です。現状では合言葉による参加資格をサーバーで検証していません。機密情報を送らないでください。</p>
+
+<p class="small">公開テスト用です。合言葉はサーバー側で検証されていません。機密情報を送らないでください。</p>
 </main>
+
+<!-- 使い方ポップアップ：この中の文章は自由に編集できます -->
+<div id="howToModal" class="how-to-modal" hidden>
+  <div class="how-to-content" role="dialog" aria-modal="true" aria-labelledby="howToTitle">
+    <button type="button" id="howToClose" class="how-to-close" aria-label="閉じる">✕</button>
+
+    <h2 id="howToTitle">📖 グループチャットの使い方</h2>
+
+    <div class="how-to-text">
+
+      <!-- ▼ ここから説明文を自由に変更できます ▼ -->
+
+      <h3>1. グループに参加する</h3>
+      <p>グループ名・合言葉・ニックネームを入力して、「参加する」ボタンを押してください。</p>
+
+      <h3>2. メッセージを送信する</h3>
+      <p>入力欄にメッセージを入力し、「送信」ボタンを押してください。Enterキーでも送信できます。Shift＋Enterで改行できます。</p>
+
+      <h3>3. メッセージに返信する</h3>
+      <p>メッセージを長押し（PCでは右クリック）すると、返信やメンションなどのメニューが表示されます。自分のメッセージは編集・削除もできます。</p>
+
+      <h3>4. 画像やリンクを開く</h3>
+      <p>送信された画像をタップすると拡大表示できます。メッセージ内のリンクをタップすると、リンク先を開けます。</p>
+
+      <h3>5. 過去のメッセージを検索する</h3>
+      <p>画面上部の検索欄にキーワードを入力すると、過去のメッセージを検索できます。</p>
+
+      <h3>6. 通知を受け取る</h3>
+      <p>チャット画面の「通知を有効にする」ボタンから、ブラウザ通知を許可してください。</p>
+
+      <p class="small">※この説明文は仮の文章です。必要に応じて編集してください。</p>
+
+      <!-- ▲ 説明文はここまで ▲ -->
+
+    </div>
+
+    <button type="button" id="howToOk" class="primary">閉じる</button>
+  </div>
+</div>
+
+<!-- メッセージメニュー -->
+<div id="menu" role="menu" style="display:none;position:fixed;z-index:1000;background:white;border-radius:12px;padding:6px;box-shadow:0 5px 25px #0003;min-width:155px">
+<button data-action="reply" style="display:block;width:100%;text-align:left;background:white">↩ リプライ</button>
+<button data-action="mention" style="display:block;width:100%;text-align:left;background:white">＠ メンション</button>
+<button data-action="edit" style="display:block;width:100%;text-align:left;background:white">✏ 編集</button>
+<button data-action="delete" class="danger" style="display:block;width:100%;text-align:left;background:white;color:#d22">🗑 削除</button>
+</div>
+
+<!-- 画像拡大表示 -->
+<div id="imageModal" role="dialog" aria-modal="true" aria-label="画像拡大表示">
+<button id="imageClose" aria-label="閉じる">✕</button>
+<div id="modalContent"></div>
+</div>
 
 <script type="module">
 import {initializeApp}
  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {getAuth,signInAnonymously,onAuthStateChanged}
  from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
-import {getDatabase,ref,push,set,onChildAdded,onChildRemoved,query,limitToLast,remove}
- from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import {
+ getDatabase,ref,push,set,update,onChildAdded,onChildChanged,
+ onChildRemoved,query,remove
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 /* Firebase Consoleで登録したWebアプリの設定 */
 const firebaseConfig={
@@ -97,127 +318,687 @@ const firebaseConfig={
 
 const $=id=>document.getElementById(id);
 let app,auth,db,user,roomId,nickname,roomName;
-let stopAdded,stopRemoved,photoData="";
+let stopAdded,stopChanged,stopRemoved;
+let photoData="",editingId=null,replyTo=null,selectedMessage=null;
+let messageCache=new Map();
+let pressTimer=null,longPressed=false;
+let joining=false;
+let initialLoadComplete=false;
+let initialMessagesPending=0;
+
 const say=t=>$("status").textContent=t;
 const sayEntry=t=>$("entryStatus").textContent=t;
+const messagesRef=()=>ref(db,`rooms/${roomId}/messages`);
+const messageRef=id=>ref(db,`rooms/${roomId}/messages/${id}`);
 
 try{
  app=initializeApp(firebaseConfig);
  auth=getAuth(app);
  db=getDatabase(app);
  onAuthStateChanged(auth,u=>{
-  if(u){user=u;sayEntry("接続準備完了。グループ情報を入力してください。");}
+  if(u){
+   user=u;
+   sayEntry("接続準備完了。グループ情報を入力してください。");
+  }
  });
  signInAnonymously(auth).catch(e=>sayEntry("認証エラー："+e.message));
-}catch(e){sayEntry("Firebase設定を確認してください。");}
+}catch(e){
+ sayEntry("Firebase設定を確認してください。");
+}
+
+/* 使い方ポップアップ */
+const howToModal=$("howToModal");
+
+$("howToBtn").onclick=()=>{
+ howToModal.hidden=false;
+ $("howToClose").focus();
+};
+
+function closeHowTo(){
+ howToModal.hidden=true;
+ $("howToBtn").focus();
+}
+
+$("howToClose").onclick=closeHowTo;
+$("howToOk").onclick=closeHowTo;
+
+howToModal.addEventListener("click",e=>{
+ if(e.target===howToModal)closeHowTo();
+});
 
 async function makeRoomId(name,pass){
  const input=name.normalize("NFKC").trim().toLowerCase()+"\0"+pass;
  const bytes=new TextEncoder().encode(input);
  const hash=await crypto.subtle.digest("SHA-256",bytes);
- return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+ return [...new Uint8Array(hash)]
+  .map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
 $("join").onclick=async()=>{
+ if(joining)return;
  if(!user)return sayEntry("認証中です。少し待ってください。");
+
  roomName=$("room").value.trim();
  const pass=$("pass").value;
  nickname=$("nick").value.trim();
+
  if(!roomName||!pass||!nickname)
   return sayEntry("グループ名、合言葉、ニックネームを入力してください。");
 
+ joining=true;
  $("join").disabled=true;
+
  try{
   roomId=await makeRoomId(roomName,pass);
   $("roomTitle").textContent=roomName;
   $("entry").style.display="none";
   $("chat").style.display="block";
   $("messages").replaceChildren();
+  $("searchResults").replaceChildren();
+  $("searchResults").style.display="none";
+  messageCache.clear();
+  initialLoadComplete=false;
+  initialMessagesPending=0;
 
-  const list=query(ref(db,`rooms/${roomId}/messages`),limitToLast(100));
-  stopAdded=onChildAdded(list,snap=>render(snap.key,snap.val()),e=>say("読み込みエラー："+e.message));
-  stopRemoved=onChildRemoved(ref(db,`rooms/${roomId}/messages`),snap=>{
-   document.getElementById("m-"+snap.key)?.remove();
+  const list=query(messagesRef());
+
+  stopAdded=onChildAdded(list,snap=>{
+   const isNew=!messageCache.has(snap.key);
+
+   if(!initialLoadComplete)initialMessagesPending++;
+
+   messageCache.set(snap.key,snap.val());
+   render(snap.key,snap.val());
+
+   if(isNew)handleIncoming(snap.key,snap.val());
+
+   if(!initialLoadComplete){
+    initialMessagesPending--;
+    clearTimeout(window._initialLoadTimer);
+    window._initialLoadTimer=setTimeout(()=>{
+     initialLoadComplete=true;
+    },800);
+   }
+  },e=>say("読み込みエラー："+e.message));
+
+  stopChanged=onChildChanged(messagesRef(),snap=>{
+   messageCache.set(snap.key,snap.val());
+   render(snap.key,snap.val());
   });
+
+  stopRemoved=onChildRemoved(messagesRef(),snap=>{
+   messageCache.delete(snap.key);
+   $("m-"+snap.key)?.remove();
+   runSearch();
+  });
+
   say("接続しました");
  }catch(e){
   sayEntry("入室エラー："+e.message);
   $("entry").style.display="block";
   $("chat").style.display="none";
- }finally{$("join").disabled=false;}
+ }finally{
+  joining=false;
+  $("join").disabled=false;
+ }
 };
+
+/* ブラウザ通知 */
+$("notifyBtn").onclick=async()=>{
+ if(!("Notification" in window)){
+  say("このブラウザは通知に対応していません。");
+  return;
+ }
+ try{
+  const permission=await Notification.requestPermission();
+  if(permission==="granted"){
+   $("notifyBtn").textContent="🔔 通知は有効です";
+   say("ブラウザ通知を有効にしました");
+  }else{
+   say("通知が許可されませんでした。ブラウザの設定を確認してください。");
+  }
+ }catch(e){
+  say("通知を有効にできませんでした。");
+ }
+};
+
+function handleIncoming(id,m){
+ if(!m||m.uid===user?.uid)return;
+
+ // 簡易既読情報を記録
+ if(roomId&&user){
+  update(ref(db,`rooms/${roomId}/messages/${id}/readBy`),{
+   [user.uid]:true
+  }).catch(()=>{});
+ }
+
+ // 初回の過去投稿では通知しない
+ if(!initialLoadComplete)return;
+
+ if("Notification" in window&&Notification.permission==="granted"&&document.hidden){
+  const title=m.nick||"参加者";
+  const body=m.text||(m.image?"📷 画像":"新しいメッセージ");
+  try{
+   const notification=new Notification(title,{
+    body:body.slice(0,120),
+    tag:"chat-"+id
+   });
+   notification.onclick=()=>{
+    window.focus();
+    notification.close();
+   };
+  }catch(e){}
+ }
+}
+
+/* URLをクリックできるリンクに変換 */
+function linkify(text,container){
+ const re=/(https?:\/\/[^\s<>"']+)/gi;
+ let last=0,match;
+
+ while((match=re.exec(text))!==null){
+  container.append(document.createTextNode(text.slice(last,match.index)));
+  let url=match[0];
+  let suffix="";
+
+  while(/[),.!?。、）】』」]$/.test(url)){
+   suffix=url.slice(-1)+suffix;
+   url=url.slice(0,-1);
+  }
+
+  try{
+   const parsed=new URL(url);
+   if(parsed.protocol==="http:"||parsed.protocol==="https:"){
+    const a=document.createElement("a");
+    a.href=parsed.href;
+    a.textContent=url;
+    a.target="_blank";
+    a.rel="noopener noreferrer";
+    container.append(a);
+   }else{
+    container.append(document.createTextNode(url));
+   }
+  }catch(e){
+   container.append(document.createTextNode(url));
+  }
+
+  if(suffix)container.append(document.createTextNode(suffix));
+  last=re.lastIndex;
+ }
+
+ container.append(document.createTextNode(text.slice(last)));
+}
+
+function formatDate(time){
+ return new Date(time||Date.now()).toLocaleDateString("ja-JP",{
+  year:"numeric",month:"2-digit",day:"2-digit"
+ });
+}
+
+function formatTime(time){
+ return new Date(time||Date.now()).toLocaleTimeString("ja-JP",{
+  hour:"2-digit",minute:"2-digit"
+ });
+}
 
 function render(id,m){
- if(!m||document.getElementById("m-"+id))return;
+ if(!m||!user)return;
+
+ const old=$("m-"+id);
+ const el=$("messages");
+ const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<100;
+
  const wrap=document.createElement("article");
  wrap.id="m-"+id;
- wrap.className="msg"+(m.uid===user?.uid?" mine":"");
+ wrap.className="msg"+(m.uid===user.uid?" mine":"");
+
  const who=document.createElement("div");
- who.className="who";who.textContent=m.nick||"参加者";
+ who.className="who";
+ who.textContent=m.nick||"参加者";
+
  const bubble=document.createElement("div");
  bubble.className="bubble";
- if(m.text)bubble.textContent=m.text;
- if(m.image){
-  const img=document.createElement("img");
-  img.src=m.image;img.alt="送信画像";img.loading="lazy";
-  bubble.append(img);
- }
- const meta=document.createElement("div");
- meta.className="meta";
- meta.textContent=new Date(m.time||Date.now()).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
- wrap.append(who,bubble,meta);
- if(m.uid===user?.uid){
-  const del=document.createElement("button");
-  del.className="del";del.textContent="削除";
-  del.onclick=async()=>{
-   if(confirm("このメッセージを削除しますか？")){
-    try{await remove(ref(db,`rooms/${roomId}/messages/${id}`));}
-    catch(e){say("削除できません。ルールを確認してください。");}
+
+ if(m.replyTo){
+  const rp=document.createElement("div");
+  rp.className="reply-preview";
+
+  const name=document.createElement("strong");
+  name.textContent=(m.replyTo.nick||"参加者")+"への返信";
+
+  const content=document.createElement("div");
+  content.textContent=(m.replyTo.text||"").slice(0,180)||
+   (m.replyTo.image?"📷 画像":"メッセージ");
+
+  rp.append(name,content);
+  rp.style.cursor="pointer";
+  rp.onclick=()=>{
+   const target=$("m-"+m.replyTo.id);
+   if(target){
+    target.scrollIntoView({behavior:"smooth",block:"center"});
+    target.style.outline="3px solid #06c755";
+    setTimeout(()=>target.style.outline="",1500);
    }
   };
-  wrap.append(del);
+  bubble.append(rp);
  }
- $("messages").append(wrap);
- $("messages").scrollTop=$("messages").scrollHeight;
+
+ if(m.text){
+  const textNode=document.createElement("div");
+  linkify(m.text,textNode);
+  bubble.append(textNode);
+ }
+
+ if(m.image){
+  const img=document.createElement("img");
+  img.src=m.image;
+  img.alt="送信画像";
+  img.loading="lazy";
+  img.onclick=()=>openImage(m.image);
+  bubble.append(img);
+ }
+
+ const meta=document.createElement("div");
+ meta.className="meta";
+
+ const date=document.createElement("span");
+ date.textContent=formatDate(m.time);
+
+ const time=document.createElement("span");
+ time.textContent=formatTime(m.time);
+ meta.append(date,time);
+
+ if(m.editedAt){
+  const edited=document.createElement("span");
+  edited.textContent="編集済み";
+  meta.append(edited);
+ }
+
+ if(m.uid===user.uid){
+  const readCount=Object.keys(m.readBy||{}).filter(uid=>uid!==m.uid).length;
+  const read=document.createElement("span");
+  read.textContent="既読 "+readCount;
+  meta.append(read);
+ }
+
+ wrap.append(who,bubble,meta);
+
+ if(m.uid===user.uid){
+  const editButton=document.createElement("button");
+  editButton.className="del";
+  editButton.textContent="編集";
+  editButton.onclick=()=>startEdit(id,m);
+  wrap.append(editButton);
+
+  const deleteButton=document.createElement("button");
+  deleteButton.className="del";
+  deleteButton.textContent="削除";
+  deleteButton.onclick=()=>deleteMessage(id,m);
+  wrap.append(deleteButton);
+ }
+
+ wrap.addEventListener("contextmenu",e=>{
+  e.preventDefault();
+  showMenu(id,m,e.clientX,e.clientY);
+ });
+
+ wrap.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  longPressed=false;
+  clearTimeout(pressTimer);
+
+  pressTimer=setTimeout(()=>{
+   longPressed=true;
+   showMenu(id,m,e.clientX,e.clientY);
+  },550);
+ });
+
+ ["pointerup","pointercancel","pointerleave"].forEach(event=>{
+  wrap.addEventListener(event,()=>clearTimeout(pressTimer));
+ });
+
+ wrap.addEventListener("click",e=>{
+  if(longPressed){
+   e.preventDefault();
+   e.stopPropagation();
+   longPressed=false;
+  }
+ });
+
+ if(old)old.replaceWith(wrap);
+ else el.append(wrap);
+
+ if(nearBottom)el.scrollTop=el.scrollHeight;
+ if($("search").value.trim())runSearch();
 }
 
+/* メッセージメニュー */
+function showMenu(id,m,x,y){
+ selectedMessage={id,m};
+ const menu=$("menu");
+ menu.style.display="block";
+
+ menu.querySelector('[data-action="edit"]').style.display=
+  m.uid===user?.uid?"block":"none";
+
+ menu.querySelector('[data-action="delete"]').style.display=
+  m.uid===user?.uid?"block":"none";
+
+ const width=175,height=190;
+ menu.style.left=Math.max(5,Math.min(x,innerWidth-width-5))+"px";
+ menu.style.top=Math.max(5,Math.min(y,innerHeight-height-5))+"px";
+}
+
+document.addEventListener("click",e=>{
+ if(!$("menu").contains(e.target))$("menu").style.display="none";
+});
+
+$("menu").querySelectorAll("button").forEach(button=>{
+ button.onclick=async()=>{
+  $("menu").style.display="none";
+  if(!selectedMessage)return;
+
+  const {id,m}=selectedMessage;
+
+  switch(button.dataset.action){
+   case "reply":
+    replyTo={
+     id,
+     nick:m.nick||"参加者",
+     text:m.text||"",
+     image:m.image||""
+    };
+    $("replyText").textContent=
+     (replyTo.text||(replyTo.image?"📷 画像":"メッセージ")).slice(0,100);
+    $("replyBar").style.display="block";
+    $("message").focus();
+    break;
+
+   case "mention":
+    $("message").value+="@"+(m.nick||"参加者")+" ";
+    $("message").focus();
+    break;
+
+   case "edit":
+    if(m.uid===user.uid)startEdit(id,m);
+    break;
+
+   case "delete":
+    if(m.uid===user.uid)await deleteMessage(id,m);
+    break;
+  }
+ };
+});
+
+function startEdit(id,m){
+ if(m.uid!==user?.uid)return;
+
+ editingId=id;
+ $("message").value=m.text||"";
+ photoData=m.image||"";
+ $("preview").textContent=photoData?"画像付きメッセージを編集中です。":"";
+ $("editBar").style.display="block";
+ $("send").textContent="変更を保存";
+ $("message").focus();
+}
+
+$("editCancel").onclick=cancelEdit;
+
+function cancelEdit(){
+ editingId=null;
+ $("message").value="";
+ photoData="";
+ $("photo").value="";
+ $("preview").textContent="";
+ $("editBar").style.display="none";
+ $("send").textContent="送信 ➤";
+}
+
+$("replyCancel").onclick=()=>{
+ replyTo=null;
+ $("replyBar").style.display="none";
+};
+
+async function deleteMessage(id,m){
+ if(m.uid!==user?.uid)
+  return say("自分のメッセージのみ削除できます。");
+
+ if(!confirm("このメッセージを削除しますか？"))return;
+
+ try{
+  await remove(messageRef(id));
+  say("メッセージを削除しました");
+ }catch(e){
+  say("削除できません。Firebaseのルールを確認してください。");
+ }
+}
+
+/* 画像拡大表示 */
+function openImage(src){
+ const img=document.createElement("img");
+ img.src=src;
+ img.alt="拡大画像";
+ $("modalContent").replaceChildren(img);
+ $("imageModal").classList.add("open");
+}
+
+function closeImage(){
+ $("imageModal").classList.remove("open");
+ $("modalContent").replaceChildren();
+}
+
+$("imageClose").onclick=closeImage;
+
+$("imageModal").onclick=e=>{
+ if(e.target===$("imageModal"))closeImage();
+};
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  closeImage();
+  $("menu").style.display="none";
+  if(!howToModal.hidden)closeHowTo();
+ }
+});
+
+/* メッセージ送信・編集 */
 async function send(){
  if(!roomId||!user)return;
+
  const text=$("message").value.trim();
  if(!text&&!photoData)return;
- if(photoData.length>180000)return say("画像が大きすぎます。小さい画像を選んでください。");
- say("送信中...");
+
+ if(photoData.length>180000)
+  return say("画像が大きすぎます。小さい画像を選んでください。");
+
+ $("send").disabled=true;
+ say(editingId?"変更を保存中...":"送信中...");
+
  try{
-  const item=push(ref(db,`rooms/${roomId}/messages`));
-  await set(item,{uid:user.uid,nick:nickname,text,image:photoData,time:Date.now()});
-  $("message").value="";
-  photoData="";$("photo").value="";$("preview").textContent="";
-  say("送信しました");
- }catch(e){say("送信失敗。認証とデータベースのルールを確認してください。");}
+  if(editingId){
+   const snapData=messageCache.get(editingId);
+
+   if(!snapData||snapData.uid!==user.uid){
+    say("自分のメッセージのみ編集できます。");
+    return;
+   }
+
+   await update(messageRef(editingId),{
+    text,
+    image:photoData||"",
+    editedAt:Date.now()
+   });
+
+   say("メッセージを編集しました");
+   cancelEdit();
+  }else{
+   const item=push(messagesRef());
+
+   const payload={
+    uid:user.uid,
+    nick:nickname,
+    text,
+    image:photoData||"",
+    time:Date.now(),
+    readBy:{}
+   };
+
+   if(replyTo)payload.replyTo=replyTo;
+
+   await set(item,payload);
+
+   $("message").value="";
+   photoData="";
+   $("photo").value="";
+   $("preview").textContent="";
+   replyTo=null;
+   $("replyBar").style.display="none";
+   say("送信しました");
+  }
+ }catch(e){
+  say("送信失敗。認証とデータベースのルールを確認してください。");
+ }finally{
+  $("send").disabled=false;
+ }
 }
+
 $("send").onclick=send;
-$("message").onkeydown=e=>{
- if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}
-};
-$("emoji").onclick=()=>$("stamps").hidden=!$("stamps").hidden;
-$("stamps").querySelectorAll("button").forEach(b=>{
- b.onclick=()=>{$("message").value+=b.textContent;$("stamps").hidden=true;};
+
+$("message").addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){
+  e.preventDefault();
+  send();
+ }
 });
+
+/* 絵文字 */
+$("emoji").onclick=()=>$("stamps").hidden=!$("stamps").hidden;
+
+$("stamps").querySelectorAll("button").forEach(b=>{
+ b.onclick=()=>{
+  const el=$("message");
+  const start=el.selectionStart;
+  const end=el.selectionEnd;
+
+  el.setRangeText(b.textContent,start,end,"end");
+  el.focus();
+  $("stamps").hidden=true;
+ };
+});
+
+/* 画像選択 */
 $("photoBtn").onclick=()=>$("photo").click();
+
 $("photo").onchange=e=>{
  const file=e.target.files?.[0];
  if(!file)return;
- if(!file.type.startsWith("image/"))return say("画像ファイルを選んでください。");
- if(file.size>120000)return say("画像は120KB以下にしてください。");
+
+ if(!file.type.startsWith("image/"))
+  return say("画像ファイルを選んでください。");
+
+ if(file.size>120000)
+  return say("画像は120KB以下にしてください。");
+
  const reader=new FileReader();
- reader.onload=()=>{photoData=reader.result;$("preview").textContent="画像を選択しました。送信できます。";};
+
+ reader.onload=()=>{
+  photoData=reader.result;
+  $("preview").textContent="画像を選択しました。送信できます。";
+ };
+
+ reader.onerror=()=>say("画像を読み込めませんでした。");
  reader.readAsDataURL(file);
 };
+
+/* 過去のメッセージ検索 */
+$("search").addEventListener("input",runSearch);
+
+$("clearSearch").onclick=()=>{
+ $("search").value="";
+ $("searchResults").replaceChildren();
+ $("searchResults").style.display="none";
+};
+
+function runSearch(){
+ const keyword=$("search").value.trim().toLocaleLowerCase();
+ const results=$("searchResults");
+ results.replaceChildren();
+
+ if(!keyword){
+  results.style.display="none";
+  return;
+ }
+
+ const matches=[...messageCache.entries()]
+  .filter(([id,m])=>
+   ((m.text||"")+" "+(m.nick||"")).toLocaleLowerCase().includes(keyword))
+  .sort((a,b)=>(b[1].time||0)-(a[1].time||0));
+
+ results.style.display="block";
+
+ if(!matches.length){
+  results.textContent="一致するメッセージはありません。";
+  return;
+ }
+
+ const heading=document.createElement("p");
+ heading.className="small";
+ heading.textContent=`検索結果：${matches.length}件`;
+ results.append(heading);
+
+ matches.slice(0,100).forEach(([id,m])=>{
+  const button=document.createElement("button");
+  button.className="search-result";
+
+  const content=document.createElement("span");
+  content.textContent=(m.text||(m.image?"📷 画像":"メッセージ")).slice(0,160);
+
+  const small=document.createElement("small");
+  small.textContent=(m.nick||"参加者")+" · "+formatDate(m.time)+" "+formatTime(m.time);
+
+  button.append(content,small);
+
+  button.onclick=()=>{
+   const target=$("m-"+id);
+
+   if(target){
+    target.scrollIntoView({behavior:"smooth",block:"center"});
+    target.style.outline="3px solid #06c755";
+    setTimeout(()=>target.style.outline="",1800);
+   }
+  };
+
+  results.append(button);
+ });
+}
+
+/* 退出 */
 $("leave").onclick=()=>{
- stopAdded?.();stopRemoved?.();
- stopAdded=null;stopRemoved=null;roomId=null;photoData="";
- $("chat").style.display="none";$("entry").style.display="block";
- $("pass").value="";sayEntry("退出しました。");
+ stopAdded?.();
+ stopChanged?.();
+ stopRemoved?.();
+
+ stopAdded=stopChanged=stopRemoved=null;
+ roomId=null;
+ photoData="";
+ editingId=null;
+ replyTo=null;
+ selectedMessage=null;
+
+ messageCache.clear();
+ cancelEdit();
+
+ $("messages").replaceChildren();
+ $("searchResults").replaceChildren();
+ $("search").value="";
+ $("chat").style.display="none";
+ $("entry").style.display="block";
+ $("pass").value="";
+ $("replyBar").style.display="none";
+ $("menu").style.display="none";
+
+ initialLoadComplete=false;
+ sayEntry("退出しました。");
 };
 </script>
 </body>
