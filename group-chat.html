@@ -8,8 +8,11 @@
 <link rel="icon" type="image/png" href="./chaticon.png">
 <title>図書手帳 グループチャット</title>
 <style>
+@font-face{font-family:"やさしさゴシック";src:url("./やさしさゴシック.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"やさしさゴシック（太字）";src:url("./やさしさゴシック.otf") format("opentype");font-weight:700;font-display:swap}
+:root{--page-bg:#eef1f4;--chat-bg:#ffffff;--received-bubble:#f0f0f0;--sent-bubble:#b9f6ca}
 *{box-sizing:border-box}
-body{margin:0;background:#eef1f4;color:#222;font-family:system-ui,sans-serif}
+body{margin:0;background:var(--page-bg);color:#222;font-family:system-ui,sans-serif}
 header{background:#06c755;color:white;padding:18px;font-weight:bold;font-size:20px}
 main{max-width:720px;margin:auto;padding:14px}
 .panel{background:white;border-radius:16px;padding:16px;margin-bottom:12px}
@@ -18,9 +21,41 @@ input,textarea{padding:12px;border:1px solid #ddd;border-radius:10px}
 input{width:100%;margin:5px 0 12px}
 button{border:0;border-radius:10px;padding:11px;cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}
+#join.is-joining{display:flex;align-items:center;justify-content:center;gap:10px;opacity:1}
+#join.is-joining::after{content:"";display:inline-block;width:15px;height:15px;border:2px solid #ffffff80;border-top-color:#fff;border-radius:50%;animation:join-spin .7s linear infinite;flex:0 0 auto}
+@keyframes join-spin{to{transform:rotate(360deg)}}
+
+/* 操作に合わせた、控えめで滑らかなアニメーション */
+button{transition:transform .18s ease,filter .18s ease,box-shadow .18s ease}
+button:not(:disabled):active{transform:scale(.96)}
+.primary:not(:disabled):hover{filter:brightness(1.04);box-shadow:0 4px 12px #06c75530}
+.panel{animation:panel-in .42s cubic-bezier(.2,.75,.25,1) both}
+@keyframes panel-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#chat.chat-entering{animation:chat-enter .48s cubic-bezier(.2,.8,.25,1) both}
+@keyframes chat-enter{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+.msg{transform-origin:center;transition:transform .2s ease,filter .2s ease}
+.msg.message-enter{animation:message-in .3s cubic-bezier(.2,.8,.25,1) both}
+.msg.message-leave{pointer-events:none;overflow:hidden;animation:message-out .24s cubic-bezier(.4,0,.7,.2) forwards}
+@keyframes message-out{0%{opacity:1;transform:translateX(0) scale(1);max-height:240px;margin-bottom:0}65%{opacity:.35;transform:translateX(18px) scale(.96)}100%{opacity:0;transform:translateX(32px) scale(.9);max-height:0;margin-bottom:-12px;padding-top:0;padding-bottom:0}}
+@keyframes message-in{from{opacity:0;transform:translateY(9px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+.bubble{transform:scale(1);transform-origin:center;transition:transform .22s cubic-bezier(.2,.8,.25,1),box-shadow .22s ease,background-color .22s ease}
+.msg.long-pressing .bubble{transform:scale(1.045);box-shadow:0 8px 22px #0002;position:relative;z-index:2}
+#menu{transform-origin:top left;animation:menu-pop .16s cubic-bezier(.2,.8,.25,1) both}
+@keyframes menu-pop{from{opacity:0;transform:scale(.94) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.how-to-modal:not([hidden]){animation:overlay-in .2s ease both}
+.how-to-content{animation:modal-in .26s cubic-bezier(.2,.8,.25,1) both}
+@keyframes overlay-in{from{opacity:0}to{opacity:1}}
+@keyframes modal-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+#imageModal.open img{animation:image-in .22s ease both}
+@keyframes image-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+#send.sending{animation:send-pulse .7s ease-in-out infinite alternate}
+@keyframes send-pulse{from{box-shadow:0 0 0 0 #06c75500}to{box-shadow:0 0 0 4px #06c75525}}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
 .primary{background:#06c755;color:white;font-weight:bold;width:100%}
 #chat{display:none}
-#messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 0;overscroll-behavior:contain}
+#messages{height:52vh;min-height:280px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px 8px;overscroll-behavior:contain;background:var(--chat-bg);border-radius:12px;transition:background-color .2s ease}
 .msg{
   max-width:85%;
   align-self:flex-start;
@@ -32,7 +67,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .msg.mine{align-self:flex-end}
 .who,.meta{font-size:11px;color:#777;margin:4px}
 .bubble{
-  background:#F0F0F0;
+  background:var(--received-bubble);
   padding:11px 13px;
   border-radius:5px 15px 15px 15px;
   white-space:pre-wrap;
@@ -41,7 +76,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   -webkit-user-select:none;
   -webkit-touch-callout:none;
 }
-.mine .bubble{background:#b9f6ca;border-radius:15px 5px 15px 15px}
+.mine .bubble{background:var(--sent-bubble);border-radius:15px 5px 15px 15px}
 .bubble a{color:#0878c9;text-decoration:underline;overflow-wrap:anywhere}
 .bubble img{max-width:100%;max-height:280px;display:block;border-radius:8px;cursor:zoom-in;margin-top:5px}
 .reply-preview{border-left:3px solid #06c755;padding:5px 8px;margin-bottom:7px;background:#ffffff75;border-radius:4px;font-size:12px;color:#555;overflow-wrap:anywhere}
@@ -51,7 +86,33 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .composer{background:white;padding:12px;border-radius:14px}
 .tools{display:flex;gap:7px;align-items:center}
 .tools input{flex:1;min-width:0;margin:0}
-.tools button{background:#f0f3f5}
+.tools button{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+#photoBtn{background:#2878e8;color:#fff;border:1px solid #1e65c7;box-shadow:0 2px 5px #2878e833}
+#photoBtn:hover{filter:brightness(1.08);box-shadow:0 4px 10px #2878e844}
+#photoBtn:active{transform:scale(.94)}
+#emojiBtn{background:#fff0cf;color:#815300;border:1px solid #f1d28a;white-space:nowrap}
+#emojiBtn:hover{background:#ffe7aa}
+#emojiPicker{display:flex;flex-wrap:wrap;gap:6px;padding:9px;margin:0 0 8px;border:1px solid #eee0bd;background:#fffaf0;border-radius:12px}
+#emojiPicker[hidden]{display:none}
+#emojiPicker button{font-size:22px;min-width:42px;background:#fff;border:1px solid #f0e6d0;padding:7px}
+#emojiPicker button:hover{background:#fff0cf}
+#settingsBtn{background:#f0eaff;color:#563e9c;border:1px solid #d9cdf8;font-size:12px;padding:8px}
+#settingsBtn:hover{background:#e5dcff}
+#settingsModal[hidden]{display:none}
+#settingsModal{position:fixed;inset:0;z-index:2200;background:#0007;display:flex;align-items:center;justify-content:center;padding:16px;animation:overlay-in .18s ease both}
+.settings-card{width:min(100%,440px);max-height:88vh;overflow:auto;background:white;border-radius:18px;padding:20px;box-shadow:0 15px 50px #0003;animation:modal-in .22s ease both}
+.settings-card h2{margin:0 0 16px}
+.settings-field{display:block;margin:13px 0;font-size:14px;font-weight:600}
+.settings-field select{display:block;width:100%;margin-top:6px;padding:10px;border:1px solid #ddd;border-radius:9px;background:white;font:inherit}
+.settings-color-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:13px 0;font-size:14px}
+.settings-color-row input[type=color]{width:56px;height:38px;padding:3px;border:1px solid #ddd;border-radius:8px;background:white}
+.settings-actions{display:flex;gap:8px;margin-top:18px}
+.settings-actions button{flex:1}
+.attachment-file{display:flex;align-items:center;gap:9px;margin-top:7px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #d8e4ef;color:#245b88;text-decoration:none;overflow-wrap:anywhere;transition:background .18s ease,transform .18s ease}
+.attachment-file:hover{background:#edf6ff;transform:translateY(-1px)}
+.attachment-file-icon{font-size:22px;flex-shrink:0}
+.attachment-file-name{font-weight:600;font-size:13px;overflow-wrap:anywhere}
+.attachment-file-size{font-size:11px;color:#777;margin-top:2px}
 #message{width:100%;min-height:43px;max-height:150px;resize:vertical}
 #status{font-size:12px;color:#666;margin-top:9px}
 #stamps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -213,6 +274,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <h3 id="roomTitle" style="overflow-wrap:anywhere"></h3>
 <div style="display:flex;gap:6px">
 <button id="notifyBtn" class="notice-btn">🔔 通知を有効にする</button>
+<button id="settingsBtn" type="button">⚙ 設定</button>
 <button id="leave">退出</button>
 </div>
 </div>
@@ -235,16 +297,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <button id="editCancel" style="float:right;padding:2px 7px">キャンセル</button>
 </div>
 
-<div id="stamps" hidden>
-<button>😀</button><button>😂</button><button>🥰</button>
-<button>👍</button><button>❤️</button><button>🎉</button>
-<button>🙏</button><button>🐱</button>
+<div id="emojiPicker" hidden aria-label="絵文字を選択">
+<button type="button">😂</button><button type="button">🥰</button><button type="button">😍</button><button type="button">😎</button>
+<button type="button">😭</button><button type="button">😡</button><button type="button">🤔</button><button type="button">🙌</button>
+<button type="button">👍</button><button type="button">👎</button><button type="button">👏</button><button type="button">🙏</button>
+<button type="button">❤️</button><button type="button">💖</button><button type="button">💯</button><button type="button">🎉</button>
+<button type="button">🔥</button><button type="button">✨</button><button type="button">🐱</button><button type="button">🐶</button>
 </div>
-
 <div class="tools">
-<button id="emoji" aria-label="絵文字">😊</button>
-<button id="photoBtn" aria-label="画像を選択">📷</button>
-<input id="photo" type="file" accept="image/*" hidden>
+<button id="emojiBtn" type="button" aria-label="絵文字を選ぶ">絵文字</button>
+<button id="photoBtn" type="button" aria-label="画像・ファイルを添付" title="画像・PDFなどのファイルを添付">📎 ファイルを添付</button>
+<input id="photo" type="file" accept="*/*" hidden>
 </div>
 
 <textarea id="message" maxlength="1000" rows="2"
@@ -279,7 +342,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       
       <h3>3. メッセージ・画像を送信する</h3>
       <p>入力欄にメッセージを入力し、「送信」ボタンを押してください。Enterキーでも送信できます。Shift＋Enterで改行できます。<br>
-      画像を送信したい場合は、カメラアイコンをクリックしてアップロードしてください。その後、送信ボタンを押すと送信できます。<br><br></p>
+      画像やPDFなどのファイルを送信したい場合は、「ファイルを添付」ボタンから選択してください（3MB以下）。その後、送信ボタンを押すと送信できます。<br><br></p>
 
       <h3>4. 特定のメッセージに返信する</h3>
       <p>返信したいメッセージを長押し（PCでは右クリックまたは長押し）すると、返信やメンションなどのメニューが表示されます。自分のメッセージは編集・削除もできます。<br><br></p>
@@ -314,6 +377,22 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </div>
 
 
+<!-- チャット設定 -->
+<div id="settingsModal" hidden>
+ <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <h2 id="settingsTitle">⚙ チャット設定</h2>
+  <label class="settings-field" for="fontChoice">フォント
+   <select id="fontChoice"><option value="system">標準フォント</option><option value="yasashisa">やさしさゴシック</option><option value="yasashisa-bold">やさしさゴシック（太字）</option></select>
+  </label>
+  <div class="settings-color-row"><label for="pageColor">ページの背景色</label><input id="pageColor" type="color" value="#eef1f4"></div>
+  <div class="settings-color-row"><label for="chatColor">トーク欄の背景色</label><input id="chatColor" type="color" value="#ffffff"></div>
+  <div class="settings-color-row"><label for="receivedColor">相手の吹き出し</label><input id="receivedColor" type="color" value="#f0f0f0"></div>
+  <div class="settings-color-row"><label for="sentColor">自分の吹き出し</label><input id="sentColor" type="color" value="#b9f6ca"></div>
+  <div class="settings-actions"><button type="button" id="settingsReset">初期設定に戻す</button><button type="button" id="settingsClose" class="primary">保存して閉じる</button></div>
+  <p class="small">設定はこのブラウザに保存されます。フォントファイルが読み込めない場合は標準フォントで表示されることがあります。</p>
+ </div>
+</div>
+
 <!-- 画像拡大表示 -->
 <div id="imageModal" role="dialog" aria-modal="true" aria-label="画像拡大表示">
 <button id="imageClose" aria-label="閉じる">✕</button>
@@ -344,7 +423,7 @@ const firebaseConfig={
 const $=id=>document.getElementById(id);
 let app,auth,db,user,roomId,nickname,roomName;
 let stopAdded,stopChanged,stopRemoved;
-let photoData="",editingId=null,replyTo=null,selectedMessage=null;
+let photoData="",attachmentData=null,editingId=null,replyTo=null,selectedMessage=null;
 let messageCache=new Map();
 let pressTimer=null,longPressed=false;
 let joining=false;
@@ -411,7 +490,10 @@ $("join").onclick=async()=>{
   return sayEntry("グループ名、合言葉、ニックネームを入力してください。");
 
  joining=true;
- $("join").disabled=true;
+ const joinButton=$("join");
+ joinButton.disabled=true;
+ joinButton.classList.add("is-joining");
+ joinButton.textContent="参加中・・・";
 
  try{
   roomId=await makeRoomId(roomName,pass);
@@ -453,7 +535,8 @@ $("join").onclick=async()=>{
 
   stopRemoved=onChildRemoved(messagesRef(),snap=>{
    messageCache.delete(snap.key);
-   $("m-"+snap.key)?.remove();
+   const removedElement=$("m-"+snap.key);
+   if(removedElement)animateMessageRemoval(removedElement);
    runSearch();
   });
 
@@ -464,7 +547,9 @@ $("join").onclick=async()=>{
   $("chat").style.display="none";
  }finally{
   joining=false;
-  $("join").disabled=false;
+  joinButton.disabled=false;
+  joinButton.classList.remove("is-joining");
+  joinButton.textContent="参加する";
  }
 };
 
@@ -566,6 +651,15 @@ function formatTime(time){
  });
 }
 
+function animateMessageRemoval(element){
+ if(!element || element.classList.contains("message-leave"))return;
+ element.classList.remove("message-enter","long-pressing");
+ element.classList.add("message-leave");
+ element.addEventListener("animationend",()=>element.remove(),{once:true});
+ // アニメーションイベントが発火しない環境向けの保険
+ setTimeout(()=>element.remove(),320);
+}
+
 function render(id,m){
  if(!m||!user)return;
 
@@ -621,6 +715,27 @@ function render(id,m){
   img.loading="lazy";
   img.onclick=()=>openImage(m.image);
   bubble.append(img);
+ }
+ if(m.attachment && m.attachment.data && !String(m.attachment.type||"").startsWith("image/")){
+  const link=document.createElement("a");
+  link.className="attachment-file";
+  link.href=m.attachment.data;
+  link.download=m.attachment.name||"添付ファイル";
+  link.target="_blank";
+  link.rel="noopener noreferrer";
+  const icon=document.createElement("span");
+  icon.className="attachment-file-icon";
+  icon.textContent=(m.attachment.type||"").includes("pdf")||/\.pdf$/i.test(m.attachment.name||"")?"📄":"📎";
+  const details=document.createElement("span");
+  const fileName=document.createElement("div");
+  fileName.className="attachment-file-name";
+  fileName.textContent=m.attachment.name||"添付ファイル";
+  const fileSize=document.createElement("div");
+  fileSize.className="attachment-file-size";
+  fileSize.textContent=(Number(m.attachment.size||0)/1024/1024).toLocaleString("ja-JP",{maximumFractionDigits:2})+" MB · ダウンロード";
+  details.append(fileName,fileSize);
+  link.append(icon,details);
+  bubble.append(link);
  }
 
  const meta=document.createElement("div");
@@ -682,6 +797,12 @@ wrap.addEventListener("pointerdown", e => {
 
   pressTimer = setTimeout(() => {
     longPressed = true;
+    wrap.classList.add("long-pressing");
+
+    // スマートフォンでは短い振動で長押しを知らせる
+    if(pointerType === "touch" && "vibrate" in navigator){
+      try{navigator.vibrate(20);}catch(e){}
+    }
 
     // 指やマウスの位置から少し離してメニューを表示
     const offset = pointerType === "touch" ? 18 : 0;
@@ -715,7 +836,10 @@ wrap.addEventListener("pointerdown", e => {
  });
 
  if(old)old.replaceWith(wrap);
- else el.append(wrap);
+ else{
+  wrap.classList.add("message-enter");
+  el.append(wrap);
+ }
 
  if(nearBottom)el.scrollTop=el.scrollHeight;
  if($("search").value.trim())runSearch();
@@ -738,13 +862,18 @@ function showMenu(id,m,x,y){
  menu.style.top=Math.max(5,Math.min(y,innerHeight-height-5))+"px";
 }
 
+function hideMessageMenu(){
+ $("menu").style.display="none";
+ document.querySelectorAll(".msg.long-pressing").forEach(el=>el.classList.remove("long-pressing"));
+}
+
 document.addEventListener("click",e=>{
- if(!$("menu").contains(e.target))$("menu").style.display="none";
+ if(!$("menu").contains(e.target))hideMessageMenu();
 });
 
 $("menu").querySelectorAll("button").forEach(button=>{
  button.onclick=async()=>{
-  $("menu").style.display="none";
+  hideMessageMenu();
   if(!selectedMessage)return;
 
   const {id,m}=selectedMessage;
@@ -835,6 +964,7 @@ function cancelEdit(){
  editingId=null;
  $("message").value="";
  photoData="";
+ attachmentData=null;
  $("photo").value="";
  $("preview").textContent="";
  $("editBar").style.display="none";
@@ -893,12 +1023,13 @@ async function send(){
  if(!roomId||!user)return;
 
  const text=$("message").value.trim();
- if(!text&&!photoData)return;
+ if(!text&&!photoData&&!attachmentData)return;
 
- if(photoData.length>180000)
-  return say("画像が大きすぎます。小さい画像を選んでください。");
+ if(attachmentData && attachmentData.size>3*1024*1024)
+  return say("ファイルは3MB以下にしてください。");
 
  $("send").disabled=true;
+ $("send").classList.add("sending");
  say(editingId?"変更を保存中...":"送信中...");
 
  try{
@@ -910,11 +1041,15 @@ async function send(){
     return;
    }
 
-   await update(messageRef(editingId),{
+   const editPayload={
     text,
-    image:photoData||"",
+    image:attachmentData && attachmentData.type.startsWith("image/") ? photoData : (photoData||""),
     editedAt:Date.now()
-   });
+   };
+   if(attachmentData && !attachmentData.type.startsWith("image/")){
+    editPayload.attachment={name:attachmentData.name,type:attachmentData.type,data:attachmentData.data,size:attachmentData.size};
+   }
+   await update(messageRef(editingId),editPayload);
 
    say("メッセージを編集しました");
    cancelEdit();
@@ -925,10 +1060,13 @@ async function send(){
     uid:user.uid,
     nick:nickname,
     text,
-    image:photoData||"",
+    image:attachmentData && attachmentData.type.startsWith("image/") ? photoData : "",
     time:Date.now(),
     readBy:{}
    };
+   if(attachmentData && !attachmentData.type.startsWith("image/")){
+    payload.attachment={name:attachmentData.name,type:attachmentData.type,data:attachmentData.data,size:attachmentData.size};
+   }
 
    if(replyTo)payload.replyTo=replyTo;
 
@@ -936,6 +1074,7 @@ async function send(){
 
    $("message").value="";
    photoData="";
+   attachmentData=null;
    $("photo").value="";
    $("preview").textContent="";
    replyTo=null;
@@ -946,6 +1085,7 @@ async function send(){
   say("送信失敗。認証とデータベースのルールを確認してください。");
  }finally{
   $("send").disabled=false;
+  $("send").classList.remove("sending");
  }
 }
 
@@ -958,42 +1098,59 @@ $("message").addEventListener("keydown",e=>{
  }
 });
 
-/* 絵文字 */
-$("emoji").onclick=()=>$("stamps").hidden=!$("stamps").hidden;
-
-$("stamps").querySelectorAll("button").forEach(b=>{
- b.onclick=()=>{
-  const el=$("message");
-  const start=el.selectionStart;
-  const end=el.selectionEnd;
-
-  el.setRangeText(b.textContent,start,end,"end");
-  el.focus();
-  $("stamps").hidden=true;
- };
+/* 絵文字ピッカー（にっこりボタンは設けず、文字ボタンから開く） */
+$("emojiBtn").onclick=()=>{$("emojiPicker").hidden=!$("emojiPicker").hidden;};
+$("emojiPicker").querySelectorAll("button").forEach(button=>{
+ button.onclick=()=>{const el=$("message"),start=el.selectionStart,end=el.selectionEnd;el.setRangeText(button.textContent,start,end,"end");el.focus();$("emojiPicker").hidden=true;};
 });
 
-/* 画像選択 */
+/* 設定：フォント・チャット色をブラウザ内に保存 */
+const settingsDefaults={font:"system",page:"#eef1f4",chat:"#ffffff",received:"#f0f0f0",sent:"#b9f6ca"};
+function applyChatSettings(settings){
+ const root=document.documentElement;
+ root.style.setProperty("--page-bg",settings.page||settingsDefaults.page);
+ root.style.setProperty("--chat-bg",settings.chat||settingsDefaults.chat);
+ root.style.setProperty("--received-bubble",settings.received||settingsDefaults.received);
+ root.style.setProperty("--sent-bubble",settings.sent||settingsDefaults.sent);
+ const fonts={system:"system-ui,sans-serif",yasashisa:'"やさしさゴシック",system-ui,sans-serif',"yasashisa-bold":'"やさしさゴシック（太字）",system-ui,sans-serif'};
+ const family=fonts[settings.font]||fonts.system;
+ document.body.style.fontFamily=family;
+ document.body.style.fontWeight=settings.font==="yasashisa-bold"?"700":"";
+ ["entry","chat","howToModal","settingsModal"].forEach(id=>{const el=$(id);if(el){el.style.fontFamily=family;el.style.fontWeight=settings.font==="yasashisa-bold"?"700":"";}});
+ $("fontChoice").value=settings.font||"system";
+ $("pageColor").value=settings.page||settingsDefaults.page;
+ $("chatColor").value=settings.chat||settingsDefaults.chat;
+ $("receivedColor").value=settings.received||settingsDefaults.received;
+ $("sentColor").value=settings.sent||settingsDefaults.sent;
+}
+function readChatSettings(){return {font:$("fontChoice").value,page:$("pageColor").value,chat:$("chatColor").value,received:$("receivedColor").value,sent:$("sentColor").value};}
+function openSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem("toshotecho-chat-settings")||"{}");}catch{}applyChatSettings({...settingsDefaults,...saved});$("settingsModal").hidden=false;}
+$("settingsBtn").onclick=openSettings;
+$("settingsClose").onclick=()=>{const settings=readChatSettings();applyChatSettings(settings);try{localStorage.setItem("toshotecho-chat-settings",JSON.stringify(settings));}catch{}$("settingsModal").hidden=true;};
+$("settingsReset").onclick=()=>{applyChatSettings(settingsDefaults);};
+$("settingsModal").addEventListener("click",e=>{if(e.target===$("settingsModal"))$("settingsModal").hidden=true;});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("settingsModal").hidden=true;$("emojiPicker").hidden=true;}});
+try{applyChatSettings({...settingsDefaults,...JSON.parse(localStorage.getItem("toshotecho-chat-settings")||"{}")});}catch{applyChatSettings(settingsDefaults);}
+
+/* ファイル選択：画像・PDFなどを3MBまで添付 */
 $("photoBtn").onclick=()=>$("photo").click();
 
 $("photo").onchange=e=>{
  const file=e.target.files?.[0];
  if(!file)return;
-
- if(!file.type.startsWith("image/"))
-  return say("画像ファイルを選んでください。");
-
- if(file.size>120000)
-  return say("画像は120KB以下にしてください。");
-
+ if(file.size>3*1024*1024){
+  say("ファイルは3MB以下にしてください。");
+  e.target.value="";
+  return;
+ }
  const reader=new FileReader();
-
  reader.onload=()=>{
-  photoData=reader.result;
-  $("preview").textContent="画像を選択しました。送信できます。";
+  attachmentData={name:file.name,type:file.type||"application/octet-stream",data:reader.result,size:file.size};
+  photoData=file.type.startsWith("image/")?reader.result:"";
+  const size=(file.size/1024/1024).toLocaleString("ja-JP",{maximumFractionDigits:2});
+  $("preview").textContent=`添付ファイル：${file.name}（${size} MB）。送信できます。`;
  };
-
- reader.onerror=()=>say("画像を読み込めませんでした。");
+ reader.onerror=()=>say("ファイルを読み込めませんでした。");
  reader.readAsDataURL(file);
 };
 
@@ -1068,6 +1225,7 @@ $("leave").onclick=()=>{
  stopAdded=stopChanged=stopRemoved=null;
  roomId=null;
  photoData="";
+ attachmentData=null;
  editingId=null;
  replyTo=null;
  selectedMessage=null;
