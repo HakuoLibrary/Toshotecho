@@ -435,6 +435,16 @@ const sayEntry=t=>$("entryStatus").textContent=t;
 const messagesRef=()=>ref(db,`rooms/${roomId}/messages`);
 const messageRef=id=>ref(db,`rooms/${roomId}/messages/${id}`);
 
+
+function scrollToBottom(){
+  const el = $("messages");
+  el.scrollTo({
+    top: el.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+
 try{
  app=initializeApp(firebaseConfig);
  auth=getAuth(app);
@@ -519,14 +529,20 @@ $("join").onclick=async()=>{
 
    if(isNew)handleIncoming(snap.key,snap.val());
 
+
    if(!initialLoadComplete){
-    initialMessagesPending--;
-    clearTimeout(window._initialLoadTimer);
-    window._initialLoadTimer=setTimeout(()=>{
-     initialLoadComplete=true;
-    },800);
+     initialMessagesPending--;
+     clearTimeout(window._initialLoadTimer);
+     window._initialLoadTimer=setTimeout(()=>{
+       initialLoadComplete=true;
+       requestAnimationFrame(()=>{
+         requestAnimationFrame(scrollToBottom);
+       });
+     },800);
    }
+
   },e=>say("読み込みエラー："+e.message));
+
 
   stopChanged=onChildChanged(messagesRef(),snap=>{
    messageCache.set(snap.key,snap.val());
@@ -841,7 +857,12 @@ wrap.addEventListener("pointerdown", e => {
   el.append(wrap);
  }
 
- if(nearBottom)el.scrollTop=el.scrollHeight;
+ if(nearBottom){
+  el.scrollTo({
+    top: el.scrollHeight,
+    behavior: "smooth"
+  });
+}
  if($("search").value.trim())runSearch();
 }
 
