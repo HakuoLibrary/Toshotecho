@@ -159,6 +159,34 @@ footer{background:#E8D5BB;padding:40px 20px;text-align:center;color:#666;margin-
 .reception-number{font-size:29px;letter-spacing:4px}
 }
 @media(min-width:769px) and (max-width:1050px){.design-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+/* 2026年10月25日以降に選択できないデザイン */
+.design-card.disabled-design {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.design-card.disabled-design .design-visual {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.design-card.disabled-design:hover .design-visual {
+  transform: none;
+  box-shadow: none;
+}
+
+.design-card.disabled-design .design-name::after {
+  content: "（選択不可）";
+  display: block;
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+
 </style>
 </head>
 <body>
@@ -389,13 +417,70 @@ start.addEventListener("click",()=>{$("formSection").classList.add("show");setTi
 CLASS_OPTIONS.forEach(v=>$("classNo").add(new Option(v,v)));
 for(let i=1;i<=ATTENDANCE_MAX;i++){const v=String(i).replace(/[0-9]/g,c=>"０１２３４５６７８９"[Number(c)])+"番";$("attendance").add(new Option(v,v))}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-DESIGNS.forEach(d=>{
- const label=document.createElement("label");label.className="design-card";
- label.innerHTML=`<input type="radio" name="質問７_色とデザイン" value="${esc(d.name)}"><div class="design-visual">
- <img src="${esc(d.file)}" alt="${esc(d.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
- <div class="design-placeholder" style="display:none">${esc(d.name)}<br>画像枠</div><div class="design-name">${esc(d.name)}</div></div>`;
- $("designGrid").appendChild(label);
+
+/* ===== デザイン選択の期限設定 ===== */
+const DESIGN_LIMIT_DATE = new Date("2026-10-25T00:00:00+09:00");
+
+/* 期限を過ぎたら、design5.png～design8.pngを選択不可にする */
+function updateDesignAvailability() {
+  const expired = Date.now() >= DESIGN_LIMIT_DATE.getTime();
+
+  document.querySelectorAll(".design-card").forEach(label => {
+    const input = label.querySelector('input[name="質問７_色とデザイン"]');
+    if (!input) return;
+
+    const index = DESIGNS.findIndex(d => d.name === input.value);
+    const isLimitedDesign = index >= 4;
+
+    if (expired && isLimitedDesign) {
+      input.disabled = true;
+      label.classList.add("disabled-design");
+
+      // 期限前に選択されていた場合も選択を解除
+      input.checked = false;
+    } else {
+      input.disabled = false;
+      label.classList.remove("disabled-design");
+    }
+  });
+}
+
+/* デザイン選択肢を作成 */
+DESIGNS.forEach(d => {
+  const label = document.createElement("label");
+  label.className = "design-card";
+
+  label.innerHTML = `
+    <input type="radio"
+           name="質問７_色とデザイン"
+           value="${esc(d.name)}">
+    <div class="design-visual">
+      <img src="${esc(d.file)}"
+           alt="${esc(d.name)}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="design-placeholder" style="display:none">
+        ${esc(d.name)}<br>画像枠
+      </div>
+      <div class="design-name">${esc(d.name)}</div>
+    </div>
+  `;
+
+  $("designGrid").appendChild(label);
 });
+
+/* ページを開いたときに期限をチェック */
+updateDesignAvailability();
+
+/* タブを開いたまま期限を迎えた場合にも対応 */
+setInterval(updateDesignAvailability, 1000);
+
+/* 別タブから戻ってきた場合にも期限を再チェック */
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    updateDesignAvailability();
+  }
+});
+
 
 /* 分岐 */
 function checked(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||""}
@@ -430,7 +515,31 @@ function validate(){
  else{if(!val("classNo")){error("組を選択してください。");return false}if(!val("attendance")){error("出席番号を選択してください。");return false}}
  const t=checked("質問５_図書手帳の種類");if(val("grade")!=="教職員"&&!t){error("図書手帳の種類を選択してください。");return false}
  if(active("q6")&&(!val("coverText")||$("coverText").value.length>13)){error("表紙に入れる文言は１３文字以内で入力してください。文言が無い場合は「（スペース）」と入力してください。");return false}
- if(!checked("質問７_色とデザイン")){error("色とデザインを選択してください。");return false}
+
+updateDesignAvailability();
+
+const selectedDesign = document.querySelector(
+  'input[name="質問７_色とデザイン"]:checked'
+);
+
+if (!selectedDesign) {
+  error("色とデザインを選択してください。");
+  return false;
+}
+
+const selectedIndex = DESIGNS.findIndex(
+  d => d.name === selectedDesign.value
+);
+
+if (
+  Date.now() >= DESIGN_LIMIT_DATE.getTime() &&
+  selectedIndex >= 4
+) {
+  selectedDesign.checked = false;
+  error("このデザインは選択期間が終了しました。別のデザインを選択してください。");
+  return false;
+}
+
  const d=checked("質問８_お渡し方法");if(!d){error("お渡し方法を選択してください。");return false}
  if(active("q9")&&!val("issueDate")){error("発行希望日を入力してください。");return false}
  if(active("q10")&&!val("customDesign")){error("特注ページのデザインを入力してください。");return false}
