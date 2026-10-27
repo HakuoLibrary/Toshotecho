@@ -346,6 +346,67 @@ body{
     .hero-slide{transition:opacity .3s ease, transform 0s;}
 }
 
+
+
+/* トップ画像スライドショー操作パネル */
+.hero-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    width:100%;
+    padding:14px 18px 18px;
+    background:#FAEEDD;
+    color:#68451F;
+    box-sizing:border-box;
+}
+.hero-control-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    min-width:42px;
+    height:42px;
+    padding:0 13px;
+    border:1px solid #B67832;
+    border-radius:999px;
+    background:#fffaf2;
+    color:#8B5A2B;
+    font:inherit;
+    font-size:15px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, transform .2s ease;
+}
+.hero-control-button:hover{
+    background:#B67832;
+    color:#fff;
+}
+.hero-control-button:active{transform:scale(.96);}
+.hero-range-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:min(460px, 48vw);
+}
+.hero-range{
+    width:100%;
+    accent-color:#B67832;
+    cursor:pointer;
+}
+.hero-slide-count{
+    min-width:48px;
+    text-align:center;
+    font-size:14px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+}
+@media(max-width:600px){
+    .hero-controls{gap:8px;padding:12px 8px 16px;}
+    .hero-control-button{min-width:38px;height:38px;padding:0 10px;font-size:13px;}
+    .hero-range-wrap{width:auto;flex:1;gap:6px;}
+    .hero-slide-count{min-width:42px;font-size:12px;}
+}
+
 /* ==========================================================
    WELCOME
 ========================================================== */
@@ -2472,43 +2533,91 @@ function(element){
 
 
 <script>
-/* トップ画像スライドショー：topimage1.png ～ topimage15.png のうち、存在する画像だけを順番に再生 */
+/* トップ画像スライドショー：最大15枚。存在する画像のみを使用し、操作パネルから手動操作も可能 */
 document.addEventListener("DOMContentLoaded", function () {
     const container = document.querySelector(".hero-image");
     if (!container) return;
 
     const imagePaths = Array.from({ length: 15 }, (_, index) => `topimage${index + 1}.png`);
-    const loadedSlides = [];
-
-    // ファイルが存在して正常に読み込めた画像だけをスライドショーに加える
-    Promise.all(imagePaths.map((src, index) => new Promise((resolve) => {
+    const resultsPromise = Promise.all(imagePaths.map((src, index) => new Promise((resolve) => {
         const image = new Image();
         image.className = "hero-slide";
         image.alt = `図書手帳の紹介画像 ${index + 1}`;
         image.onload = () => resolve({ image, index });
         image.onerror = () => resolve(null);
         image.src = src;
-    }))).then((results) => {
-        results.forEach((result) => {
-            if (result) loadedSlides.push(result);
+    })));
+
+    resultsPromise.then((results) => {
+        const slides = results.filter(Boolean).sort((a, b) => a.index - b.index);
+        slides.forEach(({ image }) => container.appendChild(image));
+        if (slides.length === 0) return;
+
+        let current = 0;
+        let playing = slides.length > 1;
+        let timer = null;
+        const intervalMs = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 8000 : 5000;
+
+        const controls = document.createElement("div");
+        controls.className = "hero-controls";
+        controls.setAttribute("role", "group");
+        controls.setAttribute("aria-label", "トップ画像の操作");
+        controls.innerHTML = `
+            <button type="button" class="hero-control-button hero-prev" aria-label="前の画像" title="前の画像">❮</button>
+            <div class="hero-range-wrap">
+                <input class="hero-range" type="range" min="1" max="${slides.length}" value="1" step="1" aria-label="表示する画像を選択">
+                <span class="hero-slide-count" aria-live="polite">1 / ${slides.length}</span>
+            </div>
+            <button type="button" class="hero-control-button hero-next" aria-label="次の画像" title="次の画像">❯</button>
+            <button type="button" class="hero-control-button hero-play" aria-label="スライドショーを停止">❚❚</button>
+        `;
+        container.insertAdjacentElement("afterend", controls);
+
+        const range = controls.querySelector(".hero-range");
+        const count = controls.querySelector(".hero-slide-count");
+        const playButton = controls.querySelector(".hero-play");
+
+        function showSlide(index) {
+            current = (index + slides.length) % slides.length;
+            slides.forEach(({ image }, i) => image.classList.toggle("active", i === current));
+            range.value = String(current + 1);
+            count.textContent = `${current + 1} / ${slides.length}`;
+        }
+        function stopTimer() {
+            if (timer !== null) window.clearInterval(timer);
+            timer = null;
+        }
+        function updatePlayButton() {
+            if (playing && slides.length > 1) {
+                playButton.textContent = "❚❚";
+                playButton.setAttribute("aria-label", "スライドショーを停止");
+            } else {
+                playButton.textContent = "▶";
+                playButton.setAttribute("aria-label", "スライドショーを再生");
+            }
+            playButton.disabled = slides.length < 2;
+            controls.querySelector(".hero-prev").disabled = slides.length < 2;
+            controls.querySelector(".hero-next").disabled = slides.length < 2;
+            range.disabled = slides.length < 2;
+        }
+        function startTimer() {
+            stopTimer();
+            if (!playing || slides.length < 2) return;
+            timer = window.setInterval(() => showSlide(current + 1), intervalMs);
+        }
+
+        controls.querySelector(".hero-prev").addEventListener("click", () => showSlide(current - 1));
+        controls.querySelector(".hero-next").addEventListener("click", () => showSlide(current + 1));
+        range.addEventListener("input", () => showSlide(Number(range.value) - 1));
+        playButton.addEventListener("click", () => {
+            playing = !playing;
+            updatePlayButton();
+            startTimer();
         });
-        loadedSlides.sort((a, b) => a.index - b.index);
 
-        loadedSlides.forEach(({ image }) => container.appendChild(image));
-        if (loadedSlides.length === 0) return;
-
-        let currentSlide = 0;
-        loadedSlides[0].image.classList.add("active");
-        if (loadedSlides.length < 2) return;
-
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const interval = reduceMotion ? 8000 : 5000;
-
-        window.setInterval(function () {
-            loadedSlides[currentSlide].image.classList.remove("active");
-            currentSlide = (currentSlide + 1) % loadedSlides.length;
-            loadedSlides[currentSlide].image.classList.add("active");
-        }, interval);
+        showSlide(0);
+        updatePlayButton();
+        startTimer();
     });
 });
 </script>
