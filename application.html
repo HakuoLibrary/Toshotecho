@@ -353,17 +353,25 @@ const DESIGNS=[
 const $=id=>document.getElementById(id);
 const menuBtn=$("menuBtn"),menu=$("menu"),overlay=$("overlay");
 
+
 /* ===== 受付番号 =====
-   英大文字・数字からランダムに６桁を生成します。
+   必ずTから始まる英大文字・数字６文字を生成します。
+   0、O、I、Lなどの見間違えやすい文字は除外します。
    同じ申し込みの送信リトライでは同じ番号を使用します。
 */
-const receptionChars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-let receptionNumber="";
+const receptionChars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+let receptionNumber = "";
+
 function generateReceptionNumber(){
-  const values=new Uint32Array(6);
+  const values = new Uint32Array(5);
   crypto.getRandomValues(values);
-  return Array.from(values,v=>receptionChars[v%receptionChars.length]).join("");
+
+  return "T" + Array.from(
+    values,
+    v => receptionChars[v % receptionChars.length]
+  ).join("");
 }
+
 function closeMenu(){menu.classList.remove("open");overlay.classList.remove("show");menuBtn.classList.remove("active")}
 menuBtn.addEventListener("click",()=>{const x=menu.classList.toggle("open");overlay.classList.toggle("show",x);menuBtn.classList.toggle("active",x)});
 overlay.addEventListener("click",closeMenu);
