@@ -624,6 +624,105 @@ footerSecret.addEventListener("click", () => {
 </script>
 
 
+<style>
+/* ダウンロードボタン */
+.download-btn {
+    display: inline-block;
+    padding: 9px 17px;
+    background: #b67832;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: 0.3s;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.download-btn:hover {
+    background: #8b5a2b;
+    transform: translateY(-2px);
+}
+
+/* カードの配置 */
+.tool {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 説明文などの領域 */
+.tool-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+    .tool {
+        flex-wrap: wrap;
+    }
+
+    .download-btn {
+        margin-left: auto;
+    }
+}
+</style>
+
+<script>
+document.querySelectorAll(".tool").forEach(tool => {
+
+    // 元のonclickからHTMLファイル名を取得
+    const onclickCode = tool.getAttribute("onclick");
+
+    if (!onclickCode) return;
+
+    const match = onclickCode.match(/openTool\(['"]([^'"]+)['"]\)/);
+
+    if (!match) return;
+
+    const fileName = match[1];
+
+    // 元のクリック動作を削除
+    tool.removeAttribute("onclick");
+
+    // 内容をまとめる
+    const content = document.createElement("div");
+    content.className = "tool-content";
+
+    while (tool.firstChild) {
+        content.appendChild(tool.firstChild);
+    }
+
+    tool.appendChild(content);
+
+    // コンテンツクリックでツールを開く
+    content.addEventListener("click", () => {
+        openTool(fileName);
+    });
+
+    // ダウンロードボタンを作成
+    const download = document.createElement("a");
+
+    download.href = fileName;
+    download.download = "";
+    download.className = "download-btn";
+    download.textContent = "↓ ダウンロード";
+
+    // カード全体のクリック動作と分離
+    download.addEventListener("click", event => {
+        event.stopPropagation();
+    });
+
+    tool.appendChild(download);
+
+});
+</script>
+
    
 </body>
 </html>
