@@ -2787,6 +2787,532 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+
+<!-- ==========================================================
+     廃止のお知らせモーダル
+========================================================== -->
+
+<div id="announcementOverlay" role="dialog"
+     aria-modal="true"
+     aria-labelledby="announcementTitle">
+
+    <div class="announcement-box">
+
+        <div class="announcement-header">
+            <span class="announcement-label">重要なお知らせ</span>
+
+            <h2 id="announcementTitle">
+                このホームページは廃止します
+            </h2>
+        </div>
+
+        <div class="announcement-scroll" id="announcementScroll">
+
+            <div class="announcement-content">
+
+                <p>
+                    いつも図書手帳公式ホームページをご利用いただき、
+                    誠にありがとうございます。
+                </p>
+
+                <p>
+                    このたび、諸般の事情により、
+                    図書手帳公式ホームページを廃止することとなりました。
+                </p>
+
+                <p>
+                    これまで多くの皆様に当ホームページをご利用いただき、
+                    運営一同、心より感謝申し上げます。
+                </p>
+
+                <h3>■ 廃止について</h3>
+
+                <p>
+                    図書手帳公式ホームページに関する全てのサービスを廃止いたします。
+                </p>
+
+                <p>
+                    このサイトは年末までに廃止いたします。
+                </p>
+
+                <h3>■ ご利用の皆様へ</h3>
+
+                <p>
+                    必要な情報がございましたら、
+                    お早めにご確認いただきますようお願いいたします。
+                </p>
+
+                <p>
+                    また、今後のご案内につきましては、
+                    別途お知らせする予定です。
+                </p>
+
+                <h3>■ 最後に</h3>
+
+                <p>
+                    これまで図書手帳公式ホームページを
+                    ご利用いただき、本当にありがとうございました。
+                </p>
+
+                <p>
+                    今後とも図書手帳をよろしくお願いいたします。
+                </p>
+
+
+
+                <!-- 長文の仮文章 -->
+
+
+                <p>
+                    皆様にはご不便をおかけいたしますが、
+                    何卒ご理解いただきますようお願い申し上げます。
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="announcement-footer">
+
+            <p id="announcementScrollMessage">
+                最後までお読みいただくと、閉じるボタンが表示されます。
+            </p>
+
+            <button type="button"
+                    id="announcementClose"
+                    disabled>
+                閉じる
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ==========================================================
+   お知らせ画面 全体
+========================================================== */
+
+#announcementOverlay {
+
+    position:fixed;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,.88);
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    z-index:99999;
+
+    opacity:1;
+    visibility:visible;
+
+    transition:
+    opacity .35s ease,
+    visibility .35s ease;
+
+}
+
+
+/* ==========================================================
+   お知らせボックス
+========================================================== */
+
+.announcement-box {
+
+    width:100%;
+    max-width:650px;
+
+    max-height:85vh;
+    max-height:85dvh;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 20px 70px rgba(0,0,0,.4);
+
+}
+
+
+/* ==========================================================
+   ヘッダー
+========================================================== */
+
+.announcement-header {
+
+    padding:25px 28px 20px;
+
+    background:#FFF8ED;
+
+    border-bottom:1px solid #E8D5BB;
+
+    flex-shrink:0;
+
+}
+
+.announcement-label {
+
+    display:inline-block;
+
+    padding:5px 13px;
+
+    background:#B67832;
+
+    color:white;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    margin-bottom:13px;
+
+}
+
+.announcement-header h2 {
+
+    color:#8B3E2F;
+
+    font-size:25px;
+
+    line-height:1.6;
+
+    font-weight:bold;
+
+}
+
+
+/* ==========================================================
+   スクロール部分
+========================================================== */
+
+.announcement-scroll {
+
+    flex:1;
+
+    min-height:0;
+
+    overflow-y:auto;
+
+    overscroll-behavior:contain;
+
+    padding:24px 28px;
+
+    -webkit-overflow-scrolling:touch;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:#B67832 #F3E9DC;
+
+}
+
+.announcement-content {
+
+    color:#444;
+
+    font-size:16px;
+
+    line-height:2;
+
+}
+
+.announcement-content p {
+
+    margin-bottom:22px;
+
+}
+
+.announcement-content h3 {
+
+    font-size:18px;
+
+    color:#8B5A2B;
+
+    margin:30px 0 15px;
+
+    padding-bottom:8px;
+
+    border-bottom:1px solid #E8D5BB;
+
+}
+
+
+/* ==========================================================
+   フッター・閉じるボタン
+========================================================== */
+
+.announcement-footer {
+
+    flex-shrink:0;
+
+    padding:16px 25px 22px;
+
+    background:#FFF8ED;
+
+    border-top:1px solid #E8D5BB;
+
+    text-align:center;
+
+}
+
+.announcement-footer p {
+
+    font-size:12px;
+
+    color:#888;
+
+    margin-bottom:12px;
+
+    line-height:1.6;
+
+}
+
+#announcementClose {
+
+    width:100%;
+
+    max-width:260px;
+
+    padding:14px 25px;
+
+    border:none;
+
+    border-radius:999px;
+
+    background:#B67832;
+
+    color:white;
+
+    font-family:inherit;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:
+    background .25s ease,
+    transform .25s ease,
+    opacity .25s ease;
+
+}
+
+#announcementClose:disabled {
+
+    background:#aaa;
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+}
+
+#announcementClose:not(:disabled):hover {
+
+    background:#8B5A2B;
+
+    transform:translateY(-2px);
+
+}
+
+
+/* ==========================================================
+   閉じた状態
+========================================================== */
+
+#announcementOverlay.hidden {
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+}
+
+
+/* ==========================================================
+   スマートフォン対応
+========================================================== */
+
+@media(max-width:600px) {
+
+    #announcementOverlay {
+
+        padding:12px;
+
+    }
+
+    .announcement-box {
+
+        max-height:90vh;
+        max-height:90dvh;
+
+        border-radius:15px;
+
+    }
+
+    .announcement-header {
+
+        padding:20px 19px 16px;
+
+    }
+
+    .announcement-header h2 {
+
+        font-size:21px;
+
+    }
+
+    .announcement-scroll {
+
+        padding:20px 19px;
+
+    }
+
+    .announcement-content {
+
+        font-size:15px;
+
+        line-height:1.95;
+
+    }
+
+    .announcement-footer {
+
+        padding:13px 16px 17px;
+
+    }
+
+}
+
+</style>
+
+
+<script>
+
+/* ==========================================================
+   お知らせ表示・スクロール制御
+========================================================== */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+    const overlay =
+    document.getElementById("announcementOverlay");
+
+    const scrollArea =
+    document.getElementById("announcementScroll");
+
+    const closeButton =
+    document.getElementById("announcementClose");
+
+    const message =
+    document.getElementById("announcementScrollMessage");
+
+
+    if(!overlay || !scrollArea || !closeButton) return;
+
+
+    // ページ表示時は必ずお知らせを表示
+    overlay.classList.remove("hidden");
+
+    document.body.style.overflow = "hidden";
+
+
+    // 初期状態では閉じるボタンを無効化
+    closeButton.disabled = true;
+
+
+    // 一番下までスクロールしたか確認
+    function checkScrollEnd(){
+
+        const isBottom =
+        scrollArea.scrollTop + scrollArea.clientHeight
+        >= scrollArea.scrollHeight - 5;
+
+
+        if(isBottom){
+
+            closeButton.disabled = false;
+
+            message.textContent =
+            "お知らせを最後までお読みいただきありがとうございます。";
+
+        }
+
+    }
+
+
+    scrollArea.addEventListener(
+        "scroll",
+        checkScrollEnd
+    );
+
+
+    // 最初から文章が短くスクロール不要の場合にも対応
+    setTimeout(checkScrollEnd,100);
+
+
+    // 画面サイズ変更時にも再確認
+    window.addEventListener(
+        "resize",
+        checkScrollEnd
+    );
+
+
+    // 閉じるボタン
+    closeButton.addEventListener("click",function(){
+
+        if(closeButton.disabled) return;
+
+        overlay.classList.add("hidden");
+
+        document.body.style.overflow = "";
+
+    });
+
+
+    // 表示中は背景への操作を防止
+    window.addEventListener("keydown",function(event){
+
+        if(
+            event.key === "Escape" &&
+            !overlay.classList.contains("hidden")
+        ){
+
+            event.preventDefault();
+
+        }
+
+    });
+
+});
+
+</script>
+
+
 </body>
 
 </html>
